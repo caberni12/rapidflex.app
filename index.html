@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar Sesión RapidFlex</title>
+  <link rel="stylesheet" href="estilos.css">
+  <link rel="stylesheet" href="estilos2.css">
+</head>
+<body>
+
+  <div id="loader" class="loader-overlay" style="display: none;">
+    <div class="loader-circle"></div>
+  </div>
+
+  <div class="login-container">
+    
+    <!-- Logo solo para login -->
+    
+<form onsubmit="event.preventDefault(); validar();">
+  <center><img class="logo-login" src="https://github.com/caberni12/rapidflexprueba/blob/5f5e8f6f857f38c0c61a9435c7e00434080f46bb/logo2.jpg?raw=true" alt="Logo" /></center>
+      <h2>Iniciar Sesión</h2>
+      <input type="text" id="usuario" placeholder="Usuario" required>
+      <input type="password" id="clave" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+      <div id="mensaje"></div>
+    </form>
+  </div>
+
+  <script src="login.js"></script>
+
+  <div id="envBannerFCSH" style="display:none;position:fixed;left:16px;bottom:16px;z-index:99999;background:#111;color:#fff;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);box-shadow:0 6px 16px rgba(0,0,0,.3);font-size:14px;">
+    <span>⚠ El servidor debe estar conectado a una red pública (o al menos Live Server) para poder operar con normalidad.</span>
+    <button id="envBannerClose" type="button" aria-label="Cerrar aviso" style="margin-left:10px;background:rgba(255,255,255,.12);border:none;padding:4px 8px;border-radius:8px;color:#fff;cursor:pointer;">✕</button>
+  </div>
+
+<script>
+function _loginBannerDetect(){
+  try{
+    if (location.protocol === "file:"){
+      var el = document.getElementById("envBannerFCSH");
+      if (el){ el.style.display = "inline-flex"; }
+      var closeBtn = document.getElementById("envBannerClose");
+      if (closeBtn){ closeBtn.onclick = function(){ el.style.display = "none"; }; }
+      var form = document.querySelector(".login-container form");
+      if (form){ form.querySelectorAll("input, button").forEach(function(n){ n.disabled = true; }); }
+      var msg = document.getElementById("mensaje");
+      if (msg){ msg.textContent = "Debe usar Live Server o un servidor público para iniciar sesión."; }
+    }
+  }catch(e){ console.warn("Login local check error:", e); }
+}
+document.addEventListener("DOMContentLoaded", _loginBannerDetect);
+</script>
+
+  <div id="envAlert" role="status" aria-live="polite">
+    <span class="icon">✔</span><span class="msg">Conectado a una red.</span>
+    <button class="close" type="button" aria-label="Cerrar">Cerrar</button>
+  </div>
+
+<script>
+function _loginModernAlert(){
+  try{
+    var box = document.getElementById('envAlert');
+    if(!box) return;
+    function show(type, text, autohide){
+      box.classList.remove('success','error','show');
+      box.classList.add(type === 'success' ? 'success' : 'error');
+      box.querySelector('.icon').textContent = type==='success' ? '✔' : '⛔';
+      box.querySelector('.msg').textContent = text || '';
+      box.style.display = 'inline-flex';
+      requestAnimationFrame(()=>{ box.classList.add('show'); });
+      var c = box.querySelector('.close');
+      if (c) c.onclick = function(){ box.classList.remove('show'); setTimeout(()=>{ box.style.display='none'; }, 200); };
+      if (autohide && type==='success') setTimeout(()=>{ try{ box.classList.remove('show'); setTimeout(()=>{ box.style.display='none'; }, 200);}catch(e){} }, autohide);
+    }
+    var isFile = location.protocol === 'file:';
+    if (isFile){
+      show('error', '⛔ Operación bloqueada: usa Live Server o un servidor público.', 0);
+      try{
+        var form = document.querySelector('.login-container form'); 
+        if (form) form.querySelectorAll('input,button').forEach(n=>n.disabled=true);
+      }catch(e){}
+    }else{
+      show('success','✔ Conexión exitosa a la red.', 5000);
+    }
+  }catch(e){}
+}
+document.addEventListener('DOMContentLoaded', _loginModernAlert);
+</script>
+</body>
+</html>

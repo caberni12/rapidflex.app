@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Usuarios</title>
+  <link rel="stylesheet" href="estilosusuarios.css" />
+</head>
+<body>
+  <div id="loader" class="loader-overlay">
+    <h3>Cargando Información...</h3>
+    <div class="loader"></div>
+  </div>
+
+  <div class="container">
+    <div class="logo-container">
+      <center>
+        </center>
+    </div>
+
+    <h2 style="text-align:center;">Gestión de Usuarios</h2>
+
+    <form id="formulario">
+      <input type="hidden" id="fila" />
+      <input type="text" id="usuario" placeholder="Usuario" required />
+      <input type="password" id="clave" placeholder="Clave" required />
+      <select id="acceso" required>
+        <option value="">Acceso</option>
+        <option value="true">true</option>
+        <option value="false">false</option>
+      </select>
+      <input type="text" id="nombre" placeholder="Nombre completo" required />
+      <select id="rol" required>
+        <option value="">Rol</option>
+        <option value="admin">Admin</option>
+        <option value="usuario">Usuario</option>
+      </select>
+
+      <div class="botones">
+        <button type="submit" class="btn-guardar">💾 Guardar</button>
+        <button type="button" onclick="cancelarEdicion()" class="btn-cancelar">❌ Cancelar</button>
+      </div>
+    </form>
+
+    <h3 style="text-align:center;">Lista de Usuarios</h3>
+    <div class="tabla-responsive">
+      <table id="tabla">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Clave</th>
+            <th>Acceso</th>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="scriptsusuarios.js"></script>
+  <script src="seguridad.js"></script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menu Principal RapidFlex</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="estilos2.css" />
+  <link rel="stylesheet" href="estilosdasboar.css" />
+
+  <!-- Librerías externas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+
+<!-- ANTI-DUP-MENUBTN -->
+<script>
+  (function(){
+    function pruneMenuBtns(){
+      const btns = document.querySelectorAll('.menu-btn');
+      for (let i = 1; i < btns.length; i++) btns[i].remove();
+    }
+    pruneMenuBtns();
+    document.addEventListener('DOMContentLoaded', pruneMenuBtns);
+    try{
+      const obs = new MutationObserver(pruneMenuBtns);
+      obs.observe(document.body, {childList:true, subtree:true});
+    }catch(e){}
+  })();
+  </script>
+  
+
+
+<body onload="verificarSesion(); cargarDashboard();">
+
+  <!-- Botón menú hamburguesa -->
+  <button class="menu-btn" type="button" onclick="toggleSlider()">☰</button>
+
+  <!-- Menú deslizable -->
+  <div id="slider" class="slider">
+    <div class="slider-content">
+      <h2>Menú</h2>
+      <div class="slider-buttons">
+<a href="#/dashboard">Inicio / Dashboard</a>
+  <a href="#/sistema">Registro Clientes</a>
+  <a href="#/sistema2">Registro Repartidor</a>
+  <a href="#/usuarios">Gestión de Usuarios</a>
+  <a href="#" onclick="alert('Accesos próximamente')">Integraciones</a>
+  <a href="#" onclick="cerrarSesion()" style="background: #e53935;">Cerrar Sesión</a>
+</div>
+    </div>
+  </div>
+
+  <!-- Contenido protegido -->
+  <div id="contenido" style="display: none;">
+    <div class="contenido" id="contenido-principal">
+      <div class="logo-container" style="text-align: center; margin-top: 20px;">
+        <img src="https://github.com/caberni12/rapidflexprueba/blob/5f5e8f6f857f38c0c61a9435c7e00434080f46bb/logo2.jpg?raw=true" alt="RapidFlex Logo" style="width:120px; height:120px;" />
+      </div>
+
+      <!-- INICIO DASHBOARD -->
+      <section style="margin-top: 40px; max-width: 1200px; margin-left: auto; margin-right: auto; display: flex; justify-content: space-around; gap: 40px; flex-wrap: wrap;">
+
+        <!-- Dashboard Clientes -->
+        <div style="flex: 1; min-width: 350px; text-align: center;">
+          <h2>Dashboard Estados Clientes</h2>
+          <div id="loadingClientes" style="font-weight:bold; margin-bottom: 10px;">Cargando datos...</div>
+          <canvas id="estadoChartClientes" style="max-width: 100%; height: 300px;"></canvas>
+          <div id="ultimosClientes" style="margin-top: 15px; font-size: 14px; color: #444;"></div>
+          <div id="totalesClientes" style="margin-top: 10px; font-weight: bold;"></div>
+          <button onclick="recargarDatosClientes()" style="margin-top: 15px; padding: 10px 20px; background-color: #007bff; border: none; color: white; font-size: 16px; cursor: pointer; border-radius: 5px;">
+            🔄 Recargar Clientes
+          </button>
+        </div>
+
+        <!-- Dashboard Repartidores -->
+        <div style="flex: 1; min-width: 350px; text-align: center;">
+          <h2>Dashboard Estados Repartidores</h2>
+          <div id="loadingRepartidores" style="font-weight:bold; margin-bottom: 10px;">Cargando datos...</div>
+          <canvas id="estadoChartRepartidores" style="max-width: 100%; height: 300px;"></canvas>
+          <div id="ultimosRepartidores" style="margin-top: 15px; font-size: 14px; color: #444;"></div>
+          <div id="totalesRepartidores" style="margin-top: 10px; font-weight: bold;"></div>
+          <button onclick="recargarDatosRepartidores()" style="margin-top: 15px; padding: 10px 20px; background-color: #28a745; border: none; color: white; font-size: 16px; cursor: pointer; border-radius: 5px;">
+            🔄 Recargar Repartidores
+          </button>
+        </div>
+
+        <!-- Dashboard Proyección Clientes -->
+        <div style="flex: 1; min-width: 350px; text-align: center;">
+          <h2>Proyección Clientes (Últimos 7 días + 3 días)</h2>
+          <div id="loadingProyeccionClientes" style="font-weight:bold; margin-bottom: 10px;">Cargando datos...</div>
+          <canvas id="proyeccionChartClientes" style="max-width: 100%; height: 300px;"></canvas>
+          <button onclick="recargarDatosProyeccionClientes()" style="margin-top: 15px; padding: 10px 20px; background-color: #ffc107; border: none; color: black; font-size: 16px; cursor: pointer; border-radius: 5px;">
+            🔄 Recargar Proyección
+          </button>
+        </div>
+
+      </section>
+      <!-- FIN DASHBOARD -->
+
+    </div>
+  </div>
+
+
+  <!-- Scripts -->
+  <script src="main.js"></script>
+  
+  <script src="app.js" defer></script>
+  <script src="seguridad.js"></script>
+
+
+<!-- Vista embebida por rutas (SPA Router) -->
+    <div id="routeView" style="display:none; width:100vw; margin:0; padding:0; position:relative; z-index:0;">
+      <iframe id="routeFrame" style="width:100%; height:1px; display:block; border:0; background:#fff;"
+              src=""
+              title="Vista embebida"></iframe>
+    </div>
+<!-- Aviso de entorno FCSH (solo cuando no es servidor público) -->
+    <div id="envBannerFCSH" style="display:none" aria-live="polite">
+      <span>⚠ El servidor debe estar conectado a una red pública para que puedo conectar.</span>
+      <button id="envBannerClose" type="button" aria-label="Cerrar aviso">✕</button>
+    </div>
+</body>
+</html>

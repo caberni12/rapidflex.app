@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
+body, .slider, .slider-content, .menu-btn, .logo-container {
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* --- LOGO --- */
+.logo-container {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.logo-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- MENÚ HAMBURGUESA --- */
+.menu-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  font-size: 24px;
+  background-color: #0a0a0a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  z-index: 1001;
+  transition: background-color 0.3s ease;
+}
+
+.menu-btn:hover {
+  background-color: #111111;
+}
+
+/* --- SLIDER --- */
+.slider {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-height: 0;
+  background-color: #333;
+  color: white;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.slider.open {
+  max-height: 240px;
+}
+
+.slider-content {
+  opacity: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: opacity 0.3s ease;
+}
+
+.slider.open .slider-content {
+  opacity: 1;
+}
+
+.slider-content h2 {
+  margin: 0;
+  font-size: 22px;
+  text-align: center;
+  border-bottom: 1px solid #777;
+  padding-bottom: 10px;
+  font-weight: 600;
+}
+
+/* --- CINTA DE BOTONES HORIZONTAL --- */
+.slider-buttons {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  gap: 10px;
+  padding-top: 10px;
+  scrollbar-width: thin;
+}
+
+.slider-buttons::-webkit-scrollbar {
+  height: 6px;
+}
+
+.slider-buttons::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.slider-buttons a {
+  white-space: nowrap;
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  background-color: #0c0c0c;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+
+.slider-buttons a:hover {
+  background-color: #0a0a0a;
+}
+
+
+
+/* === Modern Alerts (Success / Error) === */
+#envAlert{
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  border: 1px solid rgba(255,255,255,.08);
+  color: #fff;
+  z-index: 100000;
+  font: 500 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  transform: translateY(8px);
+  opacity: 0;
+  transition: opacity .2s ease, transform .2s ease;
+}
+#envAlert.show{ display: inline-flex; opacity: 1; transform: translateY(0); }
+#envAlert .icon{ font-size: 16px; opacity: .95; }
+#envAlert .msg{ letter-spacing:.2px }
+#envAlert .close{
+  all: unset;
+  padding: 2px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255,255,255,.14);
+  color: #fff;
+}
+#envAlert.success{ background: #145a32; } /* verde oscuro */
+#envAlert.error{ background: #7f1d1d; }   /* rojo vinotinto */
+
+
+
+/* === Logo solo en login === */
+.logo-login{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  margin-bottom: 14px; user-select:none;
+}
+.logo-login .mark{
+  width: 36px; height: 36px; border-radius: 10px;
+  display:grid; place-items:center;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color:#fff; font-weight:700; font-size:18px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+}
+.logo-login .brand{
+  font-weight:700; letter-spacing:.3px;
+}
+
+
+/* SLIDER_ZINDEX_FIX */
+.menu-btn{ z-index: 1002; }
+.slider{ z-index: 1001; }
+
+
+/* MENU BTN POINTER FIX */
+.menu-btn{ pointer-events: auto; z-index: 1002; }

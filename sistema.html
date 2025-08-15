@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sistema RapidFlex Clientes</title>
+<link href="estilossistema.css" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+<!-- Contenedor oculto por defecto -->
+<div id="contenido" style="display: none;">
+<div class="logo-container">
+<center>
+
+</center>
+</div>
+<h2>Registro Cliente RapidFlex</h2>
+<form id="formulario">
+<input id="fila" type="hidden"/>
+<input id="nombre" placeholder="Nombre" required="" type="text"/>
+<input id="email" placeholder="Email" required="" type="email"/>
+<input id="telefono" placeholder="Teléfono" required="" type="text"/>
+<textarea id="mensaje" placeholder="Mensaje"></textarea>
+<select id="status">
+<option value="Nuevo">Nuevo</option>
+<option value="En proceso">En proceso</option>
+<option value="Finalizado">Finalizado</option>
+</select>
+<div class="botones">
+<button class="btn-guardar" type="submit">💾 Guardar</button>
+<button class="btn-guardar" onclick="cancelarEdicion()" type="button">❌ Cancelar</button>
+
+
+</div>
+</form>
+
+
+<input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarTabla()">
+
+<button class="btn-recargar" onclick="obtenerDatos()">🔄 Recargar</button>
+<button class="btn-recargar" onclick="generarPDF()">📄 PDF</button>
+<button class="btn-recargar" onclick="exportarExcel()">📊 Excel</button>
+
+<table id="tabla">
+<!-- Loader Circular grande centrado -->
+<div class="loader-wrapper" id="loader">
+<div class="loader"></div>
+
+
+
+</div>
+<thead>
+<tr>
+<th>Fecha</th>
+<th>Nombre</th>
+<th>Email</th>
+<th>Teléfono</th>
+<th>Mensaje</th>
+<th>Status</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<!-- Asegúrate que el JS renderice la celda Status así:
+<td class='status-celda' data-status='Nuevo'>Nuevo</td> --><tbody></tbody>
+</table>
+</div>
+<script src="scriptsistema.js"></script>
+<script defer="" src="seguridad.js"></script>
+</body>
+</html>

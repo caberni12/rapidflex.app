@@ -1,0 +1,117 @@
+/* --- ESTILO GENERAL --- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+/* --- LOGIN CENTRADO --- */
+.login-container {
+  height: 100vh;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #0a0a0a, #0d0e0d);
+}
+
+form {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+}
+
+form h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #333;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #0f0f0f;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  background: linear-gradient(90deg, #070707, #0d0e0d);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #0d0e0d, #141414);
+  transform: scale(1.05);
+}
+
+#mensaje {
+  margin-top: 15px;
+  font-size: 14px;
+  color: red;
+  text-align: center;
+  min-height: 20px;
+}
+
+.logo-login {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+/* --- LOADER CIRCULAR --- */
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loader-circle {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #0f0f0f;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
