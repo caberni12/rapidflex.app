@@ -1,6 +1,47 @@
 // === CONFIG ===
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwsXshOze1AzVq4Q65VVOQBv1oOngYKBvtTTTjSoqjCzN_ew0ckUrjYrVGr0ikFXxAM/exec";
 
+// ==== Helpers: Banner moderno (#envAlert) ====
+function _ensureEnvAlert(){
+  let el = document.getElementById('envAlert');
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'envAlert';
+    el.setAttribute('role','status');
+    el.setAttribute('aria-live','polite');
+    el.innerHTML = `
+      <span class="icon">✔</span>
+      <span class="msg">Conexión exitosa.</span>
+      <button class="close" type="button" aria-label="Cerrar">Cerrar</button>
+    `;
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function _showEnvAlert(type, text, ttl = 6000){
+  const el = _ensureEnvAlert();
+  el.classList.remove('success','error','show');
+  el.classList.add(type === 'success' ? 'success' : 'error');
+  el.style.setProperty('--ttl', `${ttl}ms`);
+  const icon = el.querySelector('.icon');
+  const msg  = el.querySelector('.msg');
+  if (icon) icon.textContent = (type === 'success' ? '✔' : '⛔');
+  if (msg)  msg.textContent  = text || '';
+  el.style.display = 'inline-flex';
+  void el.offsetHeight; // reinicia animación
+  el.classList.add('show');
+  const closeBtn = el.querySelector('.close');
+  if (closeBtn){
+    closeBtn.onclick = () => { el.classList.remove('show'); setTimeout(()=>{ el.style.display='none'; }, 200); };
+  }
+  if (ttl > 0){
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => { el.style.display = 'none'; }, 200);
+    }, ttl);
+  }
+}
+
 // === SESIÓN ===
 async function verificarSesion() {
   try {
@@ -26,6 +67,15 @@ async function verificarSesion() {
     if (resultado.status === "OK") {
       const cont = document.getElementById("contenido");
       if (cont) cont.style.display = "block";
+
+      try{
+        if (resultado && resultado.nombre) {
+          _setUserName(resultado.nombre);
+          try{ localStorage.setItem('nombreUsuario', resultado.nombre); }catch(_){}
+        } else {
+          _setUserNameFromStorage();
+        }
+      }catch(e){ _setUserNameFromStorage(); }
     } else {
       localStorage.removeItem("sessionToken");
       window.location.href = "index.html";
@@ -36,22 +86,35 @@ async function verificarSesion() {
   }
 }
 
-function cerrarSesion() {
-  localStorage.removeItem("sessionToken");
-  window.location.href = "index.html";
+function cerrarSesion(ev) {
+  try { if (ev && ev.preventDefault) ev.preventDefault(); } catch(_) {}
+
+  // Limpia sesión y nombre mostrado en el header
+  try {
+    localStorage.removeItem("sessionToken");
+    localStorage.removeItem("nombreUsuario");
+  } catch(_){}
+
+  // Cierra el slider si estaba abierto
+  const slider = document.getElementById("slider");
+  if (slider) { slider.classList.remove("open"); slider.style.height = "0px"; }
+
+  // Alerta moderna de confirmación
+  _showEnvAlert('success', '🔒 Sesión cerrada correctamente', 1500);
+
+  // Redirige después de mostrar la alerta
+  setTimeout(() => { window.location.href = "index.html"; }, 1300);
 }
+
 
 // === UI: Slider ===
 function toggleSlider() {
   const slider = document.getElementById("slider");
   if (!slider) return;
   const isOpen = slider.classList.toggle("open");
-  // Control robusto por altura inline
-  if (isOpen) {
-    slider.style.height = slider.scrollHeight ? (slider.scrollHeight + "px") : "280px";
-  } else {
-    slider.style.height = "0px";
-  }
+  slider.style.height = isOpen
+    ? (slider.scrollHeight ? (slider.scrollHeight + "px") : "280px")
+    : "0px";
 }
 
 // Cierre por click fuera
@@ -75,6 +138,108 @@ window.addEventListener("resize", () => {
   }
 });
 
+// === Chips: Usuario e IP en el menú ===
+function _setUserName(name){
+  try{
+    const el = document.getElementById('usuarioNombre');
+    if (!el) return;
+    const txt = (name && String(name).trim()) ? String(name).trim() : 'Usuario';
+    el.textContent = '👤 ' + txt;
+  }catch(e){}
+}
+function _setUserNameFromStorage(){
+  try{
+    const keys = ['nombreUsuario','username','userName','usuario','nombre'];
+    for (let i=0;i<keys.length;i++){
+      const v = localStorage.getItem(keys[i]);
+      if (v && String(v).trim()){ _setUserName(v); return; }
+    }
+    _setUserName('Usuario');
+  }catch(e){ _setUserName('Usuario'); }
+}
+
+/* ======= IP pública + IP local (best-effort) ======= */
+// Multi-proveedor de IP pública (con cache busting)
+async function _fetchPublicIP(){
+  const endpoints = [
+    'https://api.ipify.org?format=json',
+    'https://api64.ipify.org?format=json',
+    'https://ifconfig.co/json',     // { ip: "..." }
+    'https://icanhazip.com'         // texto plano
+  ];
+  for (const base of endpoints){
+    try{
+      const url = base + (base.includes('?') ? '&' : '?') + 'v=' + Date.now();
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) continue;
+      const ct = (res.headers.get('content-type') || '').toLowerCase();
+      let ip = null;
+      if (ct.includes('application/json')){
+        const data = await res.json();
+        ip = data?.ip || data?.address || data?.query || null;
+      } else {
+        ip = (await res.text()).trim();
+      }
+      if (ip && (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip) || /^[a-f0-9:]+$/i.test(ip))){
+        return ip;
+      }
+    }catch(_){ /* probar siguiente */ }
+  }
+  return null;
+}
+
+// Intento de IP local privada vía WebRTC (puede estar oculto por privacidad)
+function _getPrivateLocalIPs(timeoutMs = 1500){
+  return new Promise((resolve) => {
+    try{
+      const ips = new Set();
+      const pc = new RTCPeerConnection({ iceServers: [] });
+      pc.createDataChannel('x');
+      pc.onicecandidate = (e) => {
+        if (!e || !e.candidate) return;
+        const cand = e.candidate.candidate || '';
+        const matches = cand.match(/(?:\d{1,3}\.){3}\d{1,3}|[a-f0-9:]+/gi);
+        if (matches) matches.forEach(ip => ips.add(ip));
+      };
+      pc.createOffer().then(of => pc.setLocalDescription(of));
+      setTimeout(() => {
+        try{ pc.close(); }catch(_){}
+        const priv = [...ips].filter(ip => /^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(ip));
+        resolve(priv);
+      }, timeoutMs);
+    }catch(_){
+      resolve([]);
+    }
+  });
+}
+
+// Mostrar IPs en el chip
+async function _setUserIP(){
+  const el = document.getElementById('userIP');
+  if(!el) return;
+
+  // Fallback inicial
+  const host = (location && location.hostname) ? location.hostname : 'desconocido';
+  el.textContent = '📶 Host: ' + host;
+  el.title = 'Hostname local (fallback)';
+
+  // IP pública
+  const publicIP = await _fetchPublicIP();
+  if (publicIP){
+    el.textContent = '📶 IP pública: ' + publicIP;
+    el.title = 'IP pública (saliente)';
+  }
+
+  // IP local privada (best-effort)
+  try{
+    const locals = await _getPrivateLocalIPs();
+    const privateIP = locals[0];
+    if (privateIP){
+      el.textContent += `  •  IP local: ${privateIP}`;
+      el.title += ' | IP local privada (best-effort, puede no estar disponible)';
+    }
+  }catch(_){}
+}
 
 // === IFRAME AUTO-RESIZE (single scroll) ===
 function _measureDocHeight(doc) {
@@ -87,14 +252,12 @@ function _measureDocHeight(doc) {
     );
   } catch { return 0; }
 }
-
 function _autoSizeIframe(frame) {
   if (!frame) return;
   try {
     const doc = frame.contentDocument || frame.contentWindow.document;
     if (!doc) return;
 
-    // Desactiva scroll interno del documento embebido
     try {
       doc.documentElement.style.overflow = "hidden";
       doc.body.style.overflow = "hidden";
@@ -102,15 +265,14 @@ function _autoSizeIframe(frame) {
 
     const resize = () => {
       const h = _measureDocHeight(doc);
-      if (h && Math.abs((parseInt(frame.style.height||"0",10)) - h) > 2) {
+      const cur = parseInt(frame.style.height||"0",10);
+      if (h && Math.abs(cur - h) > 2) {
         frame.style.height = h + "px";
       }
     };
 
-    // Primera medición
     resize();
 
-    // Observer para cambios en el DOM embebido
     if (frame._observer) { try { frame._observer.disconnect(); } catch {} }
     const observer = new MutationObserver(() => {
       if (frame._raf) cancelAnimationFrame(frame._raf);
@@ -119,13 +281,11 @@ function _autoSizeIframe(frame) {
     observer.observe(doc.documentElement, {subtree:true, childList:true, attributes:true, characterData:true});
     frame._observer = observer;
 
-    // Recalcular en cargas de recursos (imágenes, fuentes)
     doc.addEventListener("load", () => {
       if (frame._raf) cancelAnimationFrame(frame._raf);
       frame._raf = requestAnimationFrame(resize);
     }, true);
 
-    // Exponer función para resize global
     frame._forceResize = resize;
     setTimeout(resize, 120);
     setTimeout(resize, 400);
@@ -133,8 +293,6 @@ function _autoSizeIframe(frame) {
     console.warn("Auto-resize iframe falló:", err);
   }
 }
-
-// Recalcular en resize de ventana
 window.addEventListener("resize", () => {
   const f = document.getElementById("routeFrame");
   if (f && typeof f._forceResize === "function") f._forceResize();
@@ -147,18 +305,15 @@ function hideAllViews() {
   if (dash) dash.style.display = 'none';
   if (routeView) routeView.style.display = 'none';
 }
-
 function showDashboard() {
   hideAllViews();
   const dash = document.getElementById("contenido-principal");
   if (dash) dash.style.display = "block";
   if (typeof cargarDashboard === "function") {
-    try { cargarDashboard(); } catch (e) { /* noop */ }
+    try { cargarDashboard(); } catch (e) {}
   }
 }
-
 function loadFrame(url) {
-  // Evitar cargar main dentro del iframe
   if (/main\.html$/i.test(url)) { showDashboard(); return; }
   hideAllViews();
   const routeView = document.getElementById("routeView");
@@ -172,18 +327,15 @@ function loadFrame(url) {
     frame.src = finalUrl;
   }
 }
-
 const ROUTES = {
   "dashboard": () => showDashboard(),
   "sistema":   () => loadFrame("sistema.html"),
   "sistema2":  () => loadFrame("sistema2.html"),
   "usuarios":  () => loadFrame("usuarios.html"),
 };
-
 function onRouteChange() {
   const hash = (location.hash || "#/dashboard").replace(/^#\/?/, "");
   (ROUTES[hash] || ROUTES["dashboard"])();
-  // cerrar slider si estaba abierto
   const slider = document.getElementById("slider");
   if (slider && slider.classList.contains("open")) {
     slider.classList.remove("open");
@@ -203,75 +355,6 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-
-// === Entorno FCSH: mostrar aviso si NO es servidor público ===
-function _isPrivateHost(hostname){
-  if (!hostname) return true;
-  const h = hostname.toLowerCase();
-  // Orígenes locales/privados
-  if (h === "localhost" || h === "127.0.0.1") return true;
-  if (/^10\./.test(h)) return true;
-  if (/^192\.168\./.test(h)) return true;
-  if (/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h)) return true;
-  // Live Server host sin punto (ej: 127.0.0.1:5500 o hostname sin TLD)
-  if (!h.includes(".")) return true;
-  return false;
-}
-
-function _maybeShowFCSHBanner(){
-  try{
-    const info = _envInfo();
-    const el = document.getElementById("envBannerFCSH");
-    const closeBtn = document.getElementById("envBannerClose");
-    if (!el) return;
-
-    const setText = (txt, ok=false) => {
-      const span = el.querySelector("span");
-      if (span) span.textContent = txt;
-      el.classList.toggle("is-ok", !!ok);
-    };
-
-    // file:// => advertencia y cierre (ya hecho por _enforceServerRequirement)
-    if (info.mode === "file"){
-      setText("⚠ El servidor debe estar conectado a una red pública (o al menos Live Server) para poder operar con normalidad.", false);
-      el.style.display = "inline-flex";
-      if (closeBtn){
-        closeBtn.onclick = () => { el.style.display = "none"; };
-      }
-      return;
-    }
-
-    // private/public => mostrar SIEMPRE por 6s
-    setText("✔ El servidor informa que la conexion a la red fue exitosa", true);
-    el.style.display = "inline-flex";
-    if (closeBtn){
-      closeBtn.onclick = () => { el.style.display = "none"; };
-    }
-    setTimeout(() => { el.style.display = "none"; }, 6000);
-  }catch(e){ console.warn("FCSH banner error:", e); }
-}
-
-
-// === Requisito de servidor: cerrar sesión si se abre localmente (file://) ===
-function _enforceServerRequirement(){
-  try{
-    // Si se abre como archivo local, cerrar sesión y bloquear
-    if (location.protocol === "file:") {
-      // Mostrar banner si existe
-      const el = document.getElementById("envBannerFCSH");
-      if (el){
-        el.style.display = "inline-flex";
-        el.querySelector("span").textContent = "⚠ El servidor debe estar conectado a una red pública (o al menos Live Server) para poder operar con normalidad.";
-      }
-      // Cerrar sesión y volver al inicio
-      try { cerrarSesion(); } catch {}
-      return false;
-    }
-  }catch(e){ console.warn("Enforce server requirement error:", e); }
-  return true;
-}
-
-
 // === Info de entorno (file / private / public) ===
 function _envInfo(){
   try{
@@ -283,20 +366,46 @@ function _envInfo(){
       /^10\./.test(h) ||
       /^192\.168\./.test(h) ||
       /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h) ||
-      !h.includes(".") // host sin TLD (p.ej., live server)
+      !h.includes(".")
     );
     return { mode: isPrivate ? "private" : "public" };
   }catch{ return { mode: "unknown" }; }
 }
 
+// === Requisito de servidor: cerrar sesión si se abre localmente (file://) ===
+function _enforceServerRequirement(){
+  try{
+    if (location.protocol === "file:") {
+      _showEnvAlert('error', '⛔ Operación bloqueada: usa Live Server o un servidor público.', 0);
+      try { cerrarSesion(); } catch {}
+      return false;
+    }
+  }catch(e){ console.warn("Enforce server requirement error:", e); }
+  return true;
+}
+
+// === FCSH: mostrar alerta moderna (verde/roja) ===
+function _maybeShowFCSHBanner(){
+  try{
+    const info = _envInfo();
+    if (info.mode === "file"){
+      // ya lo maneja _enforceServerRequirement() con alerta roja persistente
+      return;
+    }
+    // private/public => mostrar SIEMPRE por 6s (verde)
+    _showEnvAlert('success', '✔ El servidor informa que la conexión a la red fue exitosa', 6000);
+  }catch(e){ console.warn("FCSH banner error:", e); }
+}
+
 // === Arranque ===
 window.addEventListener("DOMContentLoaded", () => {
   if(!_enforceServerRequirement()) return;
-  _maybeShowFCSHBanner();
-  _maybeShowFCSHBanner();
+  _maybeShowFCSHBanner(); // una sola vez
+
   // Slider cerrado al inicio
   const _sl = document.getElementById("slider");
   if (_sl) _sl.style.height = "0px";
+
   // Ocultar vista de iframe hasta enrutado
   const rv = document.getElementById('routeView');
   if (rv) rv.style.display = 'none';
@@ -307,20 +416,13 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 window.addEventListener("hashchange", onRouteChange);
 
-
-// Atajo Alt+B para mostrar el banner
+// Atajo Alt+B: mostrar alerta de prueba (verde, 3s)
 document.addEventListener("keydown", (e) => {
   if (e.altKey && (e.key || "").toLowerCase() === "b") {
-    const el = document.getElementById("envBannerFCSH");
-    if (el){ el.style.display = "inline-flex"; }
+    _showEnvAlert('success', '🔔 Alerta de prueba', 3000);
   }
 });
 
-// Si la URL contiene #/show-banner, mostrarlo
-if (String(location.hash).includes("show-banner")) {
-  window.addEventListener("DOMContentLoaded", () => {
-    const el = document.getElementById("envBannerFCSH");
-    if (el){ el.style.display = "inline-flex"; }
-  });
-}
-
+// Chips al cargar
+document.addEventListener("DOMContentLoaded", _setUserIP);
+document.addEventListener("DOMContentLoaded", _setUserNameFromStorage);

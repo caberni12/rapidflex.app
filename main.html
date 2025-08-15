@@ -40,14 +40,15 @@
   <!-- Menú deslizable -->
   <div id="slider" class="slider">
     <div class="slider-content">
-      <h2>Menú</h2>
+      <h2 class="menu-title">Menú <span id="usuarioNombre" class="pill">Cargando usuario…</span> <span id="userIP" class="pill muted" title="IP actual">Cargando IP…</span></h2>
       <div class="slider-buttons">
 <a href="#/dashboard">Inicio / Dashboard</a>
   <a href="#/sistema">Registro Clientes</a>
   <a href="#/sistema2">Registro Repartidor</a>
   <a href="#/usuarios">Gestión de Usuarios</a>
   <a href="#" onclick="alert('Accesos próximamente')">Integraciones</a>
-  <a href="#" onclick="cerrarSesion()" style="background: #e53935;">Cerrar Sesión</a>
+  <a href="#" onclick="cerrarSesion(event)" style="background:#e53935;">Cerrar Sesión</a>
+
 </div>
     </div>
   </div>
@@ -56,7 +57,7 @@
   <div id="contenido" style="display: none;">
     <div class="contenido" id="contenido-principal">
       <div class="logo-container" style="text-align: center; margin-top: 20px;">
-        <img src="https://github.com/caberni12/rapidflexprueba/blob/5f5e8f6f857f38c0c61a9435c7e00434080f46bb/logo2.jpg?raw=true" alt="RapidFlex Logo" style="width:120px; height:120px;" />
+       
       </div>
 
       <!-- INICIO DASHBOARD -->
