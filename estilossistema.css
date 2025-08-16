@@ -1,324 +1,235 @@
-/* --- BASE GENERAL --- */
-body {
+/* --- BASE GENERAL (igual) --- */
+body{
   font-family: Arial, sans-serif;
-  background: #ffffff;
-  padding: 5px 20px 20px 20px;
-  margin: 0;
-  position: relative;
+  background:#ffffff;
+  padding:5px 20px 20px 20px;
+  margin:0;
+  position:relative;
+}
+.logo-container{ text-align:center; margin-bottom:5px; }
+.logo-container img{ max-width:100%; height:auto; }
+
+/* --- FORMULARIO (igual) --- */
+form{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:16px;
+  background:#080808;
+  padding:10px;
+  border-radius:10px;
+  margin:0 auto 20px auto;
+  width:98%;
+  max-width:100%;
+  box-sizing:border-box;
+  margin-top:-14%;
+  position:fixed;
+}
+input, textarea, select{
+  padding:10px; font-size:16px; width:100%; max-width:100%;
+  border:1px solid #ccc; border-radius:6px; box-sizing:border-box; background:#fff;
+  margin-bottom:10px;
+}
+input.nombre{ font-size:14px; padding:8px; }
+textarea{ grid-column:span 2; height:80px; resize:vertical; }
+input.busqueda, input[type="search"]{
+  max-width:300px; width:100%; padding:10px; font-size:16px;
+  border:1px solid #ccc; border-radius:6px; background:#fff; box-sizing:border-box;
 }
 
-.logo-container {
-  text-align: center;
-  margin-bottom: 5px;
+/* --- BOTONES (igual) --- */
+.botones{
+  grid-column:span 2; display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-start;
+}
+button{
+  padding:10px 16px; font-size:14px; cursor:pointer; border:none; border-radius:6px;
+  min-width:120px; flex:1 1 auto; max-width:200px;
+}
+.btn-guardar{ background:#28a745; color:#fff; }
+.btn-cancelar{ background:#dc3545; color:#fff; }
+.btn-recargar{ margin-bottom:12px; background:#007bff; color:#fff; }
+
+/* ==========================================================
+   TABLA: compatible con TU HTML (table sin contenedor)
+   - Scroll H/V y scrollbar personalizado en la propia tabla
+   - Fondo negro forzado (texto blanco)
+   - Funciona aunque el loader esté dentro del <table>
+   ========================================================== */
+
+/* La tabla se comporta como bloque con scroll propio */
+#tabla{
+  display:block;                 /* permite overflow */
+  overflow:auto;                 /* H/V scroll en la tabla misma */
+  -webkit-overflow-scrolling:touch;
+  width:max-content;             /* crece según contenido */
+  min-width:100%;                /* nunca más angosta que el viewport */
+  border-collapse:collapse;
+  background:transparent;
+  color:#faf9f9;
+  margin:0;
+  border-radius:8px;
+  font-size:14px;
+  white-space:nowrap;            /* evita saltos -> genera ancho real */
+  table-layout:auto;
 }
 
-.logo-container img {
-  max-width: 100%;
-  height: auto;
+/* Cabeceras y celdas */
+#tabla th, #tabla td{
+  border:1px solid #049afdcc;
+  padding:10px;
+  text-align:center;
+}
+#tabla th{ background:#049afdcc; color:#fff; }
+
+/* Filtros en thead (si los usas) */
+#tabla thead tr.filtros th{
+  padding:4px 5px; background:#f9f9f9; color:#000; white-space:nowrap;
+}
+#tabla thead tr.filtros th input,
+#tabla thead tr.filtros th select{
+  width:100%; padding:4px; font-size:0.9em; box-sizing:border-box;
 }
 
-/* --- FORMULARIO --- */
-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  background: #080808;
-  padding: 10px;
-  border-radius: 10px;
-  margin: 0 auto 20px auto;
-  width: 98%;
-  max-width: 100%;
-  box-sizing: border-box;
-  margin-top: -14%;
-  position: fixed;
+/* Botones dentro de la tabla */
+#tabla td button{
+  padding:6px 10px; font-size:14px; border:none; border-radius:4px;
+  background:#ffffff; color:#ffffff; cursor:pointer; margin:4px;
 }
 
-/* CAMPOS */
-input,
-textarea,
-select {
-  padding: 10px;
-  font-size: 16px;
-  width: 100%;
-  max-width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  background-color: #fff;
-  margin-bottom: 10px;
+/* Scrollbar personalizado en la tabla */
+#tabla::-webkit-scrollbar{
+  height:8px;  /* horizontal */
+  width:8px;   /* vertical (si aparece) */
+  background:#222;
+}
+#tabla::-webkit-scrollbar-thumb{
+  background:#049afd; border-radius:4px;
+}
+/* Firefox */
+#tabla{ scrollbar-color:#049afd #222; scrollbar-width:thin; }
+
+/* Fuerza fondo negro en celdas (excepto status) y texto blanco */
+#tabla tbody td:not(.status-celda){
+  background:#0c0c0c !important;
+  color:#faf9f9 !important;
 }
 
-input.nombre {
-  font-size: 14px;
-  padding: 8px;
+/* Colores por status */
+#tabla td.status-celda[data-status="Nuevo"]{ background:#28a745 !important; color:#fff; font-weight:bold; }
+#tabla td.status-celda[data-status="En proceso"]{ background:#ffc107 !important; color:#000; font-weight:bold; }
+#tabla td.status-celda[data-status="Finalizado"]{ background:#ff0000 !important; color:#fff; font-weight:bold; }
+
+/* ===== Loader dentro del table: que siga funcionando ===== */
+#tabla .loader-wrapper{
+  position:fixed;   /* cubre toda la pantalla aunque esté dentro de la tabla */
+  inset:0;
+  z-index:9999;
+  background:rgba(0,0,0,0.7);
 }
-
-textarea {
-  grid-column: span 2;
-  height: 80px;
-  resize: vertical;
+.loader{
+  border:12px solid #141414; border-top:12px solid #f8f4f4; border-radius:50%;
+  width:200px; height:200px; aspect-ratio:1/1; animation:spin 1s linear infinite;
+  box-shadow:inset 0 0 10px #080808, 0 0 15px #080808;
+  position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
 }
-
-input.busqueda,
-input[type="search"] {
-  max-width: 300px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #fff;
+.loader-text{
+  position:absolute; top:calc(50% + 120px); left:50%; transform:translateX(-50%);
+  color:#fff; font-size:20px; text-align:center;
 }
+.loader-wrapper.hidden{ display:none; }
+@keyframes spin{ 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
 
-/* BOTONES */
-.botones {
-  grid-column: span 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-start;
-}
-
-button {
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  min-width: 120px;
-  flex: 1 1 auto;
-  max-width: 200px;
-}
-
-.btn-guardar { background-color: #28a745; color: white; }
-.btn-cancelar { background-color: #dc3545; color: white; }
-.btn-recargar { margin-bottom: 12px; background-color: #007bff; color: white; }
-
-/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO --- */
-.tabla-responsive,
-#tabla-wrapper {
-  background: #0c0c0c !important;
-  border-radius: 8px;
-  width: 100% !important;
-  overflow-x: auto !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain !important;
-  padding: 0 !important;
-  margin: 0 auto 20px auto;
-  box-sizing: border-box;
-}
-
-/* TABLA */
-#tabla {
-  width: 100%;
-  border-collapse: collapse;
-  background: transparent;
-  color: #faf9f9;
-  margin: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  font-size: 14px;
-}
-
-th,
-td {
-  border: 1px solid #049afdcc;
-  padding: 10px;
-  text-align: center;
-}
-
-th { background: #049afdcc; }
-
-thead tr.filtros th {
-  padding: 4px 5px;
-  background-color: #f9f9f9;
-}
-
-thead tr.filtros th input,
-thead tr.filtros th select {
-  width: 100%;
-  padding: 4px;
-  font-size: 0.9em;
-  box-sizing: border-box;
-}
-
-td button {
-  padding: 6px 10px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  background-color: #ffffff;
-  color: white;
-  cursor: pointer;
-  margin: 4px;
-}
-
-/* ENLACES */
-.telefono-link {
-  color: blue;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* USUARIO */
-.usuario-nombre {
-  color: #007bff;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-align: right;
-}
-
-/* --- LOADER SOBRE TODO EL BODY --- */
-.loader-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.loader {
-  border: 12px solid #141414;
-  border-top: 12px solid #f8f4f4;
-  border-radius: 50%;
-  width: 200px;
-  height: 200px;
-  aspect-ratio: 1/1;
-  animation: spin 1s linear infinite;
-  box-shadow: inset 0 0 10px #080808, 0 0 15px #080808;
-  margin-top: 17%;
-  margin-left: 42%;
-  box-sizing: border-box;
-}
-
-.loader-text {
-  position: absolute;
-  top: calc(35% + 110px);
-  left: 49%;
-  transform: translateX(-50%);
-  color: #fff;
-  font-size: 20px;
-  text-align: center;
-}
-
-.loader-wrapper.hidden { display: none; }
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* --- VERSION MÓVIL FLUIDA --- */
-@media (max-width: 768px) {
-  form {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    padding: 15px;
-    gap: 12px;
-  }
-
-  .botones { justify-content: center; }
-
-  button {
-    font-size: 15px;
-    min-width: 140px;
-    max-width: 100%;
-  }
-
-  .usuario-nombre { text-align: center; font-size: 14px; }
-
-  #tabla { font-size: 13px; }
-
-  td button {
-    font-size: 14px;
-    padding: 8px 10px;
-    width: auto;
-  }
-
-  .loader {
-    width: 70px;
-    height: 70px;
-    aspect-ratio: 1/1;
-    border-width: 6px;
-  }
-
-  .loader-text {
-    font-size: 14px;
-    top: calc(17% + 90px);
-  }
-}
-
-/* Colores aplicados directamente por el atributo data-status */
-td.status-celda[data-status="Nuevo"] { background-color: #28a745 !important; color: white; font-weight: bold; }
-td.status-celda[data-status="En proceso"] { background-color: #ffc107 !important; color: black; font-weight: bold; }
-td.status-celda[data-status="Finalizado"] { background-color: #ff0000 !important; color: white; font-weight: bold; }
-
-/* === Contenedor de acciones === */
+/* ===== Acciones/Buscador (igual a tu estilo) ===== */
 #contenido .acciones{
-  width: 100%;
-  max-width: 100%;
-  margin: clamp(8px, 1.5vh, 16px) auto clamp(8px, 1.5vh, 12px);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
+  width:100%; max-width:100%;
+  margin:clamp(8px, 1.5vh, 16px) auto clamp(8px, 1.5vh, 12px);
+  display:flex; flex-wrap:wrap; gap:12px; align-items:center;
 }
-
-/* El buscador al mismo ancho de la tabla */
 #contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
-  margin: 8px auto clamp(12px, 2vh, 18px);
-  padding: 10px 12px;
-  box-sizing: border-box;
+  display:block; width:100%; max-width:none;
+  margin:8px auto clamp(12px, 2vh, 18px);
+  padding:10px 12px; box-sizing:border-box;
 }
 
-/* Ajuste de tamaño */
+/* ===== Contenedor principal (igual) ===== */
 #contenido{
-  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: clamp(12px, 2vw, 24px);
-  padding-right: clamp(12px, 2vw, 24px);
+  width:min(1200px, 100% - clamp(32px, 8vw, 120px));
+  margin-left:auto; margin-right:auto;
+  padding-left:clamp(12px, 2vw, 24px);
+  padding-right:clamp(12px, 2vw, 24px);
 }
-#contenido > h2{ margin-left: 0; margin-right: 0; }
-
+#contenido > h2{ margin-left:0; margin-right:0; }
 #contenido > .logo-container,
 #contenido > h2,
 #contenido > #formulario,
-#contenido > #buscador {
-  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: clamp(12px, 2vw, 24px);
-  padding-right: clamp(12px, 2vw, 24px);
+#contenido > #buscador{
+  width:min(1200px, 100% - clamp(32px, 8vw, 120px));
+  margin-left:auto; margin-right:auto;
+  padding-left:clamp(12px, 2vw, 24px);
+  padding-right:clamp(12px, 2vw, 24px);
+}
+#formulario{ margin-bottom:clamp(16px, 4vh, 48px); }
+#buscador{ display:block; width:100%; max-width:none; margin:8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
+.btn-recargar{ margin-top:8px; }
+#tabla{ margin-top:clamp(16px, 4vh, 40px); border-radius:12px; }
+
+/* === Evitar solape del formulario fijo (como tenías) === */
+#formulario, #contenido form{
+  position:static !important; top:auto !important;
+  margin-top:clamp(8px, 2vh, 20px) !important;
 }
 
-/* Aire adicional arriba de la tabla */
-#formulario{ margin-bottom: clamp(16px, 4vh, 48px); }
-#buscador{ display:block; width:100%; max-width:none; margin: 8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
-.btn-recargar{ margin-top: 8px; }
-#tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
+/* --- RESPONSIVE --- */
+@media (max-width:1024px){
+  html, body{ overflow-x:hidden !important; touch-action:pan-y !important; }
 
-/* === FIX overlap === */
-#formulario,
-#contenido form{
-  position: static !important;
-  top: auto !important;
-  margin-top: clamp(8px, 2vh, 20px) !important;
+  #contenido{
+    width:100%;
+    padding-left:clamp(6px, 2.5vw, 12px) !important;
+    padding-right:clamp(14px, 5.5vw, 24px) !important;
+    margin-left:0 !important; background:#fff !important;
+    box-shadow:none !important; filter:none !important;
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+  }
+
+  #formulario, #contenido form, form{
+    position:static !important; top:auto !important;
+    margin:12px auto 16px !important; width:100% !important; max-width:100% !important;
+    display:grid; grid-template-columns:1fr !important; gap:12px !important;
+    padding-left:clamp(8px, 3vw, 14px) !important;
+    padding-right:clamp(12px, 4vw, 18px) !important;
+    box-sizing:border-box;
+  }
+
+  input, textarea, select{
+    font-size:16px !important; padding:12px !important;
+    width:calc(100% - 8px) !important; max-width:calc(100% - 8px) !important;
+    margin-left:0 !important; margin-right:0 !important;
+  }
+
+  .botones{
+    grid-column:1 / -1 !important; display:grid !important;
+    grid-template-columns:1fr !important; gap:8px !important; justify-items:start !important;
+  }
+  .botones button{
+    width:auto !important; min-width:140px !important; max-width:100% !important;
+    min-height:44px !important; font-size:15px !important;
+  }
+
+  #tabla td button{
+    display:block !important; width:auto !important; min-width:120px !important;
+    max-width:100% !important; min-height:40px !important; margin:4px 0 !important;
+  }
+
+  #contenido #buscador{
+    width:100% !important; margin:8px 0 12px !important; padding:10px 12px !important; max-width:none !important;
+  }
+
+  /* Mantén el comportamiento horizontal en móvil */
+  #tabla{ white-space:nowrap; min-width:760px; }
 }
 
-/* Mobile & Tablet Overrides */
-@media (max-width: 1024px) {
-  html, body { overflow-x: hidden !important; touch-action: pan-y !important; }
-  #contenido { width: 100%; padding-left: clamp(6px, 2.5vw, 12px) !important; padding-right: clamp(14px, 5.5vw, 24px) !important; margin-left: 0 !important; background-color: #fff !important; }
-  #formulario, #contenido form, form { position: static !important; margin: 12px auto 16px !important; width: 100% !important; display: grid; grid-template-columns: 1fr !important; gap: 12px !important; }
-  .botones { grid-column: 1 / -1 !important; display: grid !important; grid-template-columns: 1fr !important; gap: 8px !important; }
-  .botones button { min-width: 140px !important; font-size: 15px !important; }
-  #tabla td button { display: block !important; min-width: 120px !important; margin: 4px 0 !important; }
-  #contenido #buscador { width: 100% !important; margin: 8px 0 12px !important; padding: 10px 12px !important; }
+/* Teléfonos */
+@media (max-width:600px){
+  #tabla{ font-size:12.5px !important; }
+  textarea{ height:72px !important; }
 }
