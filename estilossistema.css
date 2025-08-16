@@ -1,464 +1,114 @@
-/* --- BASE GENERAL --- */
+
+/* ==========================================================
+   SISTEMA — IGUAL A CSS ENTREGADO (mapeado a selectores Sistema)
+   - body            -> body
+   - .container      -> #contenido
+   - form            -> #formulario
+   - .tabla-responsive/#tabla-wrapper -> los mismos
+   - table           -> #tabla y tablas dentro de wrappers de Sistema
+   ========================================================== */
+
 body {
   font-family: Arial, sans-serif;
-  background: #f3f3f3;
-  padding: 5px 20px 20px 20px;
   margin: 0;
-  position: relative;
+  padding: 0;
+  background-color: #f3f3f3;
+}
+
+#contenido {
+  max-width: 1300px;
+  margin: auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+#formulario {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  background-color: #131212;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 40px;
+  color: white;
+}
+
+#formulario input, #formulario select {
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #0f0f0f;
+  border-radius: 6px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.botones {
+  display: flex;
+  gap: 10px;
+  grid-column: span 2;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-guardar {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background-color: #45a049;
+}
+
+.btn-cancelar {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-cancelar:hover {
+  background-color: #d32f2f;
 }
 
 .logo-container {
   text-align: center;
-  margin-bottom: 5px;
-}
-
-.logo-container img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* --- FORMULARIO --- */
-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  background: #080808;
-  padding: 10px;
-  border-radius: 10px;
-  margin: 0 auto 20px auto;
-  width: 98%;
-  max-width: 100%;
-  box-sizing: border-box;
-  margin-top: -14%;
-  position: fixed;
-}
-
-
-/* CAMPOS */
-input,
-textarea,
-select {
-  padding: 10px;
-  font-size: 16px;
-  width: 100%;
-  max-width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-sizing: border-box;
-  background-color: #fff;
   margin-bottom: 10px;
 }
 
-input.nombre {
-  font-size: 14px;
-  padding: 8px;
+@media screen and (max-width: 600px) {
+  #formulario {
+    grid-template-columns: 1fr;
+  }
 }
 
-textarea {
-  grid-column: span 2;
-  height: 80px;
-  resize: vertical;
-}
-
-input.busqueda,
-input[type="search"] {
-  max-width: 300px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #fff;
-}
-
-/* BOTONES */
-.botones {
-  grid-column: span 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-start;
-}
-
-button {
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  min-width: 120px;
-  flex: 1 1 auto;
-  max-width: 200px;
-}
-
-.btn-guardar {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-cancelar {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-recargar {
-  margin-bottom: 12px;
-  background-color: #007bff;
-  color: white;
-}
-
-/* TABLA */
-#tabla {
-  width: 100%;
-  border-collapse: collapse;
-  background: #0c0c0c;
-  color: #faf9f9;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  overflow: hidden;
-  font-size: 14px;
-}
-
-th,
-td {
-  border: 1px solid #049afdcc;
-  padding: 10px;
-  text-align: center;
-}
-
-th {
-  background: #049afdcc;
-}
-
-thead tr.filtros th {
-  padding: 4px 5px;
-  background-color: #f9f9f9;
-}
-
-thead tr.filtros th input,
-thead tr.filtros th select {
-  width: 100%;
-  padding: 4px;
-  font-size: 0.9em;
-  box-sizing: border-box;
-}
-
-td button {
-  padding: 6px 10px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  background-color: #ffffff;
-  color: white;
-  cursor: pointer;
-  margin: 4px;
-}
-
-/* ENLACES */
-.telefono-link {
-  color: blue;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-/* USUARIO */
-.usuario-nombre {
-  color: #007bff;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-align: right;
-}
-
-/* --- LOADER SOBRE TODO EL BODY (MODIFICADO) --- */
-.loader-wrapper {
+.loader-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 9999;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.loader {
-  border: 12px solid #141414;
-  border-top: 12px solid #f8f4f4;
-  border-radius: 50%;
-  width: 200px;
-  height: 200px;
-  animation: spin 1s linear infinite;
-  box-shadow: inset 0 0 10px #080808, 0 0 15px #080808;
-  margin-top: 17%;
-  margin-left: 42%;
-}
-
-.loader-text {
-  position: absolute;
-  top: calc(35% + 110px);
-  left: 49%;
-  transform: translateX(-50%);
-  color: #fff;
-  font-size: 20px;
-  text-align: center;
-}
-
-.loader-wrapper.hidden {
-  display: none;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* --- VERSION MÓVIL FLUIDA --- */
-@media (max-width: 768px) {
-  form {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    padding: 15px;
-    gap: 12px;
-  }
-
-  .botones {
-    justify-content: center;
-  }
-
-  button {
-    font-size: 15px;
-    min-width: 140px;
-    max-width: 100%;
-  }
-
-  .usuario-nombre {
-    text-align: center;
-    font-size: 14px;
-  }
-
-  #tabla {
-    font-size: 13px;
-  }
-
-  td button {
-    font-size: 14px;
-    padding: 8px 10px;
-    width: auto;
-  }
-
-  .loader {
-    width: 70px;
-    height: 70px;
-    border-width: 6px;
-  }
-
-  .loader-text {
-    font-size: 14px;
-    top: calc(17% + 90px);
-  }
-}
-/* Colores aplicados directamente por el atributo data-status */
-td.status-celda[data-status="Nuevo"] {
-  background-color: #28a745 !important;
-  color: white;
-  font-weight: bold;
-}
-
-td.status-celda[data-status="En proceso"] {
-  background-color: #ffc107 !important;
-  color: black;
-  font-weight: bold;
-}
-
-td.status-celda[data-status="Finalizado"] {
-  background-color: #ff0000 !important;
-  color: white;
-  font-weight: bold;
-}
-
-
-/* === Contenedor de acciones (3 botones azules) alineado con la tabla === */
-#contenido .acciones{
-  width: 100%;
-  max-width: 100%;
-  margin: clamp(8px, 1.5vh, 16px) auto clamp(8px, 1.5vh, 12px);
+  background-color: rgba(255, 255, 255, 0.8);
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-}
-
-/* El buscador al mismo ancho de la tabla (línea completa) */
-#contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
-  margin: 8px auto clamp(12px, 2vh, 18px);
-  padding: 10px 12px;
-  box-sizing: border-box;
-}
-
-/* === Ajuste de tamaño para Sistema 1 y 2: contenedor más angosto y centrado === */
-#contenido{
-  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: clamp(12px, 2vw, 24px);
-  padding-right: clamp(12px, 2vw, 24px);
-}
-#contenido > h2{ margin-left: 0; margin-right: 0; }
-
-/* === Igualar ancho del bloque superior al de la tabla === */
-#contenido > .logo-container,
-#contenido > h2,
-#contenido > #formulario,
-#contenido > #buscador {
-  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: clamp(12px, 2vw, 24px);
-  padding-right: clamp(12px, 2vw, 24px);
-}
-
-/* === Aire adicional arriba de la TABLA y separación de controles === */
-#formulario{ margin-bottom: clamp(16px, 4vh, 48px); }
-#buscador{ display:block; width:100%; max-width:none; margin: 8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
-.btn-recargar{ margin-top: 8px; }
-#tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
-
-
-
-/* === Empujar más abajo el bloque de ACCIONES (3 botones azules) para que no quede oculto por el panel superior === */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;  /* más aire arriba */
-  margin-bottom: clamp(10px, 2vh, 18px);
-}
-
-/* Aseguramos que el buscador quede inmediatamente debajo, a ancho de tabla */
-#contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
-  margin-top: clamp(12px, 2.5vh, 24px);
-}
-
-
-
-/* === FIX OVERLAP: el formulario superior NO debe ser fixed ni con margen negativo === */
-#formulario,
-#contenido form{
-  position: static !important;
-  top: auto !important;
-  margin-top: clamp(8px, 2vh, 20px) !important;
-}
-
-/* Asegurar que el bloque de ACCIONES quede bajo el panel superior */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;
-}
-
-
-
-/* =================================================================
-   🔁 SISTEMA = ESTILO EXACTO DEL USUARIO (mapeado a selectores)
-   - #contenido  -> .container
-   - #formulario -> form
-   - #tabla-wrapper/.tabla-responsive y #tabla/table
-   ================================================================= */
-
-/* Base generales */
-body {
-  font-family: Arial, sans-serif !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  background-color: #f3f3f3 !important;
-}
-
-/* Container */
-#contenido {
-  max-width: 1300px !important;
-  margin: auto !important;
-  padding: 20px !important;
-  background-color: #ffffff !important;
-  border-radius: 10px !important;
-}
-
-/* Formulario */
-#formulario {
-  display: grid !important;
-  gap: 24px !important;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
-  background-color: #131212 !important;
-  padding: 20px !important;
-  border-radius: 10px !important;
-  margin-bottom: 40px !important;
-  color: white !important;
-}
-
-/* Campos */
-#formulario input,
-#formulario select {
-  padding: 12px !important;
-  font-size: 15px !important;
-  border: 1px solid #0f0f0f !important;
-  border-radius: 6px !important;
-  width: 100% !important;
-  margin-bottom: 10px !important;
-  box-sizing: border-box !important;
-}
-
-/* Botonera */
-.botones {
-  display: flex !important;
-  gap: 10px !important;
-  grid-column: span 2 !important;
-}
-
-button,
-#formulario button {
-  padding: 10px 20px !important;
-  font-size: 15px !important;
-  border: none !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  transition: background-color 0.3s ease !important;
-}
-
-.btn-guardar { background-color: #4CAF50 !important; color: white !important; }
-.btn-guardar:hover { background-color: #45a049 !important; }
-.btn-cancelar { background-color: #f44336 !important; color: white !important; }
-.btn-cancelar:hover { background-color: #d32f2f !important; }
-
-.logo-container { text-align: center !important; margin-bottom: 10px !important; }
-
-/* Responsive simple */
-@media screen and (max-width: 600px) {
-  #formulario { grid-template-columns: 1fr !important; }
-}
-
-/* Loader (compat con .loader-overlay y .loader-wrapper) */
-.loader-overlay,
-.loader-wrapper {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background-color: rgba(255, 255, 255, 0.8) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  align-items: center !important;
-  z-index: 9999 !important;
+  z-index: 9999;
 }
 
 .loader {
-  border: 8px solid #f3f3f3 !important;
-  border-top: 8px solid #3498db !important;
-  border-radius: 50% !important;
-  width: 60px !important;
-  height: 60px !important;
-  animation: spin 1s linear infinite !important;
-  margin-top: 20px !important;
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-top: 20px;
 }
 
 @keyframes spin {
@@ -466,49 +116,52 @@ button,
   100% { transform: rotate(360deg); }
 }
 
-/* Tabla responsive */
-#tabla-wrapper,
-.tabla-responsive {
-  overflow-x: auto !important;
+.tabla-responsive,
+#tabla-wrapper {
+  overflow-x: auto;
 }
 
 #tabla,
-table {
-  width: 100% !important;
-  border-collapse: collapse !important;
-  margin-top: 20px !important;
+#contenido .tabla-responsive table,
+#contenido #tabla-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
 #tabla th, #tabla td,
-table th, table td {
-  padding: 12px !important;
-  border: 1px solid #ece7e7 !important;
-  text-align: center !important;
+#contenido .tabla-responsive table th, #contenido .tabla-responsive table td,
+#contenido #tabla-wrapper table th, #contenido #tabla-wrapper table td {
+  padding: 12px;
+  border: 1px solid #ece7e7;
+  text-align: center;
 }
 
 #tabla thead th,
-table thead th {
-  background-color: #2196F3 !important;
-  color: white !important;
-  font-weight: bold !important;
+#contenido .tabla-responsive table thead th,
+#contenido #tabla-wrapper table thead th {
+  background-color: #2196F3;
+  color: white;
+  font-weight: bold;
 }
 
 #tabla td button,
-table td button {
-  padding: 6px 10px !important;
-  font-size: 14px !important;
-  border-radius: 6px !important;
-  margin: 2px !important;
-  cursor: pointer !important;
+#contenido .tabla-responsive table td button,
+#contenido #tabla-wrapper table td button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  margin: 2px;
+  cursor: pointer;
 }
 
 /* ==========================================================
-   ✅ Mobile & Tablet Overrides (<= 1024px)
+   ✅ Mobile & Tablet Overrides (<= 1024px) — IGUAL
    ========================================================== */
 @media (max-width: 1024px) {
   #contenido {
-    padding: clamp(12px, 4vw, 20px) !important;
-    border-radius: 10px !important;
+    padding: clamp(12px, 4vw, 20px);
+    border-radius: 10px;
   }
 
   /* Formulario a 1 columna y con buenos espacios táctiles */
@@ -530,7 +183,6 @@ table td button {
     gap: 10px !important;
   }
   .botones button,
-  #formulario button,
   button {
     width: 100% !important;
     min-height: 44px !important;
@@ -538,33 +190,38 @@ table td button {
   }
 
   /* Tabla con scroll horizontal y cabecera sticky */
-  #tabla-wrapper, .tabla-responsive,
-  #tabla, table {
+  .tabla-responsive, #tabla,
+  #contenido .tabla-responsive table, #contenido #tabla-wrapper table {
     width: 100% !important;
   }
-  #tabla-wrapper, .tabla-responsive {
+  .tabla-responsive, #tabla-wrapper {
     overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+    -webkit-overflow-scrolling: touch;
   }
-  #tabla, table {
+  #tabla,
+  #contenido .tabla-responsive table,
+  #contenido #tabla-wrapper table {
     display: block !important;
     overflow-x: auto !important;
-    white-space: nowrap !important;
+    white-space: nowrap;
     margin-top: 16px !important;
-    border-collapse: collapse !important;
+    border-collapse: collapse;
   }
   #tabla th, #tabla td,
-  table th, table td {
+  #contenido .tabla-responsive table th, #contenido .tabla-responsive table td,
+  #contenido #tabla-wrapper table th, #contenido #tabla-wrapper table td {
     padding: 10px 8px !important;
   }
   #tabla thead th,
-  table thead th {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 2 !important;
+  #contenido .tabla-responsive table thead th,
+  #contenido #tabla-wrapper table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
   }
   #tabla td button,
-  table td button {
+  #contenido .tabla-responsive table td button,
+  #contenido #tabla-wrapper table td button {
     width: 100% !important;
     margin: 4px 0 !important;
   }
@@ -579,66 +236,66 @@ table td button {
 
 /* ====== Teléfonos (<= 600px) ====== */
 @media (max-width: 600px) {
-  #tabla, table {
+  #tabla,
+  #contenido .tabla-responsive table,
+  #contenido #tabla-wrapper table {
     font-size: 12.5px !important;
   }
 }
 
 /* ==========================================================
-   📱 Tablas móviles: scroll en X e Y
+   📱 Tablas móviles: scroll en X e Y — IGUAL
    ========================================================== */
 @media (max-width: 1024px) {
   /* WRAPPERS que deben rodear a la tabla */
-  #tabla-wrapper,
-  .tabla-responsive {
+  .tabla-responsive,
+  #tabla-wrapper {
     display: block !important;
     max-width: 100% !important;
     max-height: min(70vh, 560px) !important; /* alto visible para scroll vertical */
     overflow-x: auto !important;             /* izquierda ⇄ derecha */
     overflow-y: auto !important;             /* arriba ⇅ abajo */
-    -webkit-overflow-scrolling: touch !important; /* momentum en iOS */
+    -webkit-overflow-scrolling: touch;       /* momentum en iOS */
     scrollbar-gutter: stable both-edges;
     border-radius: 10px;
   }
 
   /* La propia tabla ocupa más ancho que el viewport para forzar scroll X */
-  #tabla,
   .tabla-responsive table,
-  #tabla-wrapper table {
-    display: table !important;
-    width: 100% !important;
-    min-width: 760px !important;           /* ajusta si necesitas más/menos columnas visibles */
-    border-collapse: collapse !important;
-    table-layout: fixed !important;        /* celdas calculadas uniformemente */
+  #tabla-wrapper table,
+  #tabla {
+    display: table;
+    width: 100%;
+    min-width: 760px;           /* ajusta si necesitas más/menos columnas visibles */
+    border-collapse: collapse;
+    table-layout: fixed;        /* celdas calculadas uniformemente */
   }
 
   /* Cabecera pegajosa en el wrapper */
-  #tabla thead th,
   .tabla-responsive thead th,
-  #tabla-wrapper thead th {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 2 !important;
-    background: #2196F3 !important;        /* fondo azul como pedido */
-    color: #fff !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
+  #tabla-wrapper thead th,
+  #tabla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: inherit;        /* usa el fondo actual */
+    backdrop-filter: saturate(120%) blur(2px);
   }
 
   /* Celdas legibles en pantallas pequeñas */
-  #tabla th, #tabla td,
   .tabla-responsive th, .tabla-responsive td,
-  #tabla-wrapper th, #tabla-wrapper td {
+  #tabla-wrapper th, #tabla-wrapper td,
+  #tabla th, #tabla td {
     padding: 10px 8px !important;
     font-size: 13px !important;
-    word-break: break-word !important;
-    white-space: normal !important;        /* permite saltos de línea en móvil */
+    word-break: break-word;
+    white-space: normal;        /* permite saltos de línea en móvil */
   }
 
   /* Botones dentro de celdas: full width para facilidad táctil */
-  #tabla td button,
   .tabla-responsive td button,
-  #tabla-wrapper td button {
+  #tabla-wrapper td button,
+  #tabla td button {
     width: 100% !important;
     min-height: 40px !important;
     margin: 4px 0 !important;
@@ -647,13 +304,13 @@ table td button {
 
 /* Teléfonos pequeños: un poco más compacto */
 @media (max-width: 600px) {
-  #tabla-wrapper,
-  .tabla-responsive {
+  .tabla-responsive,
+  #tabla-wrapper {
     max-height: min(65vh, 520px) !important;
   }
-  #tabla th, #tabla td,
   .tabla-responsive th, .tabla-responsive td,
-  #tabla-wrapper th, #tabla-wrapper td {
+  #tabla-wrapper th, #tabla-wrapper td,
+  #tabla th, #tabla td {
     font-size: 12.5px !important;
   }
 }
