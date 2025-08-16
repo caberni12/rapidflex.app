@@ -423,3 +423,37 @@ td.status-celda[data-status="Finalizado"] {
     gap: 10px !important;
   }
 }
+
+
+
+/* ==========================================================
+   🎯 Patch móvil/tablet (<=1024px):
+   - Textboxes ligeramente más angostos para no sobresalir
+   - Títulos de la tabla con fondo azul y texto blanco
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* Textboxes */
+  form input[type="text"],
+  form input[type="email"],
+  form input[type="password"],
+  form input[type="tel"],
+  form input[type="number"],
+  form select,
+  form textarea {
+    box-sizing: border-box !important;
+    width: calc(100% - 8px) !important;   /* un pelín menos de 100% */
+    max-width: calc(100% - 8px) !important;
+    margin: 0 auto !important;
+  }
+
+  /* Títulos de la tabla (cabecera) */
+  .tabla-responsive thead th,
+  #tabla-wrapper thead th,
+  #tabla thead th,
+  table thead th {
+    background-color: #2196F3 !important;
+    color: #ffffff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
