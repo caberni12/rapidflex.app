@@ -546,3 +546,144 @@ td.status-celda[data-status="Finalizado"] {
   background:#0c0c0c !important;
   color:#faf9f9 !important;
 }
+
+/* ==========================================================
+   🃏 Layout tipo TARJETA con carrusel horizontal (<=1024px)
+   No requiere cambiar el HTML de la tabla.
+   Cada fila (tr) se vuelve una tarjeta deslizable.
+   ========================================================== */
+@media (max-width: 1024px) {
+
+  /* El wrapper mantiene el scroll horizontal suave */
+  .tabla-responsive,
+  #tabla-wrapper {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    padding: 12px !important;
+    background: #0c0c0c !important;
+  }
+
+  /* La tabla no forzará ancho fijo en móvil */
+  #tabla {
+    display: block !important;
+    width: 100% !important;
+    background: transparent !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ocultamos cabecera para tarjetas */
+  #tabla thead {
+    display: none !important;
+  }
+
+  /* El cuerpo se convierte en carrusel horizontal de tarjetas */
+  #tabla tbody {
+    display: flex !important;
+    gap: 12px !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    padding: 4px 2px 8px !important;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Cada fila = tarjeta */
+  #tabla tbody tr {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    min-width: min(90vw, 420px) !important; /* ancho de la tarjeta */
+    max-width: 92vw !important;
+    border: 1px solid #049afdcc !important;
+    border-radius: 12px !important;
+    background: #0c0c0c !important;
+    padding: 12px !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,.28) !important;
+    scroll-snap-align: start;
+  }
+
+  /* Quitamos bordes de tabla tradicionales para un look de tarjeta */
+  #tabla tr, #tabla th, #tabla td {
+    border: none !important;
+  }
+
+  /* Cada celda muestra etiqueta + valor en dos columnas */
+  #tabla tbody td {
+    display: grid !important;
+    grid-template-columns: 120px 1fr !important; /* etiqueta | valor */
+    align-items: center !important;
+    gap: 8px !important;
+    text-align: left !important;
+    padding: 10px 6px !important;
+    background: transparent !important;
+    color: #faf9f9 !important;
+    border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  }
+
+  /* Última celda sin borde inferior */
+  #tabla tbody td:last-child {
+    border-bottom: none !important;
+  }
+
+  /* Etiqueta (si no usas data-label, usa fallback de abajo) */
+  #tabla tbody td::before {
+    content: attr(data-label);
+    font-weight: 700 !important;
+    color: #8ecaff !important;
+    white-space: nowrap !important;
+  }
+
+  /* 🔁 Fallback por posición de columna (ajusta textos si tu orden es distinto) */
+  #tabla tbody tr td:nth-child(1)::before { content: "Nombre"; }
+  #tabla tbody tr td:nth-child(2)::before { content: "Email"; }
+  #tabla tbody tr td:nth-child(3)::before { content: "Teléfono"; }
+  #tabla tbody tr td:nth-child(4)::before { content: "Mensaje"; }
+  #tabla tbody tr td:nth-child(5)::before { content: "Status"; }
+  #tabla tbody tr td:nth-child(6)::before { content: "Acciones"; }
+
+  /* Botones dentro de la tarjeta: apilados y cómodos */
+  #tabla td button {
+    display: block !important;
+    width: 100% !important;
+    min-height: 40px !important;
+    margin: 6px 0 !important;
+    font-size: 14px !important;
+  }
+
+  /* Celdas de estado lucen como “chip” dentro de la tarjeta */
+  #tabla td.status-celda {
+    border-radius: 8px !important;
+    text-align: center !important;
+    padding: 10px !important;
+    font-weight: bold !important;
+  }
+
+  /* Scrollbar sutil (opcional) */
+  #tabla-wrapper::-webkit-scrollbar,
+  .tabla-responsive::-webkit-scrollbar,
+  #tabla tbody::-webkit-scrollbar {
+    height: 8px;
+  }
+  #tabla-wrapper::-webkit-scrollbar-thumb,
+  .tabla-responsive::-webkit-scrollbar-thumb,
+  #tabla tbody::-webkit-scrollbar-thumb {
+    background: rgba(4,154,253,.6);
+    border-radius: 8px;
+  }
+}
+
+/* ===== Tarjeta aún más compacta en teléfonos chicos (<=600px) ===== */
+@media (max-width: 600px) {
+  #tabla tbody tr {
+    min-width: 92vw !important;
+    padding: 10px !important;
+  }
+  #tabla tbody td {
+    grid-template-columns: 110px 1fr !important;
+    padding: 8px 6px !important;
+  }
+  textarea { height: 72px !important; }
+}
