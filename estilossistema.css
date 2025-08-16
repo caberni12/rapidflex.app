@@ -357,17 +357,28 @@ td.status-celda[data-status="Finalizado"] {
 }
 
 
-
 /* ==========================================================
    ✅ Mobile & Tablet Overrides (<= 1024px) — 2025-08-16
    Nota: SOLO afecta móviles/tablets. No cambia el desktop.
    ========================================================== */
 @media (max-width: 1024px) {
-  /* Contenedor general más respirable */
+
+  /* Solo la TABLA se mueve lateralmente, no la página/contenedor */
+  html, body {
+    overflow-x: hidden !important;
+    touch-action: pan-y !important; /* la página solo hace scroll vertical */
+  }
+
+  /* Contenedor general SIN sombra/blur/tenue */
   #contenido {
     width: 100%;
     padding-left: clamp(12px, 4vw, 24px);
     padding-right: clamp(12px, 4vw, 24px);
+    background-color: #fff !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
 
   /* Formulario: quitar fixed y márgenes negativos en móvil */
@@ -392,10 +403,15 @@ td.status-celda[data-status="Finalizado"] {
     box-sizing: border-box;
   }
 
-  /* Inputs y selects con mayor área táctil */
+  /* Inputs y selects con mayor área táctil y sin sobresalir */
   input, textarea, select {
     font-size: 16px !important;  /* evita zoom en iOS */
     padding: 12px !important;
+    box-sizing: border-box !important;
+    width: calc(100% - 8px) !important;   /* levemente menos para no salirse */
+    max-width: calc(100% - 8px) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
 
   /* Botonera: apilar y ocupar ancho completo */
@@ -422,7 +438,7 @@ td.status-celda[data-status="Finalizado"] {
     margin: 8px 0 !important;
   }
 
-  /* Acciones (3 botones azules) apiladas y sin desbordes */
+  /* Acciones apiladas y sin desbordes */
   #contenido .acciones {
     width: 100% !important;
     margin-top: clamp(18px, 5vh, 28px) !important;
@@ -440,29 +456,41 @@ td.status-celda[data-status="Finalizado"] {
     max-width: none !important;
   }
 
-  /* Tabla: scroll horizontal suave y cabecera pegajosa */
-  
-  /* Tabla con scroll horizontal y cabecera sticky */
-  .tabla-responsive, table {
+  /* ===== Tabla: que SOLO ella tenga scroll (X/Y) ===== */
+
+  /* Wrapper con scroll (si existe) */
+  .tabla-responsive,
+  #tabla-wrapper {
     width: 100% !important;
+    overflow-x: auto !important;             /* izquierda ⇄ derecha */
+    overflow-y: auto !important;             /* arriba ⇅ abajo */
+    -webkit-overflow-scrolling: touch;       /* momentum en iOS */
+    overscroll-behavior: contain !important; /* no arrastra al body */
   }
-  .tabla-responsive {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-  
+
+  /* Tabla: forzar ancho mínimo para que aparezca el scroll horizontal */
   #tabla {
     display: block !important;
     overflow-x: auto !important;
+    overflow-y: auto !important;
     white-space: nowrap;
     margin-top: 16px !important;
     border-collapse: collapse;
+    min-width: 760px;                        /* ajusta si hace falta */
+    touch-action: pan-x pan-y !important;    /* gestos táctiles */
   }
-    #tabla thead th {
-      position: sticky;
-      top: 0;
-      z-index: 2;
+
+  /* Cabecera sticky sin blur y con fondo azul */
+  #tabla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: #2196F3 !important;
+    color: #fff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
+
   #tabla td button {
     width: 100% !important;
     max-width: none !important;
@@ -472,10 +500,8 @@ td.status-celda[data-status="Finalizado"] {
   #tabla th, #tabla td {
     padding: 10px 8px !important;
   }
-  #tabla td, #tabla th {
-    word-break: break-word;
-  }
 
+  /* Loader compacto */
   .loader {
     width: 48px !important;
     height: 48px !important;
