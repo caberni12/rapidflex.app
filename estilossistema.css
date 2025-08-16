@@ -355,7 +355,6 @@ td.status-celda[data-status="Finalizado"] {
 #contenido .acciones{
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
-
 /* ==========================================================
    ✅ Mobile & Tablet Overrides (<= 1024px) — limpio
    Nota: SOLO afecta móviles/tablets. No cambia el desktop.
@@ -409,33 +408,20 @@ td.status-celda[data-status="Finalizado"] {
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-/* Botones apilados sin estirarse (FORMULARIO) */
-.botones {
-  grid-column: 1 / -1 !important;
-  display: grid !important;
-  grid-template-columns: 1fr !important; /* uno bajo el otro */
-  gap: 8px !important;
-  justify-items: start !important;       /* alineados a la izquierda */
-}
 
-/* ❗ Ojo: quitamos el selector global "button" para no forzar 100% en todo */
-.botones button {
-  width: auto !important;          /* ya no ocupan 100% */
-  min-width: 140px !important;     /* cómodo al tacto, ajusta si quieres */
-  max-width: 100% !important;
-  min-height: 44px !important;
-  font-size: 15px !important;
-}
-
-/* Acciones dentro de la TABLA: Modificar / Eliminar apilados y contenidos */
-#tabla td button {
-  display: block !important;       /* fuerza vertical: uno bajo el otro */
-  width: auto !important;          /* no 100% */
-  min-width: 120px !important;     /* un poco más compactos */
-  max-width: 100% !important;
-  min-height: 40px !important;
-  margin: 4px 0 !important;        /* separación vertical */
-}
+  /* Botonera del formulario: sigue a 100% (accesible) */
+  .botones {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    justify-content: stretch !important;
+  }
+  .botones button {
+    width: 100% !important;
+    min-height: 44px !important;
+    font-size: 15px !important;
+  }
 
   /* Buscador pegado a la izquierda */
   #contenido #buscador {
