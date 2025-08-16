@@ -215,3 +215,79 @@ td button {
     font-size: 12.5px !important;
   }
 }
+
+
+
+/* ==========================================================
+   📱 Tablas móviles: scroll en X e Y — 2025-08-16
+   - Funciona con envoltorios .tabla-responsive o #tabla-wrapper
+   - Degradación aceptable si solo existe #tabla
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* WRAPPERS que deben rodear a la tabla */
+  .tabla-responsive,
+  #tabla-wrapper {
+    display: block !important;
+    max-width: 100% !important;
+    max-height: min(70vh, 560px) !important; /* alto visible para scroll vertical */
+    overflow-x: auto !important;             /* izquierda ⇄ derecha */
+    overflow-y: auto !important;             /* arriba ⇅ abajo */
+    -webkit-overflow-scrolling: touch;       /* momentum en iOS */
+    scrollbar-gutter: stable both-edges;
+    border-radius: 10px;
+  }
+
+  /* La propia tabla ocupa más ancho que el viewport para forzar scroll X */
+  .tabla-responsive table,
+  #tabla-wrapper table,
+  #tabla {
+    display: table;
+    width: 100%;
+    min-width: 760px;           /* ajusta si necesitas más/menos columnas visibles */
+    border-collapse: collapse;
+    table-layout: fixed;        /* celdas calculadas uniformemente */
+  }
+
+  /* Cabecera pegajosa en el wrapper */
+  .tabla-responsive thead th,
+  #tabla-wrapper thead th,
+  #tabla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: inherit;        /* usa el fondo actual */
+    backdrop-filter: saturate(120%) blur(2px);
+  }
+
+  /* Celdas legibles en pantallas pequeñas */
+  .tabla-responsive th, .tabla-responsive td,
+  #tabla-wrapper th, #tabla-wrapper td,
+  #tabla th, #tabla td {
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+    word-break: break-word;
+    white-space: normal;        /* permite saltos de línea en móvil */
+  }
+
+  /* Botones dentro de celdas: full width para facilidad táctil */
+  .tabla-responsive td button,
+  #tabla-wrapper td button,
+  #tabla td button {
+    width: 100% !important;
+    min-height: 40px !important;
+    margin: 4px 0 !important;
+  }
+}
+
+/* Teléfonos pequeños: un poco más compacto */
+@media (max-width: 600px) {
+  .tabla-responsive,
+  #tabla-wrapper {
+    max-height: min(65vh, 520px) !important;
+  }
+  .tabla-responsive th, .tabla-responsive td,
+  #tabla-wrapper th, #tabla-wrapper td,
+  #tabla th, #tabla td {
+    font-size: 12.5px !important;
+  }
+}
