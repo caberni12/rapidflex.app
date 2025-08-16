@@ -95,39 +95,24 @@ button {
 .btn-cancelar { background-color: #dc3545; color: white; }
 .btn-recargar { margin-bottom: 12px; background-color: #007bff; color: white; }
 
-/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO Y SCROLL H/V --- */
+/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO --- */
 .tabla-responsive,
 #tabla-wrapper {
   background: #0c0c0c !important;
   border-radius: 8px;
   width: 100% !important;
-  max-height: 70vh;              /* límite para activar scroll vertical interno */
-  overflow-x: auto !important;   /* scroll horizontal */
-  overflow-y: auto !important;   /* scroll vertical */
+  overflow-x: auto !important;
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain !important;
   padding: 0 !important;
   margin: 0 auto 20px auto;
   box-sizing: border-box;
-  scrollbar-color: #049afd #222;
-  scrollbar-width: thin;
-}
-.tabla-responsive::-webkit-scrollbar,
-#tabla-wrapper::-webkit-scrollbar {
-  height: 8px;                   /* scrollbar horizontal */
-  width: 8px;                    /* scrollbar vertical */
-  background: #222;
-}
-.tabla-responsive::-webkit-scrollbar-thumb,
-#tabla-wrapper::-webkit-scrollbar-thumb {
-  background: #049afd;
-  border-radius: 4px;
 }
 
-/* --- Permite scroll horizontal real en tabla --- */
+/* TABLA */
 #tabla {
-  width: max-content;  /* permite que la tabla crezca y haga scroll si es necesario */
-  min-width: 100%;     /* nunca será más angosta que el contenedor */
+  width: 100%;
   border-collapse: collapse;
   background: transparent;
   color: #faf9f9;
@@ -136,8 +121,6 @@ button {
   overflow: hidden;
   font-size: 14px;
 }
-
-/* --- FIN FIX SCROLL --- */
 
 th,
 td {
@@ -187,7 +170,7 @@ td button {
   text-align: right;
 }
 
-/* --- LOADER SOBRE TODO EL BODY (MODIFICADO) --- */
+/* --- LOADER SOBRE TODO EL BODY --- */
 .loader-wrapper {
   position: fixed;
   top: 0;
@@ -269,23 +252,11 @@ td button {
 }
 
 /* Colores aplicados directamente por el atributo data-status */
-td.status-celda[data-status="Nuevo"] {
-  background-color: #28a745 !important;
-  color: white;
-  font-weight: bold;
-}
-td.status-celda[data-status="En proceso"] {
-  background-color: #ffc107 !important;
-  color: black;
-  font-weight: bold;
-}
-td.status-celda[data-status="Finalizado"] {
-  background-color: #ff0000 !important;
-  color: white;
-  font-weight: bold;
-}
+td.status-celda[data-status="Nuevo"] { background-color: #28a745 !important; color: white; font-weight: bold; }
+td.status-celda[data-status="En proceso"] { background-color: #ffc107 !important; color: black; font-weight: bold; }
+td.status-celda[data-status="Finalizado"] { background-color: #ff0000 !important; color: white; font-weight: bold; }
 
-/* === Contenedor de acciones (3 botones azules) alineado con la tabla === */
+/* === Contenedor de acciones === */
 #contenido .acciones{
   width: 100%;
   max-width: 100%;
@@ -296,7 +267,7 @@ td.status-celda[data-status="Finalizado"] {
   align-items: center;
 }
 
-/* El buscador al mismo ancho de la tabla (línea completa) */
+/* El buscador al mismo ancho de la tabla */
 #contenido #buscador{
   display: block;
   width: 100%;
@@ -306,7 +277,7 @@ td.status-celda[data-status="Finalizado"] {
   box-sizing: border-box;
 }
 
-/* === Ajuste de tamaño para Sistema 1 y 2: contenedor más angosto y centrado === */
+/* Ajuste de tamaño */
 #contenido{
   width: min(1200px, 100% - clamp(32px, 8vw, 120px));
   margin-left: auto;
@@ -316,7 +287,6 @@ td.status-celda[data-status="Finalizado"] {
 }
 #contenido > h2{ margin-left: 0; margin-right: 0; }
 
-/* === Igualar ancho del bloque superior al de la tabla === */
 #contenido > .logo-container,
 #contenido > h2,
 #contenido > #formulario,
@@ -328,27 +298,13 @@ td.status-celda[data-status="Finalizado"] {
   padding-right: clamp(12px, 2vw, 24px);
 }
 
-/* === Aire adicional arriba de la TABLA y separación de controles === */
+/* Aire adicional arriba de la tabla */
 #formulario{ margin-bottom: clamp(16px, 4vh, 48px); }
 #buscador{ display:block; width:100%; max-width:none; margin: 8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
 .btn-recargar{ margin-top: 8px; }
 #tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
 
-/* === Empujar más abajo el bloque de ACCIONES (3 botones azules) para que no quede oculto por el panel superior === */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;  /* más aire arriba */
-  margin-bottom: clamp(10px, 2vh, 18px);
-}
-
-/* Aseguramos que el buscador quede inmediatamente debajo, a ancho de tabla */
-#contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
-  margin-top: clamp(12px, 2.5vh, 24px);
-}
-
-/* === FIX OVERLAP: el formulario superior NO debe ser fixed ni con margen negativo === */
+/* === FIX overlap === */
 #formulario,
 #contenido form{
   position: static !important;
@@ -356,119 +312,13 @@ td.status-celda[data-status="Finalizado"] {
   margin-top: clamp(8px, 2vh, 20px) !important;
 }
 
-/* Asegurar que el bloque de ACCIONES quede bajo el panel superior */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;
-}
-
-/* ==========================================================
-   ✅ Mobile & Tablet Overrides (<= 1024px) — limpio
-   Nota: SOLO afecta móviles/tablets. No cambia el desktop.
-   ========================================================== */
+/* Mobile & Tablet Overrides */
 @media (max-width: 1024px) {
-
-  html, body {
-    overflow-x: hidden !important;
-    touch-action: pan-y !important;
-  }
-
-  #contenido {
-    width: 100%;
-    padding-left: clamp(6px, 2.5vw, 12px) !important;
-    padding-right: clamp(14px, 5.5vw, 24px) !important;
-    margin-left: 0 !important;
-    background-color: #fff !important;
-    box-shadow: none !important;
-    filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-
-  #formulario,
-  #contenido form,
-  form {
-    position: static !important;
-    top: auto !important;
-    margin: 12px auto 16px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-
-    display: grid;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    padding-left: clamp(8px, 3vw, 14px) !important;
-    padding-right: clamp(12px, 4vw, 18px) !important;
-    box-sizing: border-box;
-  }
-
-  input, textarea, select {
-    font-size: 16px !important;
-    padding: 12px !important;
-    box-sizing: border-box !important;
-    width: calc(100% - 8px) !important;
-    max-width: calc(100% - 8px) !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-
-  .botones {
-    grid-column: 1 / -1 !important;
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 8px !important;
-    justify-items: start !important;
-  }
-
-  .botones button {
-    width: auto !important;
-    min-width: 140px !important;
-    max-width: 100% !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-  }
-
-  #tabla td button {
-    display: block !important;
-    width: auto !important;
-    min-width: 120px !important;
-    max-width: 100% !important;
-    min-height: 40px !important;
-    margin: 4px 0 !important;
-  }
-
-  #contenido #buscador {
-    width: 100% !important;
-    margin: 8px 0 12px !important;
-    padding: 10px 12px !important;
-    max-width: none !important;
-  }
-
-  #contenido .acciones {
-    width: 100% !important;
-    margin-top: clamp(18px, 5vh, 28px) !important;
-    margin-bottom: 12px !important;
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(140px, max-content)) !important;
-    justify-content: start !important;
-    gap: 10px !important;
-  }
-
-  .tabla-responsive,
-  #tabla-wrapper {
-    background: #0c0c0c !important;
-    border-radius: 8px;
-    width: 100% !important;
-    max-height: 70vh;            /* activo también en móvil */
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-/* ===========================================
-   FONDO NEGRO Y LETRAS BLANCAS SOLO EN BODY DE TABLA
-   =========================================== */
-#tabla tbody td:not(.status-celda) {
-  background: #0c0c0c !important;
-  color: #faf9f9 !important;
+  html, body { overflow-x: hidden !important; touch-action: pan-y !important; }
+  #contenido { width: 100%; padding-left: clamp(6px, 2.5vw, 12px) !important; padding-right: clamp(14px, 5.5vw, 24px) !important; margin-left: 0 !important; background-color: #fff !important; }
+  #formulario, #contenido form, form { position: static !important; margin: 12px auto 16px !important; width: 100% !important; display: grid; grid-template-columns: 1fr !important; gap: 12px !important; }
+  .botones { grid-column: 1 / -1 !important; display: grid !important; grid-template-columns: 1fr !important; gap: 8px !important; }
+  .botones button { min-width: 140px !important; font-size: 15px !important; }
+  #tabla td button { display: block !important; min-width: 120px !important; margin: 4px 0 !important; }
+  #contenido #buscador { width: 100% !important; margin: 8px 0 12px !important; padding: 10px 12px !important; }
 }
