@@ -782,3 +782,89 @@ td.status-celda[data-status="Finalizado"] {
     touch-action: pan-x pan-y !important;
   }
 }
+
+
+
+/* ==========================================================
+   🌟 Móvil/Tablet: sin "sombra" y sin movimiento del contenedor
+   — solo se desplaza la TABLA (Sistema)
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* 0) Normaliza caja para evitar desbordes por padding/border */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  /* 1) Quita oscurecidos/filtros/shadows en móvil */
+  html, body, #contenido, main, .app, .app-container {
+    background: #fff !important;
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    opacity: 1 !important;
+  }
+  .overlay, .modal-backdrop, #route-loader, #splash, .backdrop, .fader, .shadow, .sombra,
+  .overlay::before, .overlay::after,
+  #route-loader::before, #route-loader::after,
+  header::before, header::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  /* Loader no bloquea por defecto; actívalo con .is-active si necesitas */
+  .loader-wrapper { pointer-events: none !important; background: transparent !important; }
+  .loader-wrapper.is-active { pointer-events: auto !important; }
+
+  /* 2) El contenedor/página no se mueve lateralmente */
+  html, body {
+    overflow-x: clip !important;            /* no barra ni "empuje" lateral */
+    overscroll-behavior-x: contain !important;
+    touch-action: pan-y !important;         /* solo vertical en la página */
+  }
+  #contenido, main, .tabla-container, .table-container, .acciones, .botones {
+    max-width: 100% !important;
+    overflow-x: clip !important;
+    overscroll-behavior-x: contain !important;
+  }
+  .acciones, .botones { flex-wrap: wrap !important; gap: 10px !important; }
+  .acciones > *, .botones > * { min-width: 0 !important; }
+
+  /* 3) Solo el wrapper de la tabla desplaza en X/Y */
+  #tabla-wrapper, .tabla-responsive {
+    position: relative;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: min(70vh, 560px) !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y !important;
+    border-radius: 10px;
+  }
+  /* Fallback: si no hay wrapper, mueve la propia tabla */
+  #tabla {
+    display: table;
+    width: 100%;
+    min-width: 760px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y !important;
+  }
+
+  /* 4) Cabecera sin blur "lechoso" y sin sombra */
+  #tabla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #fff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 5) Imágenes y medios no rompen el ancho */
+  img, svg, video, canvas { max-width: 100% !important; height: auto !important; }
+}
