@@ -355,3 +355,154 @@ td.status-celda[data-status="Finalizado"] {
 #contenido .acciones{
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
+
+
+
+/* ==========================================================
+   ✅ Mobile & Tablet Overrides (<= 1024px) — 2025-08-16
+   Nota: SOLO afecta móviles/tablets. No cambia el desktop.
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* Contenedor general más respirable */
+  #contenido {
+    width: 100%;
+    padding-left: clamp(12px, 4vw, 24px);
+    padding-right: clamp(12px, 4vw, 24px);
+  }
+
+  /* Formulario: quitar fixed y márgenes negativos en móvil */
+  #formulario,
+  #contenido form,
+  form {
+    position: static !important;
+    top: auto !important;
+    margin: 12px auto 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Grilla del formulario a 1 columna en pantallas pequeñas */
+  #formulario,
+  #contenido form,
+  form {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: clamp(12px, 3vw, 18px) !important;
+    box-sizing: border-box;
+  }
+
+  /* Inputs y selects con mayor área táctil */
+  input, textarea, select {
+    font-size: 16px !important;  /* evita zoom en iOS */
+    padding: 12px !important;
+  }
+
+  /* Botonera: apilar y ocupar ancho completo */
+  .botones {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    justify-content: stretch !important;
+  }
+  .botones button,
+  button {
+    width: 100% !important;
+    min-height: 44px !important; /* accesibilidad */
+    font-size: 15px !important;
+    max-width: none !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* Usuario arriba centrado */
+  .usuario-nombre {
+    text-align: center !important;
+    font-size: 14px !important;
+    margin: 8px 0 !important;
+  }
+
+  /* Acciones (3 botones azules) apiladas y sin desbordes */
+  #contenido .acciones {
+    width: 100% !important;
+    margin-top: clamp(18px, 5vh, 28px) !important;
+    margin-bottom: 12px !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Buscador full width debajo de acciones */
+  #contenido #buscador {
+    width: 100% !important;
+    margin: 8px 0 12px !important;
+    padding: 10px 12px !important;
+    max-width: none !important;
+  }
+
+  /* Tabla: scroll horizontal suave y cabecera pegajosa */
+  #tabla {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+  }
+  #tabla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  #tabla td button {
+    width: 100% !important;
+    max-width: none !important;
+    font-size: 14px !important;
+    margin: 4px 0 !important;
+  }
+  #tabla th, #tabla td {
+    padding: 10px 8px !important;
+  }
+  #tabla td, #tabla th {
+    word-break: break-word;
+  }
+
+  /* Loader centrado y más pequeño en móviles */
+  .loader-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .loader {
+    width: 72px !important;
+    height: 72px !important;
+    border-width: 6px !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  .loader-text {
+    position: static !important;
+    transform: none !important;
+    margin-top: 8px !important;
+    text-align: center !important;
+    font-size: 14px !important;
+  }
+
+  /* Logo siempre al 100% del contenedor */
+  .logo-container img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* ====== Ajustes específicos extra para teléfonos (<= 600px) ====== */
+@media (max-width: 600px) {
+  /* Reducir un poco el tamaño de fuente de la tabla */
+  #tabla {
+    font-size: 12.5px !important;
+  }
+  /* Textarea algo más baja para vistas pequeñas */
+  textarea {
+    height: 72px !important;
+  }
+}

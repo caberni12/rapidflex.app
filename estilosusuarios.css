@@ -135,3 +135,83 @@ td button {
   margin: 2px;
   cursor: pointer;
 }
+
+
+
+/* ==========================================================
+   ✅ Mobile & Tablet Overrides (<= 1024px) — 2025-08-16
+   Nota: SOLO afecta móviles/tablets. No cambia el desktop.
+   ========================================================== */
+@media (max-width: 1024px) {
+  .container {
+    padding: clamp(12px, 4vw, 20px) !important;
+    border-radius: 10px !important;
+  }
+
+  /* Formulario a 1 columna y con buenos espacios táctiles */
+  form {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: clamp(14px, 3vw, 20px) !important;
+  }
+  input, select {
+    font-size: 16px !important;   /* evita zoom en iOS */
+    padding: 12px !important;
+  }
+
+  /* Botones apilados al 100% de ancho */
+  .botones {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .botones button,
+  button {
+    width: 100% !important;
+    min-height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  /* Tabla con scroll horizontal y cabecera sticky */
+  .tabla-responsive, table {
+    width: 100% !important;
+  }
+  .tabla-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap;
+    margin-top: 16px !important;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 10px 8px !important;
+  }
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  td button {
+    width: 100% !important;
+    margin: 4px 0 !important;
+  }
+
+  /* Loader más pequeño */
+  .loader {
+    width: 48px !important;
+    height: 48px !important;
+    border-width: 6px !important;
+  }
+}
+
+/* ====== Teléfonos (<= 600px) ====== */
+@media (max-width: 600px) {
+  table {
+    font-size: 12.5px !important;
+  }
+}
