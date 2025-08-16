@@ -476,3 +476,13 @@ td.status-celda[data-status="Finalizado"] {
     overflow-x: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ===========================================
+   FONDO NEGRO Y LETRAS BLANCAS SOLO EN BODY DE TABLA
+   =========================================== */
+#tabla tbody td:not(.status-celda) {
+  background: #0c0c0c !important;
+  color: #faf9f9 !important;
+}
