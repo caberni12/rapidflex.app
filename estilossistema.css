@@ -533,3 +533,51 @@ td.status-celda[data-status="Finalizado"] {
     height: 72px !important;
   }
 }
+/* ===== Parche: izquierda + acciones auto-ajustables ===== */
+@media (max-width: 1024px) {
+  /* 1) Mover todo hacia la izquierda (menos padding a la izquierda) */
+  #contenido {
+    padding-left: clamp(6px, 2.5vw, 12px) !important;
+    padding-right: clamp(14px, 5.5vw, 24px) !important;
+    margin-left: 0 !important;
+  }
+
+  /* También ajusto el padding del formulario para que acompañe */
+  #formulario,
+  #contenido form,
+  form {
+    padding-left: clamp(8px, 3vw, 14px) !important;
+    padding-right: clamp(12px, 4vw, 18px) !important;
+  }
+
+  /* Buscador pegado a la izquierda */
+  #contenido #buscador {
+    margin-left: 0 !important;
+  }
+
+  /* 2) Acciones: botones más angostos y auto-ajustables */
+  #contenido .acciones {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(140px, max-content)) !important;
+    justify-content: start !important;  /* se pegan a la izquierda */
+    gap: 10px !important;
+  }
+  #contenido .acciones .btn,
+  #contenido .acciones button {
+    width: auto !important;          /* dejan de ser 100% */
+    min-width: 140px !important;     /* tamaño táctil cómodo */
+    max-width: 100% !important;      /* no desbordan */
+  }
+}
+
+/* (Opcional) En teléfonos muy chicos, que ocupen 2 columnas */
+@media (max-width: 360px) {
+  #contenido .acciones {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  #contenido .acciones .btn,
+  #contenido .acciones button {
+    width: 100% !important;          /* para que calcen en las 2 columnas */
+    min-width: 0 !important;
+  }
+}
