@@ -108,13 +108,28 @@ button {
   color: white;
 }
 
+/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO --- */
+.tabla-responsive,
+#tabla-wrapper {
+  background: #0c0c0c !important;
+  border-radius: 8px;
+  width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain !important;
+  /* El fondo negro siempre acompaña el ancho de la tabla, incluso con scroll */
+  margin-bottom: 20px;
+  /* Si quieres sombra, puedes agregar: box-shadow: 0 2px 16px #0002; */
+}
+
 /* TABLA */
 #tabla {
   width: 100%;
   border-collapse: collapse;
-  background: #0c0c0c;
+  background: transparent; /* Fondo ahora lo maneja el contenedor */
   color: #faf9f9;
-  margin-bottom: 20px;
+  margin-bottom: 0; /* El margen lo da el contenedor */
   border-radius: 8px;
   overflow: hidden;
   font-size: 14px;
@@ -326,7 +341,6 @@ td.status-celda[data-status="Finalizado"] {
 #tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
 
 
-
 /* === Empujar más abajo el bloque de ACCIONES (3 botones azules) para que no quede oculto por el panel superior === */
 #contenido .acciones{
   margin-top: clamp(28px, 7vh, 110px) !important;  /* más aire arriba */
@@ -341,8 +355,6 @@ td.status-celda[data-status="Finalizado"] {
   margin-top: clamp(12px, 2.5vh, 24px);
 }
 
-
-
 /* === FIX OVERLAP: el formulario superior NO debe ser fixed ni con margen negativo === */
 #formulario,
 #contenido form{
@@ -355,6 +367,7 @@ td.status-celda[data-status="Finalizado"] {
 #contenido .acciones{
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
+
 /* ==========================================================
    ✅ Mobile & Tablet Overrides (<= 1024px) — limpio
    Nota: SOLO afecta móviles/tablets. No cambia el desktop.
@@ -427,119 +440,4 @@ td.status-celda[data-status="Finalizado"] {
   font-size: 15px !important;
 }
 
-/* Acciones dentro de la TABLA: Modificar / Eliminar apilados y contenidos */
-#tabla td button {
-  display: block !important;       /* fuerza vertical: uno bajo el otro */
-  width: auto !important;          /* no 100% */
-  min-width: 120px !important;     /* un poco más compactos */
-  max-width: 100% !important;
-  min-height: 40px !important;
-  margin: 4px 0 !important;        /* separación vertical */
-}
-
-
-  /* Buscador pegado a la izquierda */
-  #contenido #buscador {
-    width: 100% !important;
-    margin: 8px 0 12px !important;
-    padding: 10px 12px !important;
-    max-width: none !important;
-  }
-
-  /* Acciones (los 3 botones azules): más angostos y auto-ajustables */
-  #contenido .acciones {
-    width: 100% !important;
-    margin-top: clamp(18px, 5vh, 28px) !important;
-    margin-bottom: 12px !important;
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(140px, max-content)) !important;
-    justify-content: start !important; /* pegado a la izquierda */
-    gap: 10px !important;
-  }
-  #contenido .acciones .btn,
-  #contenido .acciones button {
-    width: auto !important;         /* dejan de ocupar 100% */
-    min-width: 140px !important;    /* comodidad táctil */
-    max-width: 100% !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-  }
-
-  /* Tabla: SOLO ella tiene scroll (X/Y) */
-  .tabla-responsive,
-  #tabla-wrapper {
-    width: 100% !important;
-    overflow-x: auto !important;             /* izquierda ⇄ derecha */
-    overflow-y: auto !important;             /* arriba ⇅ abajo */
-    -webkit-overflow-scrolling: touch;       /* momentum iOS */
-    overscroll-behavior: contain !important; /* no arrastra al body */
-  }
-
-  #tabla {
-    display: block !important;
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    white-space: nowrap;
-    margin-top: 16px !important;
-    border-collapse: collapse;
-    min-width: 760px;                        /* fuerza scroll X si hay columnas */
-    touch-action: pan-x pan-y !important;    /* gestos táctiles */
-  }
-
-  /* Cabecera sticky sin blur y con fondo azul */
-  #tabla thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background-color: #2196F3 !important;
-    color: #fff !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-
-  #tabla th, #tabla td {
-    padding: 10px 8px !important;
-  }
-  #tabla td button {
-    width: 100% !important;
-    max-width: none !important;
-    font-size: 14px !important;
-    margin: 4px 0 !important;
-  }
-
-  /* Loader compacto */
-  .loader {
-    width: 48px !important;
-    height: 48px !important;
-    border-width: 6px !important;
-  }
-  .loader-text {
-    position: static !important;
-    transform: none !important;
-    margin-top: 8px !important;
-    text-align: center !important;
-    font-size: 14px !important;
-  }
-
-  /* Logo siempre al 100% del contenedor */
-  .logo-container img {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-}
-
-/* ====== Teléfonos (<= 600px) ====== */
-@media (max-width: 600px) {
-  #tabla { font-size: 12.5px !important; }
-  textarea { height: 72px !important; }
-  /* (opcional) Si quieres 2 columnas en acciones para pantallas muy chicas: */
-  /* 
-  #contenido .acciones {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-  #contenido .acciones .btn,
-  #contenido .acciones button {
-    width: 100% !important; min-width: 0 !important;
-  }
-  */
-}
+/* Acciones dentro de la TABLA: Mod
