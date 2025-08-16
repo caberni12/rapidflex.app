@@ -582,3 +582,77 @@ td.status-celda[data-status="Finalizado"] {
     font-size: 12.5px !important;
   }
 }
+
+
+
+/* ==========================================================
+   📱 Sistema: tabla con scroll en X e Y (igual a Usuarios)
+   - Soporta #tabla-wrapper, .tabla-responsive o #tabla directo
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* Wrapper con scroll biaxial */
+  #tabla-wrapper,
+  .tabla-responsive {
+    display: block !important;
+    max-width: 100% !important;
+    max-height: min(70vh, 560px) !important;
+    overflow-x: auto !important;   /* izquierda ⇄ derecha */
+    overflow-y: auto !important;   /* arriba ⇅ abajo */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable both-edges;
+    border-radius: 10px;
+  }
+
+  /* Si no hay wrapper, habilita scroll en la propia tabla */
+  #tabla {
+    display: table;                /* evita display:block que rompe sticky */
+    width: 100%;
+    min-width: 760px;              /* fuerza scroll horizontal en pantallas pequeñas */
+    border-collapse: collapse;
+    table-layout: fixed;           /* celdas uniformes y predecibles */
+  }
+
+  /* Cabecera fija durante el scroll */
+  #tabla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: inherit;
+    backdrop-filter: saturate(120%) blur(2px);
+  }
+
+  /* Celdas legibles y sin overflow visual */
+  #tabla th, #tabla td {
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+    word-break: break-word;
+    white-space: normal;
+  }
+
+  /* Columna Acciones un poco más ancha para que no sobresalga */
+  #tabla th:last-child,
+  #tabla td:last-child {
+    min-width: 180px !important;
+  }
+
+  /* Botones dentro de Acciones usan todo el ancho de la celda */
+  #tabla td:last-child button {
+    width: 100% !important;
+    min-height: 40px !important;
+    display: block !important;
+    margin: 4px 0 !important;
+  }
+
+  /* Previene recortes por overflow oculto de contenedores superiores */
+  #contenido, main, section, .tabla-container, .table-container {
+    overflow: visible !important;
+  }
+}
+
+/* Teléfonos pequeños (<=600px): un poco más de ancho en Acciones */
+@media (max-width: 600px) {
+  #tabla th:last-child,
+  #tabla td:last-child {
+    min-width: 200px !important;
+  }
+}
