@@ -1,114 +1,210 @@
-
-/* ==========================================================
-   SISTEMA — IGUAL A CSS ENTREGADO (mapeado a selectores Sistema)
-   - body            -> body
-   - .container      -> #contenido
-   - form            -> #formulario
-   - .tabla-responsive/#tabla-wrapper -> los mismos
-   - table           -> #tabla y tablas dentro de wrappers de Sistema
-   ========================================================== */
-
+/* --- BASE GENERAL --- */
 body {
   font-family: Arial, sans-serif;
+  background: #f3f3f3;
+  padding: 5px 20px 20px 20px;
   margin: 0;
-  padding: 0;
-  background-color: #f3f3f3;
-}
-
-#contenido {
-  max-width: 1300px;
-  margin: auto;
-  padding: 20px;
-  background-color: white;
-  border-radius: 10px;
-}
-
-#formulario {
-  display: grid;
-  gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  background-color: #131212;
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 40px;
-  color: white;
-}
-
-#formulario input, #formulario select {
-  padding: 12px;
-  font-size: 15px;
-  border: 1px solid #0f0f0f;
-  border-radius: 6px;
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.botones {
-  display: flex;
-  gap: 10px;
-  grid-column: span 2;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 15px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.btn-guardar {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.btn-guardar:hover {
-  background-color: #45a049;
-}
-
-.btn-cancelar {
-  background-color: #f44336;
-  color: white;
-}
-
-.btn-cancelar:hover {
-  background-color: #d32f2f;
+  position: relative;
 }
 
 .logo-container {
   text-align: center;
+  margin-bottom: 5px;
+}
+
+.logo-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- FORMULARIO --- */
+form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  background: #080808;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 0 auto 20px auto;
+  width: 98%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin-top: -14%;
+  position: fixed;
+}
+
+
+/* CAMPOS */
+input,
+textarea,
+select {
+  padding: 10px;
+  font-size: 16px;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+  background-color: #fff;
   margin-bottom: 10px;
 }
 
-@media screen and (max-width: 600px) {
-  #formulario {
-    grid-template-columns: 1fr;
-  }
+input.nombre {
+  font-size: 14px;
+  padding: 8px;
 }
 
-.loader-overlay {
+textarea {
+  grid-column: span 2;
+  height: 80px;
+  resize: vertical;
+}
+
+input.busqueda,
+input[type="search"] {
+  max-width: 300px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+/* BOTONES */
+.botones {
+  grid-column: span 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+button {
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  min-width: 120px;
+  flex: 1 1 auto;
+  max-width: 200px;
+}
+
+.btn-guardar {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-cancelar {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-recargar {
+  margin-bottom: 12px;
+  background-color: #007bff;
+  color: white;
+}
+
+/* TABLA */
+#tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: #0c0c0c;
+  color: #faf9f9;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
+}
+
+th,
+td {
+  border: 1px solid #049afdcc;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background: #049afdcc;
+}
+
+thead tr.filtros th {
+  padding: 4px 5px;
+  background-color: #f9f9f9;
+}
+
+thead tr.filtros th input,
+thead tr.filtros th select {
+  width: 100%;
+  padding: 4px;
+  font-size: 0.9em;
+  box-sizing: border-box;
+}
+
+td button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: white;
+  cursor: pointer;
+  margin: 4px;
+}
+
+/* ENLACES */
+.telefono-link {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* USUARIO */
+.usuario-nombre {
+  color: #007bff;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+/* --- LOADER SOBRE TODO EL BODY (MODIFICADO) --- */
+.loader-wrapper {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(255, 255, 255, 0.8);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 .loader {
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #3498db;
+  border: 12px solid #141414;
+  border-top: 12px solid #f8f4f4;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
+  width: 200px;
+  height: 200px;
   animation: spin 1s linear infinite;
-  margin-top: 20px;
+  box-shadow: inset 0 0 10px #080808, 0 0 15px #080808;
+  margin-top: 17%;
+  margin-left: 42%;
+}
+
+.loader-text {
+  position: absolute;
+  top: calc(35% + 110px);
+  left: 49%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+}
+
+.loader-wrapper.hidden {
+  display: none;
 }
 
 @keyframes spin {
@@ -116,201 +212,146 @@ button {
   100% { transform: rotate(360deg); }
 }
 
-.tabla-responsive,
-#tabla-wrapper {
-  overflow-x: auto;
-}
+/* --- VERSION MÓVIL FLUIDA --- */
+@media (max-width: 768px) {
+  form {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    padding: 15px;
+    gap: 12px;
+  }
 
-#tabla,
-#contenido .tabla-responsive table,
-#contenido #tabla-wrapper table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
+  .botones {
+    justify-content: center;
+  }
 
-#tabla th, #tabla td,
-#contenido .tabla-responsive table th, #contenido .tabla-responsive table td,
-#contenido #tabla-wrapper table th, #contenido #tabla-wrapper table td {
-  padding: 12px;
-  border: 1px solid #ece7e7;
-  text-align: center;
-}
+  button {
+    font-size: 15px;
+    min-width: 140px;
+    max-width: 100%;
+  }
 
-#tabla thead th,
-#contenido .tabla-responsive table thead th,
-#contenido #tabla-wrapper table thead th {
-  background-color: #2196F3;
+  .usuario-nombre {
+    text-align: center;
+    font-size: 14px;
+  }
+
+  #tabla {
+    font-size: 13px;
+  }
+
+  td button {
+    font-size: 14px;
+    padding: 8px 10px;
+    width: auto;
+  }
+
+  .loader {
+    width: 70px;
+    height: 70px;
+    border-width: 6px;
+  }
+
+  .loader-text {
+    font-size: 14px;
+    top: calc(17% + 90px);
+  }
+}
+/* Colores aplicados directamente por el atributo data-status */
+td.status-celda[data-status="Nuevo"] {
+  background-color: #28a745 !important;
   color: white;
   font-weight: bold;
 }
 
-#tabla td button,
-#contenido .tabla-responsive table td button,
-#contenido #tabla-wrapper table td button {
-  padding: 6px 10px;
-  font-size: 14px;
-  border-radius: 6px;
-  margin: 2px;
-  cursor: pointer;
+td.status-celda[data-status="En proceso"] {
+  background-color: #ffc107 !important;
+  color: black;
+  font-weight: bold;
 }
 
-/* ==========================================================
-   ✅ Mobile & Tablet Overrides (<= 1024px) — IGUAL
-   ========================================================== */
-@media (max-width: 1024px) {
-  #contenido {
-    padding: clamp(12px, 4vw, 20px);
-    border-radius: 10px;
-  }
-
-  /* Formulario a 1 columna y con buenos espacios táctiles */
-  #formulario {
-    grid-template-columns: 1fr !important;
-    gap: 14px !important;
-    padding: clamp(14px, 3vw, 20px) !important;
-  }
-  #formulario input, #formulario select {
-    font-size: 16px !important;   /* evita zoom en iOS */
-    padding: 12px !important;
-  }
-
-  /* Botones apilados al 100% de ancho */
-  .botones {
-    grid-column: 1 / -1 !important;
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-  .botones button,
-  button {
-    width: 100% !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-  }
-
-  /* Tabla con scroll horizontal y cabecera sticky */
-  .tabla-responsive, #tabla,
-  #contenido .tabla-responsive table, #contenido #tabla-wrapper table {
-    width: 100% !important;
-  }
-  .tabla-responsive, #tabla-wrapper {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-  #tabla,
-  #contenido .tabla-responsive table,
-  #contenido #tabla-wrapper table {
-    display: block !important;
-    overflow-x: auto !important;
-    white-space: nowrap;
-    margin-top: 16px !important;
-    border-collapse: collapse;
-  }
-  #tabla th, #tabla td,
-  #contenido .tabla-responsive table th, #contenido .tabla-responsive table td,
-  #contenido #tabla-wrapper table th, #contenido #tabla-wrapper table td {
-    padding: 10px 8px !important;
-  }
-  #tabla thead th,
-  #contenido .tabla-responsive table thead th,
-  #contenido #tabla-wrapper table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-  #tabla td button,
-  #contenido .tabla-responsive table td button,
-  #contenido #tabla-wrapper table td button {
-    width: 100% !important;
-    margin: 4px 0 !important;
-  }
-
-  /* Loader más pequeño */
-  .loader {
-    width: 48px !important;
-    height: 48px !important;
-    border-width: 6px !important;
-  }
+td.status-celda[data-status="Finalizado"] {
+  background-color: #ff0000 !important;
+  color: white;
+  font-weight: bold;
 }
 
-/* ====== Teléfonos (<= 600px) ====== */
-@media (max-width: 600px) {
-  #tabla,
-  #contenido .tabla-responsive table,
-  #contenido #tabla-wrapper table {
-    font-size: 12.5px !important;
-  }
+
+/* === Contenedor de acciones (3 botones azules) alineado con la tabla === */
+#contenido .acciones{
+  width: 100%;
+  max-width: 100%;
+  margin: clamp(8px, 1.5vh, 16px) auto clamp(8px, 1.5vh, 12px);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
 }
 
-/* ==========================================================
-   📱 Tablas móviles: scroll en X e Y — IGUAL
-   ========================================================== */
-@media (max-width: 1024px) {
-  /* WRAPPERS que deben rodear a la tabla */
-  .tabla-responsive,
-  #tabla-wrapper {
-    display: block !important;
-    max-width: 100% !important;
-    max-height: min(70vh, 560px) !important; /* alto visible para scroll vertical */
-    overflow-x: auto !important;             /* izquierda ⇄ derecha */
-    overflow-y: auto !important;             /* arriba ⇅ abajo */
-    -webkit-overflow-scrolling: touch;       /* momentum en iOS */
-    scrollbar-gutter: stable both-edges;
-    border-radius: 10px;
-  }
-
-  /* La propia tabla ocupa más ancho que el viewport para forzar scroll X */
-  .tabla-responsive table,
-  #tabla-wrapper table,
-  #tabla {
-    display: table;
-    width: 100%;
-    min-width: 760px;           /* ajusta si necesitas más/menos columnas visibles */
-    border-collapse: collapse;
-    table-layout: fixed;        /* celdas calculadas uniformemente */
-  }
-
-  /* Cabecera pegajosa en el wrapper */
-  .tabla-responsive thead th,
-  #tabla-wrapper thead th,
-  #tabla thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: inherit;        /* usa el fondo actual */
-    backdrop-filter: saturate(120%) blur(2px);
-  }
-
-  /* Celdas legibles en pantallas pequeñas */
-  .tabla-responsive th, .tabla-responsive td,
-  #tabla-wrapper th, #tabla-wrapper td,
-  #tabla th, #tabla td {
-    padding: 10px 8px !important;
-    font-size: 13px !important;
-    word-break: break-word;
-    white-space: normal;        /* permite saltos de línea en móvil */
-  }
-
-  /* Botones dentro de celdas: full width para facilidad táctil */
-  .tabla-responsive td button,
-  #tabla-wrapper td button,
-  #tabla td button {
-    width: 100% !important;
-    min-height: 40px !important;
-    margin: 4px 0 !important;
-  }
+/* El buscador al mismo ancho de la tabla (línea completa) */
+#contenido #buscador{
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 8px auto clamp(12px, 2vh, 18px);
+  padding: 10px 12px;
+  box-sizing: border-box;
 }
 
-/* Teléfonos pequeños: un poco más compacto */
-@media (max-width: 600px) {
-  .tabla-responsive,
-  #tabla-wrapper {
-    max-height: min(65vh, 520px) !important;
-  }
-  .tabla-responsive th, .tabla-responsive td,
-  #tabla-wrapper th, #tabla-wrapper td,
-  #tabla th, #tabla td {
-    font-size: 12.5px !important;
-  }
+/* === Ajuste de tamaño para Sistema 1 y 2: contenedor más angosto y centrado === */
+#contenido{
+  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(12px, 2vw, 24px);
+  padding-right: clamp(12px, 2vw, 24px);
+}
+#contenido > h2{ margin-left: 0; margin-right: 0; }
+
+/* === Igualar ancho del bloque superior al de la tabla === */
+#contenido > .logo-container,
+#contenido > h2,
+#contenido > #formulario,
+#contenido > #buscador {
+  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(12px, 2vw, 24px);
+  padding-right: clamp(12px, 2vw, 24px);
+}
+
+/* === Aire adicional arriba de la TABLA y separación de controles === */
+#formulario{ margin-bottom: clamp(16px, 4vh, 48px); }
+#buscador{ display:block; width:100%; max-width:none; margin: 8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
+.btn-recargar{ margin-top: 8px; }
+#tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
+
+
+
+/* === Empujar más abajo el bloque de ACCIONES (3 botones azules) para que no quede oculto por el panel superior === */
+#contenido .acciones{
+  margin-top: clamp(28px, 7vh, 110px) !important;  /* más aire arriba */
+  margin-bottom: clamp(10px, 2vh, 18px);
+}
+
+/* Aseguramos que el buscador quede inmediatamente debajo, a ancho de tabla */
+#contenido #buscador{
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin-top: clamp(12px, 2.5vh, 24px);
+}
+
+
+
+/* === FIX OVERLAP: el formulario superior NO debe ser fixed ni con margen negativo === */
+#formulario,
+#contenido form{
+  position: static !important;
+  top: auto !important;
+  margin-top: clamp(8px, 2vh, 20px) !important;
+}
+
+/* Asegurar que el bloque de ACCIONES quede bajo el panel superior */
+#contenido .acciones{
+  margin-top: clamp(28px, 7vh, 110px) !important;
 }
