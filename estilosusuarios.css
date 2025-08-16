@@ -540,3 +540,9 @@ td.status-celda[data-status="Finalizado"] {
   #tabla { font-size: 12.5px !important; }
   textarea { height: 72px !important; }
 }
+
+/* Fuerza fondo negro en celdas (excepto status) y texto blanco */
+#tabla tbody td:not(.status-celda){
+  background:#0c0c0c !important;
+  color:#faf9f9 !important;
+}
