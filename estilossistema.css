@@ -409,7 +409,7 @@ td.status-celda[data-status="Finalizado"] {
     margin-right: 0 !important;
   }
 
- /* Botones apilados sin estirarse (FORMULARIO) */
+/* Botones apilados sin estirarse (FORMULARIO) */
 .botones {
   grid-column: 1 / -1 !important;
   display: grid !important;
@@ -436,6 +436,7 @@ td.status-celda[data-status="Finalizado"] {
   min-height: 40px !important;
   margin: 4px 0 !important;        /* separación vertical */
 }
+
 
   /* Buscador pegado a la izquierda */
   #contenido #buscador {
