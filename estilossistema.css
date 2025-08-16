@@ -359,512 +359,67 @@ td.status-celda[data-status="Finalizado"] {
 
 
 /* ==========================================================
-   ✅ Mobile & Tablet Overrides (<= 1024px) — 2025-08-16
-   Nota: SOLO afecta móviles/tablets. No cambia el desktop.
+   🔄 Corrección móvil/tablet Sistema:
+   - Restaura color de cabecera de tabla (azul + texto blanco)
+   - La tabla sí se desplaza en X (forzamos ancho mínimo)
+   - Inputs y botones a 100% de ancho
    ========================================================== */
 @media (max-width: 1024px) {
-  /* Contenedor general más respirable */
-  #contenido {
-    width: 100%;
-    padding-left: clamp(12px, 4vw, 24px);
-    padding-right: clamp(12px, 4vw, 24px);
-  }
-
-  /* Formulario: quitar fixed y márgenes negativos en móvil */
-  #formulario,
-  #contenido form,
-  form {
-    position: static !important;
-    top: auto !important;
-    margin: 12px auto 16px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  /* Grilla del formulario a 1 columna en pantallas pequeñas */
-  #formulario,
-  #contenido form,
-  form {
-    display: grid;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    padding: clamp(12px, 3vw, 18px) !important;
-    box-sizing: border-box;
-  }
-
-  /* Inputs y selects con mayor área táctil */
-  input, textarea, select {
-    font-size: 16px !important;  /* evita zoom en iOS */
-    padding: 12px !important;
-  }
-
-  /* Botonera: apilar y ocupar ancho completo */
-  .botones {
-    grid-column: 1 / -1 !important;
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-    justify-content: stretch !important;
-  }
-  .botones button,
-  button {
-    width: 100% !important;
-    min-height: 44px !important; /* accesibilidad */
-    font-size: 15px !important;
-    max-width: none !important;
-    flex: 0 0 auto !important;
-  }
-
-  /* Usuario arriba centrado */
-  .usuario-nombre {
-    text-align: center !important;
-    font-size: 14px !important;
-    margin: 8px 0 !important;
-  }
-
-  /* Acciones (3 botones azules) apiladas y sin desbordes */
-  #contenido .acciones {
-    width: 100% !important;
-    margin-top: clamp(18px, 5vh, 28px) !important;
-    margin-bottom: 12px !important;
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-
-  /* Buscador full width debajo de acciones */
-  #contenido #buscador {
-    width: 100% !important;
-    margin: 8px 0 12px !important;
-    padding: 10px 12px !important;
-    max-width: none !important;
-  }
-
-  /* Tabla: scroll horizontal suave y cabecera pegajosa */
-  #tabla {
-    display: block !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-    border-radius: 10px !important;
-    font-size: 13px !important;
-  }
-  #tabla thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-  #tabla td button {
-    width: 100% !important;
-    max-width: none !important;
-    font-size: 14px !important;
-    margin: 4px 0 !important;
-  }
-  #tabla th, #tabla td {
-    padding: 10px 8px !important;
-  }
-  #tabla td, #tabla th {
-    word-break: break-word;
-  }
-
-  /* Loader centrado y más pequeño en móviles */
-  .loader-wrapper {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  .loader {
-    width: 72px !important;
-    height: 72px !important;
-    border-width: 6px !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-  }
-  .loader-text {
-    position: static !important;
-    transform: none !important;
-    margin-top: 8px !important;
-    text-align: center !important;
-    font-size: 14px !important;
-  }
-
-  /* Logo siempre al 100% del contenedor */
-  .logo-container img {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-}
-
-/* ====== Ajustes específicos extra para teléfonos (<= 600px) ====== */
-@media (max-width: 600px) {
-  /* Reducir un poco el tamaño de fuente de la tabla */
-  #tabla {
-    font-size: 12.5px !important;
-  }
-  /* Textarea algo más baja para vistas pequeñas */
-  textarea {
-    height: 72px !important;
-  }
-}
-
-
-
-/* ==========================================================
-   📱 Tablas móviles: scroll en X e Y — 2025-08-16
-   - Funciona con envoltorios .tabla-responsive o #tabla-wrapper
-   - Degradación aceptable si solo existe #tabla
-   ========================================================== */
-@media (max-width: 1024px) {
-  /* WRAPPERS que deben rodear a la tabla */
-  .tabla-responsive,
-  #tabla-wrapper {
-    display: block !important;
-    max-width: 100% !important;
-    max-height: min(70vh, 560px) !important; /* alto visible para scroll vertical */
-    overflow-x: auto !important;             /* izquierda ⇄ derecha */
-    overflow-y: auto !important;             /* arriba ⇅ abajo */
-    -webkit-overflow-scrolling: touch;       /* momentum en iOS */
-    scrollbar-gutter: stable both-edges;
-    border-radius: 10px;
-  }
-
-  /* La propia tabla ocupa más ancho que el viewport para forzar scroll X */
-  .tabla-responsive table,
-  #tabla-wrapper table,
-  #tabla {
-    display: table;
-    width: 100%;
-    min-width: 760px;           /* ajusta si necesitas más/menos columnas visibles */
-    border-collapse: collapse;
-    table-layout: fixed;        /* celdas calculadas uniformemente */
-  }
-
-  /* Cabecera pegajosa en el wrapper */
-  .tabla-responsive thead th,
+  /* 1) Cabecera de la tabla con fondo azul y texto blanco */
   #tabla-wrapper thead th,
+  .tabla-responsive thead th,
   #tabla thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: inherit;        /* usa el fondo actual */
-    backdrop-filter: saturate(120%) blur(2px);
-  }
-
-  /* Celdas legibles en pantallas pequeñas */
-  .tabla-responsive th, .tabla-responsive td,
-  #tabla-wrapper th, #tabla-wrapper td,
-  #tabla th, #tabla td {
-    padding: 10px 8px !important;
-    font-size: 13px !important;
-    word-break: break-word;
-    white-space: normal;        /* permite saltos de línea en móvil */
-  }
-
-  /* Botones dentro de celdas: full width para facilidad táctil */
-  .tabla-responsive td button,
-  #tabla-wrapper td button,
-  #tabla td button {
-    width: 100% !important;
-    min-height: 40px !important;
-    margin: 4px 0 !important;
-  }
-}
-
-/* Teléfonos pequeños: un poco más compacto */
-@media (max-width: 600px) {
-  .tabla-responsive,
-  #tabla-wrapper {
-    max-height: min(65vh, 520px) !important;
-  }
-  .tabla-responsive th, .tabla-responsive td,
-  #tabla-wrapper th, #tabla-wrapper td,
-  #tabla th, #tabla td {
-    font-size: 12.5px !important;
-  }
-}
-
-
-
-/* ==========================================================
-   📱 Sistema: tabla con scroll en X e Y (igual a Usuarios)
-   - Soporta #tabla-wrapper, .tabla-responsive o #tabla directo
-   ========================================================== */
-@media (max-width: 1024px) {
-  /* Wrapper con scroll biaxial */
-  #tabla-wrapper,
-  .tabla-responsive {
-    display: block !important;
-    max-width: 100% !important;
-    max-height: min(70vh, 560px) !important;
-    overflow-x: auto !important;   /* izquierda ⇄ derecha */
-    overflow-y: auto !important;   /* arriba ⇅ abajo */
-    -webkit-overflow-scrolling: touch;
-    scrollbar-gutter: stable both-edges;
-    border-radius: 10px;
-  }
-
-  /* Si no hay wrapper, habilita scroll en la propia tabla */
-  #tabla {
-    display: table;                /* evita display:block que rompe sticky */
-    width: 100%;
-    min-width: 760px;              /* fuerza scroll horizontal en pantallas pequeñas */
-    border-collapse: collapse;
-    table-layout: fixed;           /* celdas uniformes y predecibles */
-  }
-
-  /* Cabecera fija durante el scroll */
-  #tabla thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: inherit;
-    backdrop-filter: saturate(120%) blur(2px);
-  }
-
-  /* Celdas legibles y sin overflow visual */
-  #tabla th, #tabla td {
-    padding: 10px 8px !important;
-    font-size: 13px !important;
-    word-break: break-word;
-    white-space: normal;
-  }
-
-  /* Columna Acciones un poco más ancha para que no sobresalga */
-  #tabla th:last-child,
-  #tabla td:last-child {
-    min-width: 180px !important;
-  }
-
-  /* Botones dentro de Acciones usan todo el ancho de la celda */
-  #tabla td:last-child button {
-    width: 100% !important;
-    min-height: 40px !important;
-    display: block !important;
-    margin: 4px 0 !important;
-  }
-
-  /* Previene recortes por overflow oculto de contenedores superiores */
-  #contenido, main, section, .tabla-container, .table-container {
-    overflow: visible !important;
-  }
-}
-
-/* Teléfonos pequeños (<=600px): un poco más de ancho en Acciones */
-@media (max-width: 600px) {
-  #tabla th:last-child,
-  #tabla td:last-child {
-    min-width: 200px !important;
-  }
-}
-
-
-
-/* ==========================================================
-   🛠️ Fix móvil: interfaz bloqueada & scroll tabla (Sistema)
-   - Evita que overlays invisibles bloqueen toques
-   - Asegura desplazamiento táctil en X/Y
-   ========================================================== */
-@media (max-width: 1024px) {
-  /* 1) Si el loader no está "activo", no debe bloquear los toques */
-  .loader-wrapper {
-    pointer-events: none !important;  /* no captura taps por encima */
-  }
-  /* Si tu código usa una clase para mostrar el loader, re-actívalo ahí:
-     .loader-wrapper.is-active { pointer-events: auto !important; } */
-
-  /* 2) Tabla: permitir gestos táctiles pan en ambos ejes */
-  #tabla-wrapper,
-  .tabla-responsive,
-  #tabla {
-    touch-action: pan-x pan-y;        /* gestos nativos en móvil */
-  }
-
-  /* 3) Quitar restricciones de overflow en la propia tabla para que el wrapper maneje el scroll */
-  #tabla {
-    overflow: visible !important;
-  }
-
-  /* 4) Asegurar que el viewport puede desplazarse si hay contenido */
-  html, body {
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-  }
-}
-
-
-
-/* ==========================================================
-   🌞 Fix móvil: pantalla se ve "oscura"/"lechosa" en Sistema
-   - Oculta overlays y elimina filtros en móviles/tablets
-   - Quita backdrop-filter en cabecera sticky de la tabla
-   ========================================================== */
-@media (max-width: 1024px) {
-  /* 0) Fondo limpio */
-  html, body {
-    background: #fff !important;
-  }
-
-  /* 1) Nunca aplicar filtros ni mezclas globales en móvil */
-  html, body, #contenido, main, .app, .app-container {
-    filter: none !important;
-    mix-blend-mode: normal !important;
-  }
-
-  /* 2) Overlays/modales/loader no deben teñir la pantalla por defecto */
-  .loader-wrapper,
-  .overlay,
-  .modal-backdrop,
-  #route-loader,
-  #splash,
-  .backdrop,
-  .fader {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
-    pointer-events: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-  }
-  /* Si quieres activarlos explícitamente desde JS, añade .is-active */
-  .loader-wrapper.is-active,
-  .overlay.is-active,
-  .modal-backdrop.is-active,
-  #route-loader.is-active,
-  #splash.is-active,
-  .backdrop.is-active,
-  .fader.is-active {
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-    /* background: rgba(0,0,0,.28) !important;  // (opcional) */
-  }
-
-  /* 3) Tabla sticky sin "leche" arriba */
-  #tabla thead th {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background-color: #ffffff !important;
-  }
-}
-
-
-
-/* ==========================================================
-   🎯 Móvil/Tablet: que SOLO se mueva la TABLA, no el contenedor
-   (Sistema)
-   ========================================================== */
-@media (max-width: 1024px) {
-  /* 1) Bloquear desplazamiento horizontal del contenedor/página */
-  html, body, #contenido, main, .tabla-container, .table-container {
-    overflow-x: hidden !important;   /* sin scroll lateral en contenedor */
-    touch-action: pan-y !important;  /* solo gestos verticales */
-  }
-
-  /* 2) Habilitar scroll X/Y únicamente en el wrapper de la tabla */
-  #tabla-wrapper,
-  .tabla-responsive {
-    overflow-x: auto !important;     /* izquierda ⇄ derecha */
-    overflow-y: auto !important;     /* arriba ⇅ abajo (contenido de la tabla) */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;    /* no "arrastra" el scroll al body */
-    touch-action: pan-x pan-y !important;
-  }
-
-  /* 3) Si no hay wrapper, permitir scroll en la propia tabla (fallback) */
-  #tabla {
-    display: table;
-    min-width: 760px;                /* fuerza scroll horizontal si hay muchas columnas */
-    border-collapse: collapse;
-    table-layout: fixed;
-    overflow: auto !important;       /* maneja su propio scroll */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-x pan-y !important;
-  }
-}
-
-
-
-/* ==========================================================
-   🌟 Móvil/Tablet: sin "sombra" y sin movimiento del contenedor
-   — solo se desplaza la TABLA (Sistema)
-   ========================================================== */
-@media (max-width: 1024px) {
-  /* 0) Normaliza caja para evitar desbordes por padding/border */
-  *, *::before, *::after { box-sizing: border-box; }
-
-  /* 1) Quita oscurecidos/filtros/shadows en móvil */
-  html, body, #contenido, main, .app, .app-container {
-    background: #fff !important;
-    filter: none !important;
-    mix-blend-mode: normal !important;
-    opacity: 1 !important;
-  }
-  .overlay, .modal-backdrop, #route-loader, #splash, .backdrop, .fader, .shadow, .sombra,
-  .overlay::before, .overlay::after,
-  #route-loader::before, #route-loader::after,
-  header::before, header::after {
-    background: transparent !important;
-    box-shadow: none !important;
-    filter: none !important;
+    background: var(--thead-bg, #0ea5e9) !important;
+    color: var(--thead-color, #ffffff) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+    box-shadow: none !important;
   }
-  /* Loader no bloquea por defecto; actívalo con .is-active si necesitas */
-  .loader-wrapper { pointer-events: none !important; background: transparent !important; }
-  .loader-wrapper.is-active { pointer-events: auto !important; }
 
-  /* 2) El contenedor/página no se mueve lateralmente */
-  html, body {
-    overflow-x: clip !important;            /* no barra ni "empuje" lateral */
-    overscroll-behavior-x: contain !important;
-    touch-action: pan-y !important;         /* solo vertical en la página */
+  /* 2) El contenedor NO se mueve lateralmente, solo la tabla */
+  html, body, #contenido, main {
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
   }
-  #contenido, main, .tabla-container, .table-container, .acciones, .botones {
-    max-width: 100% !important;
-    overflow-x: clip !important;
-    overscroll-behavior-x: contain !important;
-  }
-  .acciones, .botones { flex-wrap: wrap !important; gap: 10px !important; }
-  .acciones > *, .botones > * { min-width: 0 !important; }
-
-  /* 3) Solo el wrapper de la tabla desplaza en X/Y */
+  /* Wrapper de tabla con scroll en ambos ejes */
   #tabla-wrapper, .tabla-responsive {
-    position: relative;
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: min(70vh, 560px) !important;
     overflow-x: auto !important;
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     touch-action: pan-x pan-y !important;
-    border-radius: 10px;
   }
-  /* Fallback: si no hay wrapper, mueve la propia tabla */
+
+  /* 3) La propia tabla es más ancha que el viewport para forzar scroll X */
   #tabla {
-    display: table;
     width: 100%;
-    min-width: 760px;
-    table-layout: fixed;
+    min-width: 900px;          /* fuerza que aparezca el scroll horizontal */
+    table-layout: auto;        /* deja que el contenido defina mejor el ancho */
     border-collapse: collapse;
-    overflow: auto !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-x pan-y !important;
   }
 
-  /* 4) Cabecera sin blur "lechoso" y sin sombra */
-  #tabla thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: #fff !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
+  /* 4) Inputs/Selects/Textareas con 100% de ancho visible */
+  form input[type="text"],
+  form input[type="email"],
+  form input[type="password"],
+  form input[type="tel"],
+  form select,
+  form textarea {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
-  /* 5) Imágenes y medios no rompen el ancho */
-  img, svg, video, canvas { max-width: 100% !important; height: auto !important; }
+  /* 5) Botones al 100% (acciones y botonera del formulario) */
+  .acciones .btn,
+  .acciones button,
+  .botones button {
+    width: 100% !important;
+    display: block !important;
+  }
+  .acciones, .botones {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
 }
