@@ -356,8 +356,8 @@ td.status-celda[data-status="Finalizado"] {
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
 
-* ==========================================================
-   ✅ Mobile & Tablet (<= 1024px) — limpio y unificado
+/* ==========================================================
+   ✅ SOLO MÓVIL/TABLET (<= 1024px) — versión compacta
    ========================================================== */
 @media (max-width: 1024px) {
 
@@ -367,23 +367,22 @@ td.status-celda[data-status="Finalizado"] {
     touch-action: pan-y !important;
   }
 
-  /* Contenedores más anchos y pegados al marco */
+  /* Contenedores más anchos y pegados al marco (un poco más a la izquierda) */
   .container,
   #contenido {
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 !important;
-    padding-left: clamp(6px, 2.5vw, 12px) !important;   /* más a la izquierda */
-    padding-right: clamp(6px, 2.5vw, 12px) !important;  /* simétrico */
+    padding-left: clamp(6px, 2.5vw, 12px) !important;   /* más pegado a la izquierda */
+    padding-right: clamp(12px, 4.5vw, 20px) !important; /* margen cómodo a la derecha */
     box-sizing: border-box !important;
-    background-color: #fff !important; /* sin “sombra/lechoso” */
+    background-color: #fff !important;
     box-shadow: none !important;
-    filter: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
 
-  /* Form: 1 columna y acompaña los nuevos márgenes */
+  /* Formulario: 1 columna y acompaña la alineación a la izquierda */
   form,
   #formulario,
   #contenido form {
@@ -401,9 +400,9 @@ td.status-celda[data-status="Finalizado"] {
     box-sizing: border-box !important;
   }
 
-  /* Inputs/Select/Textarea no sobresalen y evitan zoom iOS */
+  /* Inputs/Select/Textarea: táctiles y sin sobresalir */
   input, textarea, select {
-    font-size: 16px !important;
+    font-size: 16px !important;  /* evita zoom en iOS */
     padding: 12px !important;
     box-sizing: border-box !important;
     width: calc(100% - 8px) !important;
@@ -416,19 +415,19 @@ td.status-celda[data-status="Finalizado"] {
   .botones {
     grid-column: 1 / -1 !important;
     display: grid !important;
-    grid-template-columns: 1fr !important;  /* vertical */
+    grid-template-columns: 1fr !important; /* vertical */
     gap: 8px !important;
-    justify-items: start !important;        /* alineados a la izquierda */
+    justify-items: start !important;       /* alineados a la izquierda */
   }
   .botones button {
-    width: auto !important;                 /* NO 100% */
-    min-width: 140px !important;            /* tacto cómodo */
+    width: auto !important;                /* NO 100% */
+    min-width: 140px !important;           /* comodidad táctil */
     max-width: 100% !important;
     min-height: 44px !important;
     font-size: 15px !important;
   }
 
-  /* Acciones superiores (si existen): auto-ajuste y compactas */
+  /* Acciones superiores: auto-ajuste y compactas, pegadas a la izquierda */
   #contenido .acciones {
     width: 100% !important;
     margin-top: clamp(18px, 5vh, 28px) !important;
@@ -497,10 +496,10 @@ td.status-celda[data-status="Finalizado"] {
   #tabla td button {
     display: block !important;              /* uno bajo otro */
     width: auto !important;                 /* NO 100% */
-    min-width: 120px !important;            /* un poco más compacto */
+    min-width: 120px !important;
     max-width: 100% !important;
     min-height: 40px !important;
-    margin: 4px 0 !important;               /* separación vertical */
+    margin: 4px 0 !important;               /* espacio vertical */
   }
 
   /* Loader compacto */
@@ -509,14 +508,16 @@ td.status-celda[data-status="Finalizado"] {
     height: 48px !important;
     border-width: 6px !important;
   }
+
+  /* Logo al 100% del contenedor */
+  .logo-container img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
 }
 
 /* ====== Teléfonos (<= 600px) ====== */
 @media (max-width: 600px) {
-  table { font-size: 12.5px !important; }
+  table, #tabla { font-size: 12.5px !important; }
   textarea { height: 72px !important; }
-  /* (opcional) 2 columnas en acciones si la pantalla es muy chica:
-  #contenido .acciones { grid-template-columns: repeat(2, 1fr) !important; }
-  #contenido .acciones .btn, #contenido .acciones button { width: 100% !important; min-width: 0 !important; }
-  */
 }
