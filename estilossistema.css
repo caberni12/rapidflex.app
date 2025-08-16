@@ -91,30 +91,19 @@ button {
   max-width: 200px;
 }
 
-.btn-guardar {
-  background-color: #28a745;
-  color: white;
-}
+.btn-guardar { background-color: #28a745; color: white; }
+.btn-cancelar { background-color: #dc3545; color: white; }
+.btn-recargar { margin-bottom: 12px; background-color: #007bff; color: white; }
 
-.btn-cancelar {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-recargar {
-  margin-bottom: 12px;
-  background-color: #007bff;
-  color: white;
-}
-
-/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO Y SCROLL HORIZONTAL --- */
+/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO Y SCROLL H/V --- */
 .tabla-responsive,
 #tabla-wrapper {
   background: #0c0c0c !important;
   border-radius: 8px;
   width: 100% !important;
-  overflow-x: auto !important;
-  overflow-y: visible !important;
+  max-height: 70vh;              /* límite para activar scroll vertical interno */
+  overflow-x: auto !important;   /* scroll horizontal */
+  overflow-y: auto !important;   /* scroll vertical */
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain !important;
   padding: 0 !important;
@@ -125,7 +114,8 @@ button {
 }
 .tabla-responsive::-webkit-scrollbar,
 #tabla-wrapper::-webkit-scrollbar {
-  height: 8px;
+  height: 8px;                   /* scrollbar horizontal */
+  width: 8px;                    /* scrollbar vertical */
   background: #222;
 }
 .tabla-responsive::-webkit-scrollbar-thumb,
@@ -156,9 +146,7 @@ td {
   text-align: center;
 }
 
-th {
-  background: #049afdcc;
-}
+th { background: #049afdcc; }
 
 thead tr.filtros th {
   padding: 4px 5px;
@@ -234,9 +222,7 @@ td button {
   text-align: center;
 }
 
-.loader-wrapper.hidden {
-  display: none;
-}
+.loader-wrapper.hidden { display: none; }
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
@@ -251,9 +237,7 @@ td button {
     gap: 12px;
   }
 
-  .botones {
-    justify-content: center;
-  }
+  .botones { justify-content: center; }
 
   button {
     font-size: 15px;
@@ -261,14 +245,9 @@ td button {
     max-width: 100%;
   }
 
-  .usuario-nombre {
-    text-align: center;
-    font-size: 14px;
-  }
+  .usuario-nombre { text-align: center; font-size: 14px; }
 
-  #tabla {
-    font-size: 13px;
-  }
+  #tabla { font-size: 13px; }
 
   td button {
     font-size: 14px;
@@ -288,19 +267,18 @@ td button {
     top: calc(17% + 90px);
   }
 }
+
 /* Colores aplicados directamente por el atributo data-status */
 td.status-celda[data-status="Nuevo"] {
   background-color: #28a745 !important;
   color: white;
   font-weight: bold;
 }
-
 td.status-celda[data-status="En proceso"] {
   background-color: #ffc107 !important;
   color: black;
   font-weight: bold;
 }
-
 td.status-celda[data-status="Finalizado"] {
   background-color: #ff0000 !important;
   color: white;
@@ -474,22 +452,15 @@ td.status-celda[data-status="Finalizado"] {
     justify-content: start !important;
     gap: 10px !important;
   }
-  #contenido .acciones .btn,
-  #contenido .acciones button {
-    width: auto !important;
-    min-width: 140px !important;
-    max-width: 100% !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-  }
 
   .tabla-responsive,
   #tabla-wrapper {
     background: #0c0c0c !important;
     border-radius: 8px;
     width: 100% !important;
+    max-height: 70vh;            /* activo también en móvil */
     overflow-x: auto !important;
-    overflow-y: visible !important;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
   }
 }
