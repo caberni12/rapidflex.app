@@ -355,9 +355,13 @@ td.status-celda[data-status="Finalizado"] {
 #contenido .acciones{
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
-
 /* ==========================================================
-   ✅ SOLO MÓVIL/TABLET (<= 1024px) — versión compacta
+   ✅ SOLO MÓVIL/TABLET (<= 1024px) — con ajustes finales
+   - Contenedores más anchos (pegados al marco)
+   - Botones del form uno bajo otro, sin estirarse
+   - Acciones auto-ajustables y compactas
+   - Tabla accesible hasta la última columna (sin girar pantalla)
+   - Solo la tabla se desplaza; cabecera azul sticky
    ========================================================== */
 @media (max-width: 1024px) {
 
@@ -367,14 +371,14 @@ td.status-celda[data-status="Finalizado"] {
     touch-action: pan-y !important;
   }
 
-  /* Contenedores más anchos y pegados al marco (un poco más a la izquierda) */
+  /* Contenedor principal a todo el ancho, pegado a la izquierda */
   .container,
   #contenido {
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 !important;
-    padding-left: clamp(6px, 2.5vw, 12px) !important;   /* más pegado a la izquierda */
-    padding-right: clamp(12px, 4.5vw, 20px) !important; /* margen cómodo a la derecha */
+    padding-left: clamp(6px, 2.5vw, 12px) !important;   /* más a la izquierda */
+    padding-right: clamp(6px, 2.5vw, 12px) !important;  /* simétrico */
     box-sizing: border-box !important;
     background-color: #fff !important;
     box-shadow: none !important;
@@ -382,7 +386,7 @@ td.status-celda[data-status="Finalizado"] {
     backdrop-filter: none !important;
   }
 
-  /* Formulario: 1 columna y acompaña la alineación a la izquierda */
+  /* Formulario: 1 columna y acompaña la alineación */
   form,
   #formulario,
   #contenido form {
@@ -411,11 +415,11 @@ td.status-celda[data-status="Finalizado"] {
     margin-right: 0 !important;
   }
 
-  /* Botonera del FORM: uno debajo del otro y sin estirarse */
+  /* Botonera del FORM: vertical, compacta y sin estirarse */
   .botones {
     grid-column: 1 / -1 !important;
     display: grid !important;
-    grid-template-columns: 1fr !important; /* vertical */
+    grid-template-columns: 1fr !important; /* uno bajo otro */
     gap: 8px !important;
     justify-items: start !important;       /* alineados a la izquierda */
   }
@@ -461,7 +465,9 @@ td.status-celda[data-status="Finalizado"] {
     overflow-x: auto !important;            /* izquierda ⇄ derecha */
     overflow-y: auto !important;            /* arriba ⇅ abajo */
     -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain !important;/* no arrastra al body */
+    touch-action: pan-x pan-y !important;
+    padding-right: 12px !important;         /* colchón para llegar al final */
+    scrollbar-gutter: stable both-edges;    /* la barra no tapa contenido */
   }
 
   table,
@@ -469,19 +475,21 @@ td.status-celda[data-status="Finalizado"] {
     display: block !important;
     overflow-x: auto !important;
     overflow-y: auto !important;
-    white-space: nowrap !important;
+    white-space: normal !important;         /* ❗ permite llegar a la última col */
+    table-layout: auto !important;
+    min-width: 640px !important;            /* más accesible que 760+ en vertical */
     margin-top: 16px !important;
     border-collapse: collapse !important;
-    min-width: 760px;                       /* fuerza scroll horizontal si hace falta */
-    touch-action: pan-x pan-y !important;   /* gestos táctiles */
+    touch-action: pan-x pan-y !important;
   }
 
+  /* Cabecera azul sticky sin blur */
   thead th,
   #tabla thead th {
     position: sticky !important;
     top: 0 !important;
     z-index: 2 !important;
-    background-color: #2196F3 !important;   /* azul sólido, sin blur */
+    background-color: #2196F3 !important;
     color: #fff !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
@@ -492,14 +500,24 @@ td.status-celda[data-status="Finalizado"] {
     padding: 10px 8px !important;
   }
 
-  /* Botones de acciones dentro de la TABLA: verticales y compactos */
-  #tabla td button {
-    display: block !important;              /* uno bajo otro */
-    width: auto !important;                 /* NO 100% */
-    min-width: 120px !important;
+  /* Última columna (Acciones) compacta y legible */
+  #tabla th:last-child,
+  #tabla td:last-child,
+  table th:last-child,
+  table td:last-child {
+    min-width: 150px !important;
+    white-space: normal !important;
+  }
+
+  /* Botones de Acciones (Modificar / Eliminar) apilados y visibles */
+  #tabla td:last-child button,
+  table td:last-child button {
+    display: block !important;              /* uno bajo el otro */
+    width: auto !important;                 /* sin estirarse */
+    min-width: 110px !important;
     max-width: 100% !important;
     min-height: 40px !important;
-    margin: 4px 0 !important;               /* espacio vertical */
+    margin: 4px 0 !important;               /* separación vertical */
   }
 
   /* Loader compacto */
