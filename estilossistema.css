@@ -107,25 +107,37 @@ button {
   color: white;
 }
 
-/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO y SCROLL HORIZONTAL --- */
+/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO Y SCROLL HORIZONTAL --- */
 .tabla-responsive,
 #tabla-wrapper {
   background: #0c0c0c !important;
   border-radius: 8px;
   width: 100% !important;
   overflow-x: auto !important;
-  overflow-y: auto !important;
+  overflow-y: visible !important;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain !important;
   padding: 0 !important;
   margin: 0 auto 20px auto;
   box-sizing: border-box;
+  scrollbar-color: #049afd #222;
+  scrollbar-width: thin;
+}
+.tabla-responsive::-webkit-scrollbar,
+#tabla-wrapper::-webkit-scrollbar {
+  height: 8px;
+  background: #222;
+}
+.tabla-responsive::-webkit-scrollbar-thumb,
+#tabla-wrapper::-webkit-scrollbar-thumb {
+  background: #049afd;
+  border-radius: 4px;
 }
 
-/* --- Permite scroll horizontal sin bloquear la tabla --- */
+/* --- Permite scroll horizontal real en tabla --- */
 #tabla {
-  width: max-content; /* <-- clave para permitir scroll horizontal real */
-  min-width: 100%;    /* la tabla nunca será más angosta que el contenedor */
+  width: max-content;  /* permite que la tabla crezca y haga scroll si es necesario */
+  min-width: 100%;     /* nunca será más angosta que el contenedor */
   border-collapse: collapse;
   background: transparent;
   color: #faf9f9;
@@ -134,6 +146,8 @@ button {
   overflow: hidden;
   font-size: 14px;
 }
+
+/* --- FIN FIX SCROLL --- */
 
 th,
 td {
@@ -475,7 +489,7 @@ td.status-celda[data-status="Finalizado"] {
     border-radius: 8px;
     width: 100% !important;
     overflow-x: auto !important;
-    overflow-y: auto !important;
+    overflow-y: visible !important;
     -webkit-overflow-scrolling: touch;
   }
 }
