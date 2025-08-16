@@ -476,18 +476,10 @@ td.status-celda[data-status="Finalizado"] {
     word-break: break-word;
   }
 
-  /* Loader centrado y más pequeño en móviles */
-  .loader-wrapper {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
   .loader {
-    width: 72px !important;
-    height: 72px !important;
+    width: 48px !important;
+    height: 48px !important;
     border-width: 6px !important;
-    margin: 0 !important;
-    box-shadow: none !important;
   }
   .loader-text {
     position: static !important;
