@@ -690,3 +690,95 @@ td.status-celda[data-status="Finalizado"] {
     overflow-y: auto !important;
   }
 }
+
+
+
+/* ==========================================================
+   🌞 Fix móvil: pantalla se ve "oscura"/"lechosa" en Sistema
+   - Oculta overlays y elimina filtros en móviles/tablets
+   - Quita backdrop-filter en cabecera sticky de la tabla
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* 0) Fondo limpio */
+  html, body {
+    background: #fff !important;
+  }
+
+  /* 1) Nunca aplicar filtros ni mezclas globales en móvil */
+  html, body, #contenido, main, .app, .app-container {
+    filter: none !important;
+    mix-blend-mode: normal !important;
+  }
+
+  /* 2) Overlays/modales/loader no deben teñir la pantalla por defecto */
+  .loader-wrapper,
+  .overlay,
+  .modal-backdrop,
+  #route-loader,
+  #splash,
+  .backdrop,
+  .fader {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  /* Si quieres activarlos explícitamente desde JS, añade .is-active */
+  .loader-wrapper.is-active,
+  .overlay.is-active,
+  .modal-backdrop.is-active,
+  #route-loader.is-active,
+  #splash.is-active,
+  .backdrop.is-active,
+  .fader.is-active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    /* background: rgba(0,0,0,.28) !important;  // (opcional) */
+  }
+
+  /* 3) Tabla sticky sin "leche" arriba */
+  #tabla thead th {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: #ffffff !important;
+  }
+}
+
+
+
+/* ==========================================================
+   🎯 Móvil/Tablet: que SOLO se mueva la TABLA, no el contenedor
+   (Sistema)
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* 1) Bloquear desplazamiento horizontal del contenedor/página */
+  html, body, #contenido, main, .tabla-container, .table-container {
+    overflow-x: hidden !important;   /* sin scroll lateral en contenedor */
+    touch-action: pan-y !important;  /* solo gestos verticales */
+  }
+
+  /* 2) Habilitar scroll X/Y únicamente en el wrapper de la tabla */
+  #tabla-wrapper,
+  .tabla-responsive {
+    overflow-x: auto !important;     /* izquierda ⇄ derecha */
+    overflow-y: auto !important;     /* arriba ⇅ abajo (contenido de la tabla) */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;    /* no "arrastra" el scroll al body */
+    touch-action: pan-x pan-y !important;
+  }
+
+  /* 3) Si no hay wrapper, permitir scroll en la propia tabla (fallback) */
+  #tabla {
+    display: table;
+    min-width: 760px;                /* fuerza scroll horizontal si hay muchas columnas */
+    border-collapse: collapse;
+    table-layout: fixed;
+    overflow: auto !important;       /* maneja su propio scroll */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y !important;
+  }
+}
