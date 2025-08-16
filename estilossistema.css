@@ -356,87 +356,154 @@ td.status-celda[data-status="Finalizado"] {
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
 
-
-
-/* ==========================================================
-   ✅ Mobile & Tablet Overrides (<= 1024px) — 2025-08-16
-   Nota: SOLO afecta móviles/tablets. No cambia el desktop.
+* ==========================================================
+   ✅ Mobile & Tablet (<= 1024px) — limpio y unificado
    ========================================================== */
 @media (max-width: 1024px) {
-  .container {
-    padding: clamp(12px, 4vw, 20px) !important;
-    border-radius: 10px !important;
+
+  /* La página NO se mueve lateralmente; solo la TABLA */
+  html, body {
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
   }
 
-  /* Formulario a 1 columna y con buenos espacios táctiles */
-  form {
-    grid-template-columns: 1fr !important;
-    gap: 14px !important;
-    padding: clamp(14px, 3vw, 20px) !important;
-  }
-  input, select {
-    font-size: 16px !important;   /* evita zoom en iOS */
-    padding: 12px !important;
-  }
-
-  /* Botones apilados sin estirarse (FORMULARIO) */
-.botones {
-  grid-column: 1 / -1 !important;
-  display: grid !important;
-  grid-template-columns: 1fr !important; /* uno bajo el otro */
-  gap: 8px !important;
-  justify-items: start !important;       /* alineados a la izquierda */
-}
-
-/* ❗ Ojo: quitamos el selector global "button" para no forzar 100% en todo */
-.botones button {
-  width: auto !important;          /* ya no ocupan 100% */
-  min-width: 140px !important;     /* cómodo al tacto, ajusta si quieres */
-  max-width: 100% !important;
-  min-height: 44px !important;
-  font-size: 15px !important;
-}
-
-/* Acciones dentro de la TABLA: Modificar / Eliminar apilados y contenidos */
-#tabla td button {
-  display: block !important;       /* fuerza vertical: uno bajo el otro */
-  width: auto !important;          /* no 100% */
-  min-width: 120px !important;     /* un poco más compactos */
-  max-width: 100% !important;
-  min-height: 40px !important;
-  margin: 4px 0 !important;        /* separación vertical */
-}
-
-
-  /* Tabla con scroll horizontal y cabecera sticky */
-  .tabla-responsive, table {
+  /* Contenedores más anchos y pegados al marco */
+  .container,
+  #contenido {
+    max-width: 100% !important;
     width: 100% !important;
+    margin: 0 !important;
+    padding-left: clamp(6px, 2.5vw, 12px) !important;   /* más a la izquierda */
+    padding-right: clamp(6px, 2.5vw, 12px) !important;  /* simétrico */
+    box-sizing: border-box !important;
+    background-color: #fff !important; /* sin “sombra/lechoso” */
+    box-shadow: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
-  .tabla-responsive {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
+
+  /* Form: 1 columna y acompaña los nuevos márgenes */
+  form,
+  #formulario,
+  #contenido form {
+    position: static !important;
+    top: auto !important;
+    margin: 12px auto 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding-left: clamp(8px, 3vw, 14px) !important;
+    padding-right: clamp(12px, 4vw, 18px) !important;
+    box-sizing: border-box !important;
   }
-  table {
+
+  /* Inputs/Select/Textarea no sobresalen y evitan zoom iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+    padding: 12px !important;
+    box-sizing: border-box !important;
+    width: calc(100% - 8px) !important;
+    max-width: calc(100% - 8px) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* Botonera del FORM: uno debajo del otro y sin estirarse */
+  .botones {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;  /* vertical */
+    gap: 8px !important;
+    justify-items: start !important;        /* alineados a la izquierda */
+  }
+  .botones button {
+    width: auto !important;                 /* NO 100% */
+    min-width: 140px !important;            /* tacto cómodo */
+    max-width: 100% !important;
+    min-height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  /* Acciones superiores (si existen): auto-ajuste y compactas */
+  #contenido .acciones {
+    width: 100% !important;
+    margin-top: clamp(18px, 5vh, 28px) !important;
+    margin-bottom: 12px !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(140px, max-content)) !important;
+    justify-content: start !important;
+    gap: 10px !important;
+  }
+  #contenido .acciones .btn,
+  #contenido .acciones button {
+    width: auto !important;
+    min-width: 140px !important;
+    max-width: 100% !important;
+    min-height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  /* Buscador pegado a la izquierda */
+  #contenido #buscador {
+    width: 100% !important;
+    margin: 8px 0 12px !important;
+    padding: 10px 12px !important;
+    max-width: none !important;
+  }
+
+  /* ========= TABLA: solo ella tiene scroll (X/Y) ========= */
+  .tabla-responsive,
+  #tabla-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;            /* izquierda ⇄ derecha */
+    overflow-y: auto !important;            /* arriba ⇅ abajo */
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;/* no arrastra al body */
+  }
+
+  table,
+  #tabla {
     display: block !important;
     overflow-x: auto !important;
-    white-space: nowrap;
+    overflow-y: auto !important;
+    white-space: nowrap !important;
     margin-top: 16px !important;
-    border-collapse: collapse;
-  }
-  th, td {
-    padding: 10px 8px !important;
-  }
-  thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-  td button {
-    width: 100% !important;
-    margin: 4px 0 !important;
+    border-collapse: collapse !important;
+    min-width: 760px;                       /* fuerza scroll horizontal si hace falta */
+    touch-action: pan-x pan-y !important;   /* gestos táctiles */
   }
 
-  /* Loader más pequeño */
+  thead th,
+  #tabla thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2 !important;
+    background-color: #2196F3 !important;   /* azul sólido, sin blur */
+    color: #fff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  th, td,
+  #tabla th, #tabla td {
+    padding: 10px 8px !important;
+  }
+
+  /* Botones de acciones dentro de la TABLA: verticales y compactos */
+  #tabla td button {
+    display: block !important;              /* uno bajo otro */
+    width: auto !important;                 /* NO 100% */
+    min-width: 120px !important;            /* un poco más compacto */
+    max-width: 100% !important;
+    min-height: 40px !important;
+    margin: 4px 0 !important;               /* separación vertical */
+  }
+
+  /* Loader compacto */
   .loader {
     width: 48px !important;
     height: 48px !important;
@@ -446,8 +513,10 @@ td.status-celda[data-status="Finalizado"] {
 
 /* ====== Teléfonos (<= 600px) ====== */
 @media (max-width: 600px) {
-  table {
-    font-size: 12.5px !important;
-  }
+  table { font-size: 12.5px !important; }
+  textarea { height: 72px !important; }
+  /* (opcional) 2 columnas en acciones si la pantalla es muy chica:
+  #contenido .acciones { grid-template-columns: repeat(2, 1fr) !important; }
+  #contenido .acciones .btn, #contenido .acciones button { width: 100% !important; min-width: 0 !important; }
+  */
 }
-
