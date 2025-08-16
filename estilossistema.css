@@ -107,7 +107,7 @@ button {
   color: white;
 }
 
-/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO --- */
+/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO y SCROLL HORIZONTAL --- */
 .tabla-responsive,
 #tabla-wrapper {
   background: #0c0c0c !important;
@@ -122,9 +122,10 @@ button {
   box-sizing: border-box;
 }
 
-/* TABLA */
+/* --- Permite scroll horizontal sin bloquear la tabla --- */
 #tabla {
-  width: 100%;
+  width: max-content; /* <-- clave para permitir scroll horizontal real */
+  min-width: 100%;    /* la tabla nunca será más angosta que el contenedor */
   border-collapse: collapse;
   background: transparent;
   color: #faf9f9;
