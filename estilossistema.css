@@ -356,14 +356,11 @@ td.status-celda[data-status="Finalizado"] {
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
 /* ==========================================================
-   ✅ SOLO MÓVIL/TABLET (<= 1024px) — con ajustes finales
-   - Contenedores más anchos (pegados al marco)
-   - Botones del form uno bajo otro, sin estirarse
-   - Acciones auto-ajustables y compactas
-   - Tabla accesible hasta la última columna (sin girar pantalla)
-   - Solo la tabla se desplaza; cabecera azul sticky
+   ✅ SOLO MÓVIL/TABLET (<=1024px) — BLOQUE FINAL
    ========================================================== */
 @media (max-width: 1024px) {
+  /* Base segura en móvil */
+  *, *::before, *::after { box-sizing: border-box; }
 
   /* La página NO se mueve lateralmente; solo la TABLA */
   html, body {
@@ -371,25 +368,22 @@ td.status-celda[data-status="Finalizado"] {
     touch-action: pan-y !important;
   }
 
-  /* Contenedor principal a todo el ancho, pegado a la izquierda */
-  .container,
-  #contenido {
+  /* Contenedor principal: más ancho y pegado a la izquierda */
+  #contenido, .container {
     max-width: 100% !important;
     width: 100% !important;
     margin: 0 !important;
-    padding-left: clamp(6px, 2.5vw, 12px) !important;   /* más a la izquierda */
-    padding-right: clamp(6px, 2.5vw, 12px) !important;  /* simétrico */
-    box-sizing: border-box !important;
-    background-color: #fff !important;
+    padding-left: clamp(6px, 2.5vw, 12px) !important;
+    padding-right: clamp(6px, 2.5vw, 12px) !important;
+    background: #fff !important;
     box-shadow: none !important;
+    filter: none !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
 
-  /* Formulario: 1 columna y acompaña la alineación */
-  form,
-  #formulario,
-  #contenido form {
+  /* Formulario: 1 columna y alineado con el contenedor */
+  #formulario, #contenido form, form {
     position: static !important;
     top: auto !important;
     margin: 12px auto 16px !important;
@@ -401,141 +395,125 @@ td.status-celda[data-status="Finalizado"] {
     gap: 12px !important;
     padding-left: clamp(8px, 3vw, 14px) !important;
     padding-right: clamp(12px, 4vw, 18px) !important;
-    box-sizing: border-box !important;
   }
 
-  /* Inputs/Select/Textarea: táctiles y sin sobresalir */
-  input, textarea, select {
-    font-size: 16px !important;  /* evita zoom en iOS */
+  /* Inputs/Select/Textarea táctiles y sin sobresalir */
+  input, select, textarea {
+    font-size: 16px !important; /* evita zoom iOS */
     padding: 12px !important;
-    box-sizing: border-box !important;
     width: calc(100% - 8px) !important;
     max-width: calc(100% - 8px) !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
 
-  /* Botonera del FORM: vertical, compacta y sin estirarse */
+  /* Botonera del FORM: vertical y compacta (no 100%) */
   .botones {
     grid-column: 1 / -1 !important;
     display: grid !important;
-    grid-template-columns: 1fr !important; /* uno bajo otro */
+    grid-template-columns: 1fr !important;
     gap: 8px !important;
-    justify-items: start !important;       /* alineados a la izquierda */
+    justify-items: start !important;
   }
   .botones button {
-    width: auto !important;                /* NO 100% */
-    min-width: 140px !important;           /* comodidad táctil */
-    max-width: 100% !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-  }
-
-  /* Acciones superiores: auto-ajuste y compactas, pegadas a la izquierda */
-  #contenido .acciones {
-    width: 100% !important;
-    margin-top: clamp(18px, 5vh, 28px) !important;
-    margin-bottom: 12px !important;
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(140px, max-content)) !important;
-    justify-content: start !important;
-    gap: 10px !important;
-  }
-  #contenido .acciones .btn,
-  #contenido .acciones button {
-    width: auto !important;
+    width: auto !important;          /* NO 100% */
     min-width: 140px !important;
     max-width: 100% !important;
     min-height: 44px !important;
     font-size: 15px !important;
   }
 
-  /* Buscador pegado a la izquierda */
-  #contenido #buscador {
+  /* (Si usas acciones arriba) compactas y auto-ajustables */
+  #contenido .acciones {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(140px, max-content)) !important;
+    justify-content: start !important;
+    gap: 10px !important;
     width: 100% !important;
-    margin: 8px 0 12px !important;
-    padding: 10px 12px !important;
-    max-width: none !important;
+    margin: 16px 0 12px !important;
+  }
+  #contenido .acciones .btn, #contenido .acciones button {
+    width: auto !important;
+    min-width: 140px !important;
+    min-height: 44px !important;
   }
 
-  /* ========= TABLA: solo ella tiene scroll (X/Y) ========= */
-  .tabla-responsive,
-  #tabla-wrapper {
+  /* ====== TABLA: solo ella se desplaza y llega hasta el final ====== */
+  .tabla-responsive, #tabla-wrapper {
     width: 100% !important;
-    overflow-x: auto !important;            /* izquierda ⇄ derecha */
-    overflow-y: auto !important;            /* arriba ⇅ abajo */
+    overflow-x: auto !important;         /* izquierda ⇄ derecha */
+    overflow-y: auto !important;         /* arriba ⇅ abajo */
     -webkit-overflow-scrolling: touch !important;
     touch-action: pan-x pan-y !important;
-    padding-right: 12px !important;         /* colchón para llegar al final */
-    scrollbar-gutter: stable both-edges;    /* la barra no tapa contenido */
+    padding-right: 12px !important;      /* colchón al final */
+    scrollbar-gutter: stable both-edges; /* la barra no tapa contenido */
   }
 
-  table,
-  #tabla {
+  #tabla, table {
     display: block !important;
     overflow-x: auto !important;
     overflow-y: auto !important;
-    white-space: normal !important;         /* ❗ permite llegar a la última col */
+    white-space: normal !important;      /* ❗ permite ver la última columna */
     table-layout: auto !important;
-    min-width: 640px !important;            /* más accesible que 760+ en vertical */
+    min-width: 640px !important;         /* más accesible en vertical */
     margin-top: 16px !important;
     border-collapse: collapse !important;
     touch-action: pan-x pan-y !important;
   }
 
-  /* Cabecera azul sticky sin blur */
-  thead th,
-  #tabla thead th {
+  /* Cabecera azul sticky */
+  #tabla thead th, thead th {
     position: sticky !important;
     top: 0 !important;
     z-index: 2 !important;
-    background-color: #2196F3 !important;
+    background: #2196F3 !important;
     color: #fff !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
 
-  th, td,
-  #tabla th, #tabla td {
+  #tabla th, #tabla td, th, td {
     padding: 10px 8px !important;
+    word-break: break-word;
   }
 
-  /* Última columna (Acciones) compacta y legible */
-  #tabla th:last-child,
-  #tabla td:last-child,
-  table th:last-child,
-  table td:last-child {
+  /* Última columna (Acciones) visible y compacta */
+  #tabla th:last-child, #tabla td:last-child,
+  table th:last-child, table td:last-child {
     min-width: 150px !important;
     white-space: normal !important;
   }
 
-  /* Botones de Acciones (Modificar / Eliminar) apilados y visibles */
+  /* Botones Modificar/Eliminar: verticales y compactos */
   #tabla td:last-child button,
   table td:last-child button {
-    display: block !important;              /* uno bajo el otro */
-    width: auto !important;                 /* sin estirarse */
+    display: block !important;       /* uno bajo el otro */
+    width: auto !important;          /* no se estiran */
     min-width: 110px !important;
     max-width: 100% !important;
     min-height: 40px !important;
-    margin: 4px 0 !important;               /* separación vertical */
+    margin: 4px 0 !important;
+  }
+
+  /* Overlays/loader no bloquean (a menos que estén activos) */
+  .loader-overlay, .loader-wrapper {
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+  .loader-overlay.is-active, .loader-wrapper.is-active {
+    pointer-events: auto !important;
+    background: rgba(255,255,255,.8) !important;
   }
 
   /* Loader compacto */
-  .loader {
-    width: 48px !important;
-    height: 48px !important;
-    border-width: 6px !important;
-  }
+  .loader { width: 48px !important; height: 48px !important; border-width: 6px !important; }
 
-  /* Logo al 100% del contenedor */
-  .logo-container img {
-    max-width: 100% !important;
-    height: auto !important;
-  }
+  /* Logo responsivo */
+  .logo-container img { max-width: 100% !important; height: auto !important; }
 }
 
-/* ====== Teléfonos (<= 600px) ====== */
+/* Teléfonos (<=600px) */
 @media (max-width: 600px) {
-  table, #tabla { font-size: 12.5px !important; }
+  #tabla, table { font-size: 12.5px !important; }
   textarea { height: 72px !important; }
 }
