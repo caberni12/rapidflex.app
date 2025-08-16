@@ -656,3 +656,37 @@ td.status-celda[data-status="Finalizado"] {
     min-width: 200px !important;
   }
 }
+
+
+
+/* ==========================================================
+   🛠️ Fix móvil: interfaz bloqueada & scroll tabla (Sistema)
+   - Evita que overlays invisibles bloqueen toques
+   - Asegura desplazamiento táctil en X/Y
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* 1) Si el loader no está "activo", no debe bloquear los toques */
+  .loader-wrapper {
+    pointer-events: none !important;  /* no captura taps por encima */
+  }
+  /* Si tu código usa una clase para mostrar el loader, re-actívalo ahí:
+     .loader-wrapper.is-active { pointer-events: auto !important; } */
+
+  /* 2) Tabla: permitir gestos táctiles pan en ambos ejes */
+  #tabla-wrapper,
+  .tabla-responsive,
+  #tabla {
+    touch-action: pan-x pan-y;        /* gestos nativos en móvil */
+  }
+
+  /* 3) Quitar restricciones de overflow en la propia tabla para que el wrapper maneje el scroll */
+  #tabla {
+    overflow: visible !important;
+  }
+
+  /* 4) Asegurar que el viewport puede desplazarse si hay contenido */
+  html, body {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+  }
+}
