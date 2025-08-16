@@ -212,248 +212,156 @@ td button {
   100% { transform: rotate(360deg); }
 }
 
-/* --- VERSION MÓVIL FLUIDA --- */
-@media (max-width: 768px) {
-  form {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    padding: 15px;
-    gap: 12px;
-  }
-
-  .botones {
-    justify-content: center;
-  }
-
-  button {
-    font-size: 15px;
-    min-width: 140px;
-    max-width: 100%;
-  }
-
-  .usuario-nombre {
-    text-align: center;
-    font-size: 14px;
-  }
-
-  #tabla {
-    font-size: 13px;
-  }
-
-  td button {
-    font-size: 14px;
-    padding: 8px 10px;
-    width: auto;
-  }
-
-  .loader {
-    width: 70px;
-    height: 70px;
-    border-width: 6px;
-  }
-
-  .loader-text {
-    font-size: 14px;
-    top: calc(17% + 90px);
-  }
-}
-/* Colores aplicados directamente por el atributo data-status */
-td.status-celda[data-status="Nuevo"] {
-  background-color: #28a745 !important;
-  color: white;
-  font-weight: bold;
-}
-
-td.status-celda[data-status="En proceso"] {
-  background-color: #ffc107 !important;
-  color: black;
-  font-weight: bold;
-}
-
-td.status-celda[data-status="Finalizado"] {
-  background-color: #ff0000 !important;
-  color: white;
-  font-weight: bold;
-}
-
-
-/* === Contenedor de acciones (3 botones azules) alineado con la tabla === */
-#contenido .acciones{
-  width: 100%;
-  max-width: 100%;
-  margin: clamp(8px, 1.5vh, 16px) auto clamp(8px, 1.5vh, 12px);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-/* El buscador al mismo ancho de la tabla (línea completa) */
-#contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
-  margin: 8px auto clamp(12px, 2vh, 18px);
-  padding: 10px 12px;
-  box-sizing: border-box;
-}
-
-/* === Ajuste de tamaño para Sistema 1 y 2: contenedor más angosto y centrado === */
-#contenido{
-  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: clamp(12px, 2vw, 24px);
-  padding-right: clamp(12px, 2vw, 24px);
-}
-#contenido > h2{ margin-left: 0; margin-right: 0; }
-
-/* === Igualar ancho del bloque superior al de la tabla === */
-#contenido > .logo-container,
-#contenido > h2,
-#contenido > #formulario,
-#contenido > #buscador {
-  width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: clamp(12px, 2vw, 24px);
-  padding-right: clamp(12px, 2vw, 24px);
-}
-
-/* === Aire adicional arriba de la TABLA y separación de controles === */
-#formulario{ margin-bottom: clamp(16px, 4vh, 48px); }
-#buscador{ display:block; width:100%; max-width:none; margin: 8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
-.btn-recargar{ margin-top: 8px; }
-#tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
-
-
-
-/* === Empujar más abajo el bloque de ACCIONES (3 botones azules) para que no quede oculto por el panel superior === */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;  /* más aire arriba */
-  margin-bottom: clamp(10px, 2vh, 18px);
-}
-
-/* Aseguramos que el buscador quede inmediatamente debajo, a ancho de tabla */
-#contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
-  margin-top: clamp(12px, 2.5vh, 24px);
-}
-
-
-
-/* === FIX OVERLAP: el formulario superior NO debe ser fixed ni con margen negativo === */
-#formulario,
-#contenido form{
-  position: static !important;
-  top: auto !important;
-  margin-top: clamp(8px, 2vh, 20px) !important;
-}
-
-/* Asegurar que el bloque de ACCIONES quede bajo el panel superior */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;
-}
-
-
-
 /* ==========================================================
-   🔄 Corrección móvil/tablet Sistema:
-   - Restaura color de cabecera de tabla (azul + texto blanco)
-   - La tabla sí se desplaza en X (forzamos ancho mínimo)
-   - Inputs y botones a 100% de ancho
+   ✅ Mobile & Tablet Overrides (<= 1024px) — 2025-08-16
+   Nota: SOLO afecta móviles/tablets. No cambia el desktop.
    ========================================================== */
 @media (max-width: 1024px) {
-  /* 1) Cabecera de la tabla con fondo azul y texto blanco */
-  #tabla-wrapper thead th,
-  .tabla-responsive thead th,
-  #tabla thead th {
-    background: var(--thead-bg, #0ea5e9) !important;
-    color: var(--thead-color, #ffffff) !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
+  .container {
+    padding: clamp(12px, 4vw, 20px) !important;
+    border-radius: 10px !important;
   }
 
-  /* 2) El contenedor NO se mueve lateralmente, solo la tabla */
-  html, body, #contenido, main {
-    overflow-x: hidden !important;
-    touch-action: pan-y !important;
+  /* Formulario a 1 columna y con buenos espacios táctiles */
+  form {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    padding: clamp(14px, 3vw, 20px) !important;
   }
-  /* Wrapper de tabla con scroll en ambos ejes */
-  #tabla-wrapper, .tabla-responsive {
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-x pan-y !important;
+  input, select {
+    font-size: 16px !important;   /* evita zoom en iOS */
+    padding: 12px !important;
   }
 
-  /* 3) La propia tabla es más ancha que el viewport para forzar scroll X */
-  #tabla {
-    width: 100%;
-    min-width: 900px;          /* fuerza que aparezca el scroll horizontal */
-    table-layout: auto;        /* deja que el contenido defina mejor el ancho */
-    border-collapse: collapse;
-  }
-
-  /* 4) Inputs/Selects/Textareas con 100% de ancho visible */
-  form input[type="text"],
-  form input[type="email"],
-  form input[type="password"],
-  form input[type="tel"],
-  form select,
-  form textarea {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  /* 5) Botones al 100% (acciones y botonera del formulario) */
-  .acciones .btn,
-  .acciones button,
-  .botones button {
-    width: 100% !important;
-    display: block !important;
-  }
-  .acciones, .botones {
+  /* Botones apilados al 100% de ancho */
+  .botones {
+    grid-column: 1 / -1 !important;
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 10px !important;
   }
+  .botones button,
+  button {
+    width: 100% !important;
+    min-height: 44px !important;
+    font-size: 15px !important;
+  }
+
+  /* Tabla con scroll horizontal y cabecera sticky */
+  .tabla-responsive, table {
+    width: 100% !important;
+  }
+  .tabla-responsive {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap;
+    margin-top: 16px !important;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 10px 8px !important;
+  }
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  td button {
+    width: 100% !important;
+    margin: 4px 0 !important;
+  }
+
+  /* Loader más pequeño */
+  .loader {
+    width: 48px !important;
+    height: 48px !important;
+    border-width: 6px !important;
+  }
+}
+
+/* ====== Teléfonos (<= 600px) ====== */
+@media (max-width: 600px) {
+  table {
+    font-size: 12.5px !important;
+  }
 }
 
 
 
 /* ==========================================================
-   🎯 Patch móvil/tablet (<=1024px):
-   - Textboxes ligeramente más angostos para no sobresalir
-   - Títulos de la tabla con fondo azul y texto blanco
+   📱 Tablas móviles: scroll en X e Y — 2025-08-16
+   - Funciona con envoltorios .tabla-responsive o #tabla-wrapper
+   - Degradación aceptable si solo existe #tabla
    ========================================================== */
 @media (max-width: 1024px) {
-  /* Textboxes */
-  form input[type="text"],
-  form input[type="email"],
-  form input[type="password"],
-  form input[type="tel"],
-  form input[type="number"],
-  form select,
-  form textarea {
-    box-sizing: border-box !important;
-    width: calc(100% - 8px) !important;   /* un pelín menos de 100% */
-    max-width: calc(100% - 8px) !important;
-    margin: 0 auto !important;
+  /* WRAPPERS que deben rodear a la tabla */
+  .tabla-responsive,
+  #tabla-wrapper {
+    display: block !important;
+    max-width: 100% !important;
+    max-height: min(70vh, 560px) !important; /* alto visible para scroll vertical */
+    overflow-x: auto !important;             /* izquierda ⇄ derecha */
+    overflow-y: auto !important;             /* arriba ⇅ abajo */
+    -webkit-overflow-scrolling: touch;       /* momentum en iOS */
+    scrollbar-gutter: stable both-edges;
+    border-radius: 10px;
   }
 
-  /* Títulos de la tabla (cabecera) */
+  /* La propia tabla ocupa más ancho que el viewport para forzar scroll X */
+  .tabla-responsive table,
+  #tabla-wrapper table,
+  #tabla {
+    display: table;
+    width: 100%;
+    min-width: 760px;           /* ajusta si necesitas más/menos columnas visibles */
+    border-collapse: collapse;
+    table-layout: fixed;        /* celdas calculadas uniformemente */
+  }
+
+  /* Cabecera pegajosa en el wrapper */
   .tabla-responsive thead th,
   #tabla-wrapper thead th,
-  #tabla thead th,
-  table thead th {
-    background-color: #2196F3 !important;
-    color: #ffffff !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
+  #tabla thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: inherit;        /* usa el fondo actual */
+    backdrop-filter: saturate(120%) blur(2px);
+  }
+
+  /* Celdas legibles en pantallas pequeñas */
+  .tabla-responsive th, .tabla-responsive td,
+  #tabla-wrapper th, #tabla-wrapper td,
+  #tabla th, #tabla td {
+    padding: 10px 8px !important;
+    font-size: 13px !important;
+    word-break: break-word;
+    white-space: normal;        /* permite saltos de línea en móvil */
+  }
+
+  /* Botones dentro de celdas: full width para facilidad táctil */
+  .tabla-responsive td button,
+  #tabla-wrapper td button,
+  #tabla td button {
+    width: 100% !important;
+    min-height: 40px !important;
+    margin: 4px 0 !important;
+  }
+}
+
+/* Teléfonos pequeños: un poco más compacto */
+@media (max-width: 600px) {
+  .tabla-responsive,
+  #tabla-wrapper {
+    max-height: min(65vh, 520px) !important;
+  }
+  .tabla-responsive th, .tabla-responsive td,
+  #tabla-wrapper th, #tabla-wrapper td,
+  #tabla th, #tabla td {
+    font-size: 12.5px !important;
   }
 }
