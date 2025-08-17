@@ -9,11 +9,11 @@ function _ensureEnvAlert(){
     el.id = 'envAlert';
     el.setAttribute('role','status');
     el.setAttribute('aria-live','polite');
-    el.innerHTML = 
+    el.innerHTML = `
       <span class="icon">✔</span>
       <span class="msg">Conexión exitosa.</span>
       <button class="close" type="button" aria-label="Cerrar">Cerrar</button>
-    ;
+    `;
     document.body.appendChild(el);
   }
   return el;
@@ -22,7 +22,7 @@ function _showEnvAlert(type, text, ttl = 6000){
   const el = _ensureEnvAlert();
   el.classList.remove('success','error','show');
   el.classList.add(type === 'success' ? 'success' : 'error');
-  el.style.setProperty('--ttl', ${ttl}ms);
+  el.style.setProperty('--ttl', `${ttl}ms`);
   const icon = el.querySelector('.icon');
   const msg  = el.querySelector('.msg');
   if (icon) icon.textContent = (type === 'success' ? '✔' : '⛔');
@@ -62,7 +62,7 @@ async function verificarSesion() {
     return;
   }
   try {
-    const response = await fetch(${GAS_URL}?checkSession=1&session=${token});
+    const response = await fetch(`${GAS_URL}?checkSession=1&session=${token}`);
     const resultado = await response.json();
     if (resultado.status === "OK") {
       const cont = document.getElementById("contenido");
@@ -123,11 +123,18 @@ document.addEventListener("click", (e) => {
   const menuBtn = document.querySelector(".menu-btn");
   if (!slider) return;
   const clickedInsideSlider = slider.contains(e.target);
-  const clickedMenuBtn = menuBtn y (menuBtn === e.target || menuBtn.contains(e.target));
-  if (slider.classList.contains("open") && !clickedInsideSlider y !clickedMenuBtn) {
+  const clickedMenuBtn = menuBtn && (menuBtn === e.target || menuBtn.contains(e.target));
+  if (slider.classList.contains("open") && !clickedInsideSlider && !clickedMenuBtn) {
     slider.classList.remove("open");
     slider.style.height = "0px";
   }
+});
+
+// Asegura que el botón hamburguesa abra/cierre el slider
+document.querySelector('.menu-btn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  toggleSlider();
 });
 
 // Recalcular altura si cambia el tamaño
@@ -143,7 +150,7 @@ function _setUserName(name){
   try{
     const el = document.getElementById('usuarioNombre');
     if (!el) return;
-    const txt = (name y String(name).trim()) ? String(name).trim() : 'Usuario';
+    const txt = (name && String(name).trim()) ? String(name).trim() : 'Usuario';
     el.textContent = '👤 ' + txt;
   }catch(e){}
 }
@@ -152,7 +159,7 @@ function _setUserNameFromStorage(){
     const keys = ['nombreUsuario','username','userName','usuario','nombre'];
     for (let i=0;i<keys.length;i++){
       const v = localStorage.getItem(keys[i]);
-      if (v y String(v).trim()){ _setUserName(v); return; }
+      if (v && String(v).trim()){ _setUserName(v); return; }
     }
     _setUserName('Usuario');
   }catch(e){ _setUserName('Usuario'); }
@@ -164,8 +171,8 @@ async function _fetchPublicIP(){
   const endpoints = [
     'https://api.ipify.org?format=json',
     'https://api64.ipify.org?format=json',
-    'https://ifconfig.co/json',     // { ip: "..." }
-    'https://icanhazip.com'         // texto plano
+    'https://ifconfig.co/json',
+    'https://icanhazip.com'
   ];
   for (const base of endpoints){
     try{
@@ -180,7 +187,7 @@ async function _fetchPublicIP(){
       } else {
         ip = (await res.text()).trim();
       }
-      if (ip y (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip) || /^[a-f0-9:]+$/i.test(ip))){
+      if (ip && (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip) || /^[a-f0-9:]+$/i.test(ip))){
         return ip;
       }
     }catch(_){ /* probar siguiente */ }
@@ -219,7 +226,7 @@ async function _setUserIP(){
   if(!el) return;
 
   // Fallback inicial
-  const host = (location y location.hostname) ? location.hostname : 'desconocido';
+  const host = (location && location.hostname) ? location.hostname : 'desconocido';
   el.textContent = '📶 Host: ' + host;
   el.title = 'Hostname local (fallback)';
 
@@ -235,7 +242,7 @@ async function _setUserIP(){
     const locals = await _getPrivateLocalIPs();
     const privateIP = locals[0];
     if (privateIP){
-      el.textContent +=   •  IP local: ${privateIP};
+      el.textContent += `  •  IP local: ${privateIP}`;
       el.title += ' | IP local privada (best-effort, puede no estar disponible)';
     }
   }catch(_){}
@@ -266,7 +273,7 @@ function _autoSizeIframe(frame) {
     const resize = () => {
       const h = _measureDocHeight(doc);
       const cur = parseInt(frame.style.height||"0",10);
-      if (h y Math.abs(cur - h) > 2) {
+      if (h && Math.abs(cur - h) > 2) {
         frame.style.height = h + "px";
       }
     };
@@ -295,7 +302,7 @@ function _autoSizeIframe(frame) {
 }
 window.addEventListener("resize", () => {
   const f = document.getElementById("routeFrame");
-  if (f y typeof f._forceResize === "function") f._forceResize();
+  if (f && typeof f._forceResize === "function") f._forceResize();
 });
 
 // === Router (hash-based) ===
@@ -333,8 +340,7 @@ const ROUTES = {
   "sistema2":  () => loadFrame("sistema2.html"),
   "usuarios":  () => loadFrame("usuarios.html"),
   "georeferencia":  () => loadFrame("usuarios2.html"),
-
-  // NUEVO (agregado sin borrar nada):
+  // agregado sin borrar nada
   "usuarios2": () => loadFrame("usuarios2.html"),
 };
 function onRouteChange() {
@@ -352,9 +358,9 @@ document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
   const key = (e.key || "").toLowerCase();
   if (e.key === "F12" ||
-      (e.ctrlKey y e.shiftKey y ["i", "j", "c", "k"].includes(key)) ||
-      (e.ctrlKey y ["u", "s", "p", "f", "c"].includes(key)) ||
-      (e.metaKey y ["s", "p", "u", "f"].includes(key))) {
+      (e.ctrlKey && e.shiftKey && ["i", "j", "c", "k"].includes(key)) ||
+      (e.ctrlKey && ["u", "s", "p", "f", "c"].includes(key)) ||
+      (e.metaKey && ["s", "p", "u", "f"].includes(key))) {
     e.preventDefault();
   }
 });
