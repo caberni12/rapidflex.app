@@ -1,9 +1,9 @@
-/* ===== usuarios.js (lee CONN_API; rol/fila desde URL_GET; 5 columnas; modal con mapa) ===== */
+/* ===== usuarios.js (CONN_API para datos; rol/fila desde URL_GET; 5 cols; modal con mapa) ===== */
 
 /* Endpoints */
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
-const CONN_API = 'https://script.google.com/macros/s/AKfycbyvLO9mn-Xlu4RNF9czAqcSwdzP-gRt3LjusahyF5S9ElaJMNiOYRoL9SoXQ0opaqdx/exec';
+const CONN_API = 'https://script.google.com/macros/s/AKfycby8sj-J1_fJfgZ8huNVMAoWIiAgPFZ6Guy1T1crtAEdBWEuHabm7AFy6AiMoiqcMQeA/exec';
 
 /* DOM */
 const form  = document.getElementById("formulario");
@@ -36,7 +36,7 @@ function claseAcceso(v){
 }
 async function safeJson(res){
   const txt = await res.text();
-  try { return JSON.parse(txt); } catch { throw new Error('JSON inválido'); }
+  try { return JSON.parse(txt); } catch { console.error('No JSON:', txt); throw new Error('JSON inválido'); }
 }
 
 /* ===== Roles/filas desde URL_GET ===== */
@@ -52,7 +52,8 @@ async function cargarRolesYFilas(){
       map.set(kn(usuario), { rol: x.rol ?? x.Rol ?? '', fila: x.fila ?? '' });
     }
     return map;
-  }catch{
+  }catch(e){
+    console.error(e);
     toast('No se pudo leer roles de Usuarios','error',3000);
     return new Map();
   }
@@ -62,10 +63,24 @@ async function cargarRolesYFilas(){
 async function cargarConexiones(){
   try{
     const r = await fetch(CONN_API + '?accion=last_all');
-    if (!r.ok) throw new Error('GET conexion falló');
-    const arr = await safeJson(r); // [{Usuario,Clave,Acceso,nombre,geolocalizacion,geo_lat,geo_lng,maps_iframe,hora,fecha,estado}]
-    return Array.isArray(arr) ? arr : [];
-  }catch{
+    if (!r.ok) throw new Error('GET conexion falló: ' + r.status);
+    const data = await safeJson(r);
+    if (Array.isArray(data)) return data;
+    // backend no devuelve array -> explicar
+    if (data && typeof data === 'object') {
+      if (data.resultado === 'error') {
+        toast('CONN_API error: ' + (data.detalle||'desconocido'), 'error', 4000);
+      } else if (data.ok) {
+        toast('CONN_API sin acción last_all', 'error', 3500);
+      } else {
+        toast('CONN_API respondió objeto no iterable', 'error', 3500);
+      }
+    } else {
+      toast('Respuesta CONN_API no válida', 'error', 3500);
+    }
+    return [];
+  }catch(e){
+    console.error(e);
     toast('No se pudo leer conexiones','error',3000);
     return [];
   }
@@ -84,7 +99,7 @@ async function obtenerUsuarios(){
   tabla.innerHTML = "";
 
   if (!conexiones.length){
-    toast('Sin registros de conexión','error',2500);
+    toast('Sin registros de conexión', 'error', 2500);
     return;
   }
 
@@ -177,7 +192,7 @@ function eliminar(fila){
     .catch(()=> toast("Error de red al eliminar","error"));
 }
 
-/* ===== MODAL de Conexión (usa CONN_API) ===== */
+/* ===== MODAL de Conexión (CONN_API) ===== */
 (function(){
   let modalInyectado = false;
 
@@ -277,7 +292,8 @@ function eliminar(fila){
       const src = mapSrc(d.geo_lat, d.geo_lng, d.geolocalizacion, d.maps_iframe);
       document.getElementById('connGMap').innerHTML =
         `<iframe src="${src}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
-    }catch{
+    }catch(e){
+      console.error(e);
       toast("Error cargando modal","error",3000);
     }
   };
