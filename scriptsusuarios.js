@@ -4,7 +4,7 @@
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
 // Web App de la hoja "conexion" (mismo que usas para LOG_URL en login)
-const CONN_API = 'https://script.google.com/macros/s/AKfycbxYI3UQNfeM1K6H5DmRdAVVqUkJhIAH3zJQU_vJUWrTZuw3ObwqyKM5JE5D9T8mav3t/exec';
+const CONN_API = 'https://script.google.com/macros/s/AKfycbyuiH9JRDKt7lxklFiTg9L46_tZOA4TDgugsQGtSo-IGtQWZXnI0M-DedszX-KFmPWF/exec';
 
 // DOM
 const form  = document.getElementById("formulario");
