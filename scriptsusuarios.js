@@ -101,7 +101,6 @@ function mergeConexion(u){
     hora: c.hora || u.hora,
     fecha: c.fecha || u.fecha,
     estado: c.estado || u.estado,
-    // opcional: sobreescribir acceso si viene de conexion
     acceso: u.acceso || c.acceso
   };
 }
