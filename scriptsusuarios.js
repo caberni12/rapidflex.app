@@ -8,27 +8,22 @@ const tabla = document.querySelector("#tabla tbody");
 
 // === Estado ===
 let datosOriginales = {};
+let primeraCarga = true;
+let poller = null;
 
 // === UI: alerta flotante autodescartable ===
-function toast(msg, type = "ok", ms = 2500) {
+function toast(msg, type = "ok", ms = 2000) {
   const el = document.createElement("div");
   el.setAttribute("role", "status");
   el.textContent = msg;
-  el.style.position = "fixed";
-  el.style.top = "12px";
-  el.style.left = "50%";
-  el.style.transform = "translateX(-50%)";
-  el.style.padding = "10px 14px";
-  el.style.background = type === "ok" ? "#0ea5e9" : "#ef4444";
-  el.style.color = "#fff";
-  el.style.fontSize = "14px";
-  el.style.borderRadius = "8px";
-  el.style.zIndex = "9999";
-  el.style.boxShadow = "0 2px 6px rgba(0,0,0,.2)";
+  Object.assign(el.style, {
+    position:"fixed", top:"12px", left:"50%", transform:"translateX(-50%)",
+    padding:"10px 14px", background: type==="ok" ? "#0ea5e9" : "#ef4444",
+    color:"#fff", fontSize:"14px", borderRadius:"8px", zIndex:"9999",
+    boxShadow:"0 2px 6px rgba(0,0,0,.2)"
+  });
   document.body.appendChild(el);
-  setTimeout(() => {
-    el.style.transition = "opacity .25s";
-    el.style.opacity = "0";
+  setTimeout(() => { el.style.transition="opacity .25s"; el.style.opacity="0";
     setTimeout(() => el.remove(), 250);
   }, ms);
 }
@@ -41,7 +36,9 @@ function normalizar(item) {
     acceso:  item.acceso  ?? item.Acceso  ?? "",
     nombre:  item.nombre  ?? item.Nombre  ?? "",
     rol:     item.rol     ?? item.Rol     ?? "",
-    fila: item.fila
+    fila:    item.fila,
+    geo_lat: parseFloat(item.geo_lat ?? item.lat ?? item.Lat ?? ""),
+    geo_lng: parseFloat(item.geo_lng ?? item.lng ?? item.Lng ?? "")
   };
 }
 
@@ -90,16 +87,145 @@ form.addEventListener("submit", e => {
 // === Cancelar ===
 function cancelarEdicion() { form.reset(); }
 
-// === Listar ===
+// ====== Leaflet / Mapa ======
+let LLoaded = false, mapa, capaOSM, markers = new Map();
+
+function cargarLeaflet() {
+  if (LLoaded) return Promise.resolve();
+  return new Promise((resolve) => {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    document.head.appendChild(link);
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.onload = () => { LLoaded = true; resolve(); };
+    document.head.appendChild(s);
+  });
+}
+
+function crearUIgps() {
+  if (document.getElementById('gpsOverlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'gpsOverlay';
+  overlay.innerHTML = `
+    <div id="gpsPanel">
+      <div class="gpsBar">
+        <strong>Mapa de conexiones</strong>
+        <span>
+          <button id="gpsFit">Centrar</button>
+          <button id="gpsClose" aria-label="Cerrar">×</button>
+        </span>
+      </div>
+      <div id="gpsMap"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('#gpsClose').onclick = () => overlay.style.display = 'none';
+  overlay.addEventListener('click', e => { if (e.target.id === 'gpsOverlay') overlay.style.display = 'none'; });
+  overlay.querySelector('#gpsFit').onclick = ajustarABounds;
+}
+
+async function iniciarMapa() {
+  await cargarLeaflet();
+  if (mapa) return mapa;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+  });
+  mapa = L.map('gpsMap', { zoomControl: true }).setView([-33.45, -70.66], 11);
+  capaOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap'
+  }).addTo(mapa);
+  return mapa;
+}
+
+function popupDe(it){
+  return `
+    <div style="min-width:160px">
+      <div><strong>${it.usuario || '(sin usuario)'}</strong></div>
+      <div>${it.nombre || ''}</div>
+      <div>Rol: ${it.rol || '-'}</div>
+      <div>Acceso: ${it.acceso || '-'}</div>
+      <div>Lat: ${isFinite(it.geo_lat)?it.geo_lat:'-'} Lng: ${isFinite(it.geo_lng)?it.geo_lng:'-'}</div>
+    </div>`;
+}
+
+function ajustarABounds(){
+  if (!mapa) return;
+  const pts = [];
+  markers.forEach(m => { if (m.getLatLng) pts.push(m.getLatLng()); });
+  if (pts.length) {
+    const b = L.latLngBounds(pts);
+    mapa.fitBounds(b.pad(0.2));
+  }
+}
+
+function keyFor(it){ return (it.fila ?? it.usuario ?? '').toString(); }
+
+function actualizarMapa(items) {
+  items.forEach(it => {
+    const lat = Number(it.geo_lat), lng = Number(it.geo_lng);
+    if (!isFinite(lat) || !isFinite(lng)) return;
+    const key = keyFor(it);
+    if (markers.has(key)) {
+      const m = markers.get(key);
+      if (m.getLatLng) m.setLatLng([lat, lng]).setPopupContent(popupDe(it));
+      else m.__pending__ = [lat, lng], m.__data__ = it;
+    } else {
+      markers.set(key, { __pending__: [lat, lng], __data__: it }); // se crea al abrir
+      if (mapa) {
+        const m = L.marker([lat, lng]).addTo(mapa).bindPopup(popupDe(it));
+        markers.set(key, m);
+      }
+    }
+  });
+
+  // crear pendientes si el mapa ya está abierto
+  if (mapa) {
+    for (const [k, v] of markers) {
+      if (v.__pending__) {
+        const m = L.marker(v.__pending__).addTo(mapa).bindPopup(popupDe(v.__data__));
+        markers.set(k, m);
+      }
+    }
+  }
+}
+
+async function verEnMapa(item){
+  const lat = Number(item.geo_lat), lng = Number(item.geo_lng);
+  if (!isFinite(lat) || !isFinite(lng)) { toast("Sin coordenadas", "error"); return; }
+  crearUIgps();
+  const overlay = document.getElementById('gpsOverlay');
+  overlay.style.display = 'block';
+  await iniciarMapa();
+  setTimeout(() => mapa.invalidateSize(), 50);
+
+  const key = keyFor(item);
+  let mark = markers.get(key);
+  if (!mark || !mark.getLatLng) {
+    mark = L.marker([lat, lng]).addTo(mapa).bindPopup(popupDe(item));
+    markers.set(key, mark);
+  } else {
+    mark.setLatLng([lat, lng]).setPopupContent(popupDe(item));
+  }
+  mapa.setView([lat, lng], 14);
+  mark.openPopup();
+}
+
+// ====== Listar + eventos ======
 function obtenerUsuarios() {
   fetch(URL_GET)
     .then(r => r.json())
     .then(data => {
       tabla.innerHTML = "";
-      data.forEach(raw => {
-        const item = normalizar(raw);
+      const norm = data.map(normalizar);
+
+      norm.forEach(item => {
         const tr = document.createElement("tr");
-        tr.className = claseAcceso(item.acceso); // formato condicional por acceso
+        tr.className = claseAcceso(item.acceso);
+        if (isFinite(item.geo_lat) && isFinite(item.geo_lng)) tr.classList.add('tiene-geo');
         tr.innerHTML = `
           <td>${item.usuario}</td>
           <td>${item.clave}</td>
@@ -110,9 +236,12 @@ function obtenerUsuarios() {
             <button onclick='editar(${JSON.stringify(item)}, ${item.fila})'>✏️</button>
             <button onclick='eliminar(${item.fila})'>🗑️</button>
           </td>`;
+        tr.addEventListener('dblclick', () => verEnMapa(item)); // ← doble clic abre modal
         tabla.appendChild(tr);
       });
-      toast("Usuarios cargados");
+
+      if (primeraCarga) { toast("Usuarios cargados"); primeraCarga = false; }
+      actualizarMapa(norm);
     })
     .catch(() => toast("Error al cargar usuarios", "error"));
 }
@@ -144,5 +273,12 @@ function eliminar(fila) {
     .catch(() => toast("Error de red al eliminar", "error"));
 }
 
+// === Tiempo real ===
+function iniciarTiempoReal(){
+  if (poller) clearInterval(poller);
+  poller = setInterval(obtenerUsuarios, 10000); // 10s
+}
+
 // === Inicio ===
 obtenerUsuarios();
+iniciarTiempoReal();
