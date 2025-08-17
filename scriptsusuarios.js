@@ -1,9 +1,9 @@
-/* ===== usuarios.js (listado con modal + mapa y lectura de hoja conexion) ===== */
+/* ===== usuarios.js (modal + mapa, leyendo Hoja conexion) ===== */
 
 // Endpoints base
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
-// Web App de la hoja "conexion"
+// Web App de la hoja "conexion" (URL /exec)
 const CONN_API = 'https://script.google.com/macros/s/AKfycbyuiH9JRDKt7lxklFiTg9L46_tZOA4TDgugsQGtSo-IGtQWZXnI0M-DedszX-KFmPWF/exec';
 
 // DOM
@@ -34,9 +34,9 @@ function toast(msg, type = "ok", ms = 2000) {
 
 // Normaliza fila base (usuarios)
 function normalizar(item) {
+  const toNum = v => v !== "" && v != null ? parseFloat(String(v).replace(',', '.')) : NaN;
   const lat = item.geo_lat ?? item.lat ?? item.Lat ?? "";
   const lng = item.geo_lng ?? item.lng ?? item.Lng ?? "";
-  const toNum = v => v !== "" ? parseFloat(String(v).replace(',', '.')) : NaN;
   return {
     usuario: item.usuario ?? item.Usuario ?? "",
     clave:   item.clave   ?? item.Clave   ?? "",
@@ -61,7 +61,10 @@ function claseAcceso(v){
 }
 
 // ====== LECTURA de hoja "conexion" ======
-let conexionCache = new Map();
+const keyNorm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+let conexionCacheByUser = new Map();
+let conexionCacheByName = new Map();
+
 function parseGeo(s){
   const m = /(-?\d+(?:[.,]\d+)?)[,\s;]+(-?\d+(?:[.,]\d+)?)/.exec(String(s||""));
   if (!m) return null;
@@ -69,34 +72,40 @@ function parseGeo(s){
   const lng = parseFloat(String(m[2]).replace(',', '.'));
   return (isFinite(lat) && isFinite(lng)) ? {lat, lng} : null;
 }
+
 async function cargarConexionCache(){
   try{
     const r = await fetch(CONN_API + "?accion=last_all");
     if (!r.ok) return;
-    const arr = await r.json(); // [{Usuario, geolocalizacion, hora, fecha, estado, ...}]
-    const map = new Map();
-    for (const x of arr){
-      const u = String(x.Usuario||'').trim();
-      if (!u) continue;
+    const arr = await r.json(); // [{Usuario, nombre, geolocalizacion, ...}]
+    const byUser = new Map(), byName = new Map();
+    for (const x of (Array.isArray(arr)?arr:[])){
+      const usuario = String(x.Usuario||'').trim();
+      const nombre  = String(x.nombre||'').trim();
       const g = parseGeo(x.geolocalizacion);
-      map.set(u.toLowerCase(), {
-        usuario:u,
+      const rec = {
+        usuario,
         geo_lat: g ? g.lat : NaN,
         geo_lng: g ? g.lng : NaN,
         hora: x.hora||'',
         fecha: x.fecha||'',
         estado: (x.estado||''),
         acceso: x.Acceso ?? x.acceso ?? '',
-        nombre: x.nombre ?? '',
+        nombre,
         rol:    x.rol ?? x.Rol ?? ''
-      });
+      };
+      if (usuario) byUser.set(keyNorm(usuario), rec);
+      if (nombre)  byName.set(keyNorm(nombre),  rec);
     }
-    conexionCache = map;
+    conexionCacheByUser = byUser;
+    conexionCacheByName = byName;
   }catch{}
 }
+
 function mergeConexion(u){
-  const key = String(u.usuario||'').trim().toLowerCase();
-  const c = conexionCache.get(key);
+  const byU = conexionCacheByUser.get(keyNorm(u.usuario));
+  const byN = conexionCacheByName.get(keyNorm(u.nombre));
+  const c = byU || byN;
   if (!c) return u;
   return {
     ...u,
@@ -105,7 +114,10 @@ function mergeConexion(u){
     hora: c.hora || u.hora,
     fecha: c.fecha || u.fecha,
     estado: c.estado || u.estado,
-    acceso: u.acceso || c.acceso
+    acceso: u.acceso || c.acceso,
+    // también puedes actualizar nombre/rol si faltan en usuarios
+    nombre: u.nombre || c.nombre,
+    rol:    u.rol    || c.rol
   };
 }
 
@@ -267,7 +279,7 @@ async function abrirModalConexion(item){
   const overlay = document.getElementById("connOverlay");
   overlay.style.display = "block";
 
-  // Fallback: trae última conexión si faltan coords
+  // Fallback: si no hay coords fusionadas, intenta con accion=last
   if (!isFinite(item.geo_lat) || !isFinite(item.geo_lng)) {
     try {
       const r = await fetch(CONN_API + "?accion=last&usuario=" + encodeURIComponent(item.usuario||""));
