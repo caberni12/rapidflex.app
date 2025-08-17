@@ -191,9 +191,13 @@ function inyectarEstilosModal(){
   if (document.getElementById("connModalCSS")) return;
   const css = `
   #connOverlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:9998}
-  #connModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  /* MOD: modal alto, casi pegado al buscador */
+  #connModal{
+    position:fixed;left:50%;top:72px;transform:translate(-50%,0);
     width:min(960px,92vw);background:#0b0f14;color:#e5e7eb;border:1px solid #162133;
-    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:9999}
+    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:9999;
+    max-height:calc(100vh - 96px);overflow:auto
+  }
   .connHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #162133}
   .connTitle{display:flex;gap:10px;align-items:center}
   .dot{width:10px;height:10px;border-radius:50%}
@@ -211,6 +215,24 @@ function inyectarEstilosModal(){
   .loc-pin{line-height:0; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));}`;
   const s = document.createElement("style"); s.id = "connModalCSS"; s.textContent = css; document.head.appendChild(s);
 }
+// Posicionar modal respecto al buscador
+function posicionarModalRespectoBuscador(){
+  const modal = document.getElementById('connModal');
+  if (!modal) return;
+  const busc = document.getElementById('buscador');
+  let top = 72;
+  if (busc){
+    const r = busc.getBoundingClientRect();
+    top = Math.max(8, Math.min(r.bottom + 8, window.innerHeight - 120));
+  }
+  modal.style.top = top + 'px';
+  modal.style.transform = 'translate(-50%,0)';
+  modal.style.maxHeight = `calc(100vh - ${top + 16}px)`;
+  modal.style.overflow = 'auto';
+}
+window.addEventListener('resize', posicionarModalRespectoBuscador);
+document.addEventListener('scroll', posicionarModalRespectoBuscador, true);
+
 
 function ensureModalConexion(){
   if (document.getElementById("connOverlay")) return;
