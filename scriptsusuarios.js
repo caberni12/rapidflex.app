@@ -1,10 +1,10 @@
-/* ===== usuarios.js (CRUD + merge conexion; sin columna de geolocalizacion) ===== */
+/* ===== usuarios.js (CRUD + merge conexion; Google Maps por iframe; tabla 5 columnas) ===== */
 
 /* Endpoints base */
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
 /* Web App de la hoja "conexion" */
-const CONN_API = 'https://script.google.com/macros/s/AKfycbwzFNp1o1KkeTh98MBNW7JFLBYYl9MhEJExOBSx-9SfhgCz37Y0AypOwLHNpBZqmWU9/exec';
+const CONN_API = 'https://script.google.com/macros/s/AKfycbxYI3UQNfeM1K6H5DmRdAVVqUkJhIAH3zJQU_vJUWrTZuw3ObwqyKM5JE5D9T8mav3t/exec';
 
 /* DOM */
 const form  = document.getElementById("formulario");
@@ -82,9 +82,9 @@ async function cargarConexionCache(){
         Clave:   x.Clave   || "",
         Acceso:  x.Acceso  || "",
         nombre:  x.nombre  || "",
-        geo_txt,                  // texto crudo
-        geo_lat: g?g.lat:NaN,     // para mapa
-        geo_lng: g?g.lng:NaN,     // para mapa
+        geo_txt,
+        geo_lat: g?g.lat:NaN,
+        geo_lng: g?g.lng:NaN,
         hora:    x.hora    || "",
         fecha:   x.fecha   || "",
         estado:  x.estado  || ""
@@ -94,7 +94,7 @@ async function cargarConexionCache(){
   }catch{}
 }
 
-/* Merge: de conexion toma Usuario, Clave, Acceso, nombre, geo_txt/lat/lng, hora, fecha, estado. rol queda de Usuarios */
+/* Merge: conexion sobre Usuarios (rol de Usuarios) */
 function mergeConexion(u){
   const c = conexionCache.get(kn(u.usuario));
   if (!c) return u;
@@ -110,7 +110,6 @@ function mergeConexion(u){
     hora:    c.hora    || u.hora,
     fecha:   c.fecha   || u.fecha,
     estado:  c.estado  || u.estado
-    // rol intacto
   };
 }
 
@@ -142,7 +141,7 @@ form.addEventListener("submit", e => {
 });
 function cancelarEdicion(){ form.reset(); }
 
-/* Listar + fusionar con "conexion" */
+/* Listar + fusionar con "conexion" (solo 5 columnas) */
 async function obtenerUsuarios() {
   const [usuarios] = await Promise.all([
     fetch(URL_GET).then(r=>r.json()).catch(()=>[]),
@@ -160,16 +159,13 @@ async function obtenerUsuarios() {
       <td>${item.acceso}</td>
       <td>${item.nombre}</td>
       <td>${item.rol}</td>
-      <td>${item.hora||''}</td>
-      <td>${item.fecha||''}</td>
-      <td>${item.estado||''}</td>
       <td>
         <button type="button" class="btn-ed">✏️</button>
         <button type="button" class="btn-el">🗑️</button>
       </td>`;
     tr.querySelector(".btn-ed").addEventListener("click", () => editar(item, item.fila));
     tr.querySelector(".btn-el").addEventListener("click", () => eliminar(item.fila));
-    tr.addEventListener("dblclick", () => abrirModalConexion(item)); // doble clic -> modal
+    tr.addEventListener("dblclick", () => abrirModalConexion(item));
     tabla.appendChild(tr);
   });
 
@@ -194,9 +190,7 @@ function eliminar(fila) {
     .catch(()=>toast("Error de red al eliminar","error"));
 }
 
-/* ===== Modal con mapa ===== */
-let modalMap = null, modalMarker = null;
-
+/* ===== Modal + Google Maps por iframe (sin API key) ===== */
 function inyectarEstilosModal(){
   if (document.getElementById("connModalCSS")) return;
   const css = `
@@ -204,21 +198,14 @@ function inyectarEstilosModal(){
   #connModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
     width:min(960px,92vw);background:#0b0f14;color:#e5e7eb;border:1px solid #162133;border-radius:14px;z-index:9999}
   .connHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #162133}
-  .connTitle{display:flex;gap:10px;align-items:center}
-  .dot{width:10px;height:10px;border-radius:50%}
-  .dot.online{background:#16a34a}
-  .dot.offline{background:#dc2626}
   .connBody{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
   .connGrid{display:grid;grid-template-columns:140px 1fr;gap:8px;border:1px solid #162133;border-radius:10px;padding:10px}
   .connGrid div{display:contents}
   .connGrid label{opacity:.7}
-  #connMap{height:360px;border:1px solid #162133;border-radius:10px}
-  .connFoot{display:flex;justify-content:flex-end;padding:10px 12px;border-top:1px solid #162133}
-  .connBtn{background:#111827;border:1px solid #1f2937;color:#e5e7eb;border-radius:8px;padding:8px 12px;cursor:pointer}
-  .connBtn:hover{background:#0b1220}`;
+  #connGMap{height:360px;border:1px solid #162133;border-radius:10px;overflow:hidden}
+  #connGMap iframe{width:100%;height:100%;border:0}`;
   const s = document.createElement("style"); s.id="connModalCSS"; s.textContent=css; document.head.appendChild(s);
 }
-
 function ensureModalConexion(){
   if (document.getElementById("connOverlay")) return;
   inyectarEstilosModal();
@@ -227,11 +214,8 @@ function ensureModalConexion(){
   overlay.innerHTML = `
     <div id="connModal" role="dialog" aria-modal="true">
       <div class="connHead">
-        <div class="connTitle">
-          <span id="connDot" class="dot offline"></span>
-          <strong id="connTitulo">Conexión</strong>
-        </div>
-        <button class="connBtn" id="connClose" aria-label="Cerrar">Cerrar</button>
+        <strong id="connTitulo">Conexión</strong>
+        <button class="connBtn" id="connClose">Cerrar</button>
       </div>
       <div class="connBody">
         <div class="connGrid">
@@ -245,37 +229,26 @@ function ensureModalConexion(){
           <div><label>Fecha</label><span id="cFecha"></span></div>
           <div><label>Estado</label><span id="cEstado"></span></div>
         </div>
-        <div id="connMap"></div>
-      </div>
-      <div class="connFoot">
-        <button class="connBtn" id="connCenter">Centrar mapa</button>
+        <div id="connGMap"></div>
       </div>
     </div>`;
   document.body.appendChild(overlay);
-  overlay.addEventListener("click", e => { if (e.target.id === "connOverlay") cerrarModalConexion(); });
-  document.getElementById("connClose").onclick = cerrarModalConexion;
-  document.getElementById("connCenter").onclick = () => { if (modalMap && modalMarker) modalMap.setView(modalMarker.getLatLng(), 14); };
+  overlay.addEventListener("click", e => { if (e.target.id === "connOverlay") overlay.style.display = "none"; });
+  document.getElementById("connClose").onclick = () => overlay.style.display = "none";
 }
-
-function cargarLeaflet(){
-  if (window.L) return Promise.resolve();
-  return new Promise((resolve) => {
-    const link=document.createElement('link'); link.rel='stylesheet';
-    link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(link);
-    const s=document.createElement('script'); s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    s.onload=resolve; document.head.appendChild(s);
-  });
+function mapSrc(lat,lng,geoTxt){
+  if (isFinite(lat) && isFinite(lng)) {
+    return `https://www.google.com/maps?q=${lat},${lng}&hl=es&z=14&output=embed`;
+  }
+  const q = encodeURIComponent(geoTxt || '');
+  return `https://www.google.com/maps?q=${q||'Chile'}&hl=es&z=11&output=embed`;
 }
-
 async function abrirModalConexion(item){
   ensureModalConexion();
   const overlay = document.getElementById("connOverlay");
   overlay.style.display = "block";
 
-  const esOnline = ["true","1","sí","si","online"].includes(String(item.acceso||item.estado).toLowerCase());
-  document.getElementById("connDot").className = "dot " + (esOnline ? "online" : "offline");
-
-  // Geo: mostrar texto crudo; parsear solo para mapa
+  // Geo: texto crudo; parsear solo para coordenadas
   let geoStr = String(item.geo_txt||'').trim();
   if ((!isFinite(item.geo_lat) || !isFinite(item.geo_lng)) && geoStr){
     const g = parseGeo(geoStr);
@@ -311,33 +284,9 @@ async function abrirModalConexion(item){
   document.getElementById("cFecha").textContent   = item.fecha||'';
   document.getElementById("cEstado").textContent  = item.estado||'';
 
-  await cargarLeaflet();
-  setTimeout(() => {
-    if (!modalMap) {
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl:'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
-      });
-      modalMap = L.map('connMap',{zoomControl:true});
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(modalMap);
-    }
-    setTimeout(()=>modalMap.invalidateSize(),60);
-
-    if (isFinite(item.geo_lat)&&isFinite(item.geo_lng)){
-      const pos=[item.geo_lat,item.geo_lng];
-      if (!modalMarker) modalMarker=L.marker(pos).addTo(modalMap);
-      else modalMarker.setLatLng(pos);
-      modalMarker.bindPopup(`<strong>${item.usuario||''}</strong><br>${geoStr||''}`).openPopup();
-      modalMap.setView(pos,14);
-    } else {
-      modalMap.setView([-33.45,-70.66],11);
-      if (modalMarker){ modalMap.removeLayer(modalMarker); modalMarker=null; }
-    }
-  }, 0);
+  const mapEl = document.getElementById('connGMap');
+  mapEl.innerHTML = `<iframe src="${mapSrc(item.geo_lat,item.geo_lng,geoStr)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
 }
-
-function cerrarModalConexion(){ const overlay = document.getElementById("connOverlay"); if (overlay) overlay.style.display = "none"; }
 
 /* Tiempo real */
 function iniciarTiempoReal(){ if (poller) clearInterval(poller); poller = setInterval(obtenerUsuarios, 10000); }
