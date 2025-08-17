@@ -356,12 +356,17 @@ td.status-celda[data-status="Finalizado"] {
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
 
+/* Formato condicional SIN cambiar el fondo */
+#tabla tbody tr.estado-true,
+#tabla tbody tr.estado-false {
+  background: inherit !important; /* mantiene negro u original */
+  position: relative;
+}
 
-/* Filas con formato condicional por 'acceso' */
-#tabla tbody tr.estado-true  { background: #d1fae5; } /* verde suave */
-#tabla tbody tr.estado-false { background: #fee2e2; } /* rojo suave */
+/* Indicador lateral */
+#tabla tbody tr.estado-true { box-shadow: inset 4px 0 0 0 #16a34a; } /* verde */
+#tabla tbody tr.estado-false { box-shadow: inset 4px 0 0 0 #dc2626; } /* rojo */
 
-/* Resalta la celda Acceso (3ª columna) */
-#tabla tbody tr.estado-true  td:nth-child(3) { color: #065f46; font-weight: 600; }
-#tabla tbody tr.estado-false td:nth-child(3) { color: #991b1b; font-weight: 600; }
-
+/* Color solo en la celda "Acceso" (3ª columna) */
+#tabla tbody tr.estado-true  td:nth-child(3) { color: #22c55e; font-weight: 600; }
+#tabla tbody tr.estado-false td:nth-child(3) { color: #ef4444; font-weight: 600; }
