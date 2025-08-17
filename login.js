@@ -35,19 +35,13 @@ function _showEnvAlert(type, text, ttl = 2000){
   el.style.display = 'inline-flex';
   void el.offsetHeight;
   el.classList.add('show');
-  const closeBtn = el.querySelector('.close');
-  if (closeBtn){
-    closeBtn.onclick = () => { el.classList.remove('show'); setTimeout(()=>{ el.style.display='none'; }, 180); };
-  }
+  el.querySelector('.close').onclick = () => { el.classList.remove('show'); setTimeout(()=>{ el.style.display='none'; }, 180); };
   if (ttl > 0){
-    setTimeout(() => {
-      el.classList.remove('show');
-      setTimeout(() => { el.style.display = 'none'; }, 180);
-    }, ttl);
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => { el.style.display = 'none'; }, 180); }, ttl);
   }
 }
 
-/* ===== Utilidades auto: geo + fecha/hora CL + envío ===== */
+/* ===== Utilidades: geo + fecha/hora CL + envío ===== */
 async function getGeo(){
   const viaIP = async ()=>{ try{
     const r = await fetch('https://ipapi.co/json/'); if(!r.ok) return null;
@@ -70,11 +64,17 @@ function fechaHoraCL(){
     hora:  new Intl.DateTimeFormat('es-CL',{ timeZone:tz, hour:'2-digit', minute:'2-digit', second:'2-digit' }).format(now)
   };
 }
+/* Envío form-encoded para evitar preflight */
 function logConexion(payload){
   try{
-    const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+    const params = new URLSearchParams(payload).toString();
+    const blob = new Blob([params], {type:'application/x-www-form-urlencoded;charset=UTF-8'});
     if (!(navigator.sendBeacon && navigator.sendBeacon(LOG_URL, blob))){
-      fetch(LOG_URL,{method:'POST',body:JSON.stringify(payload)}).catch(()=>{});
+      fetch(LOG_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+        body: params
+      }).catch(()=>{});
     }
   }catch{}
 }
