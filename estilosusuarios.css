@@ -355,3 +355,13 @@ td.status-celda[data-status="Finalizado"] {
 #contenido .acciones{
   margin-top: clamp(28px, 7vh, 110px) !important;
 }
+
+
+/* Filas con formato condicional por 'acceso' */
+#tabla tbody tr.estado-true  { background: #d1fae5; } /* verde suave */
+#tabla tbody tr.estado-false { background: #fee2e2; } /* rojo suave */
+
+/* Resalta la celda Acceso (3ª columna) */
+#tabla tbody tr.estado-true  td:nth-child(3) { color: #065f46; font-weight: 600; }
+#tabla tbody tr.estado-false td:nth-child(3) { color: #991b1b; font-weight: 600; }
+
