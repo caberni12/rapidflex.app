@@ -2,7 +2,7 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwsXshOze1AzVq4Q65VVOQBv1oOngYKBvtTTTjSoqjCzN_ew0ckUrjYrVGr0ikFXxAM/exec";
 
 /* ===== Endpoint de REGISTRO (conexion) ===== */
-const LOG_URL = "https://script.google.com/macros/s/AKfycbzPqO60R3SswkiAOhH9sEnGePFg4pUVHOA_OesEfYyY8NusgaRirmHaOa5ZFEWMxS--/exec";
+const LOG_URL = "https://script.google.com/macros/s/AKfycbyIRFouSj1OIwIcIHIy1cPlVzgJKzwAScE-J_qm5uFPxtwIfkSzDTnbgIn6YkEuSFo/exec";
 
 /* ===== Loader ===== */
 function mostrarLoader(){ const l = document.getElementById("loader"); if (l) l.style.display = "flex"; }
