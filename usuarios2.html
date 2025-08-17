@@ -17,27 +17,7 @@
 
     <h2 style="text-align:center;">Gestión de Usuarios</h2>
 
-    <form id="formulario">
-      <input type="hidden" id="fila" />
-      <input type="text" id="usuario" placeholder="Usuario" required />
-      <input type="password" id="clave" placeholder="Clave" required />
-      <select id="acceso" required>
-        <option value="">Acceso</option>
-        <option value="true">true</option>
-        <option value="false">false</option>
-      </select>
-      <input type="text" id="nombre" placeholder="Nombre completo" required />
-      <select id="rol" required>
-        <option value="">Rol</option>
-        <option value="admin">Admin</option>
-        <option value="usuario">Usuario</option>
-      </select>
-
-      <div class="botones">
-        <button type="submit" class="btn-guardar">💾 Guardar</button>
-        <button type="button" onclick="cancelarEdicion()" class="btn-cancelar">❌ Cancelar</button>
-      </div>
-    </form>
+   
      <input type="text" id="buscador" placeholder="Buscar..." onkeyup="filtrarTabla()">
     <h3 style="text-align:center;">Lista de Usuarios</h3>
     <div class="tabla-responsive">
