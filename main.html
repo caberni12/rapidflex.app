@@ -123,5 +123,60 @@
       <span>⚠ El servidor debe estar conectado a una red pública para que puedo conectar.</span>
       <button id="envBannerClose" type="button" aria-label="Cerrar aviso">✕</button>
     </div>
+  <script>
+(function(){
+  function getUser(){
+    const keys = ['nombreUsuario','username','userName','usuario','nombre'];
+    for (const k of keys){
+      try{
+        const v = localStorage.getItem(k);
+        if (v && v.trim()) return v.trim();
+      }catch(_){}
+    }
+    const pill = document.getElementById('usuarioNombre');
+    if (pill){
+      const t = pill.textContent.replace(/^👤\s*/,'').trim();
+      if (t) return t;
+    }
+    return '';
+  }
+
+  function georefLink(){
+    return document.getElementById('linkGeoref')
+        || document.querySelector('a[href="#/usuarios2"], a[href="#/georeferencia"]');
+  }
+
+  function gate(){
+    const a = georefLink(); if (!a) return;
+    const u = getUser();
+    const ok = (u === 'asilva' || u === 'ASILVA'); // solo estas dos variantes
+
+    if (ok){
+      a.removeAttribute('aria-disabled');
+      a.style.pointerEvents = '';
+      a.style.opacity = '';
+      a.tabIndex = 0;
+      a.removeAttribute('title');
+      a.onclick = null;
+    } else {
+      a.setAttribute('aria-disabled','true');
+      a.style.pointerEvents = 'none';
+      a.style.opacity = '0.5';
+      a.tabIndex = -1;
+      a.title = 'Solo disponible para ASILVA';
+      a.onclick = (e) => { e.preventDefault(); return false; };
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', gate);
+  window.addEventListener('hashchange', gate);
+  const u = document.getElementById('usuarioNombre');
+  if (u){
+    new MutationObserver(gate).observe(u, {childList:true, characterData:true, subtree:true});
+  }
+  setTimeout(gate, 800);
+})();
+</script>
+
 </body>
 </html>
