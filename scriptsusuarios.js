@@ -19,7 +19,7 @@ function toast(msg, type = "ok", ms = 2500) {
   el.style.left = "50%";
   el.style.transform = "translateX(-50%)";
   el.style.padding = "10px 14px";
-  el.style.background = type === "ok" ? "#0ea5e9" : "#ef4444"; // azul / rojo
+  el.style.background = type === "ok" ? "#0ea5e9" : "#ef4444";
   el.style.color = "#fff";
   el.style.fontSize = "14px";
   el.style.borderRadius = "8px";
@@ -43,6 +43,14 @@ function normalizar(item) {
     rol:     item.rol     ?? item.Rol     ?? "",
     fila: item.fila
   };
+}
+
+// === Acceso -> clase para formato condicional ===
+function claseAcceso(v){
+  const s = (v ?? "").toString().trim().toLowerCase();
+  if (["true","1","sí","si"].includes(s))  return "estado-true";
+  if (["false","0","no"].includes(s))      return "estado-false";
+  return "";
 }
 
 // === Submit ===
@@ -91,6 +99,7 @@ function obtenerUsuarios() {
       data.forEach(raw => {
         const item = normalizar(raw);
         const tr = document.createElement("tr");
+        tr.className = claseAcceso(item.acceso); // formato condicional por acceso
         tr.innerHTML = `
           <td>${item.usuario}</td>
           <td>${item.clave}</td>
@@ -110,12 +119,12 @@ function obtenerUsuarios() {
 
 // === Editar ===
 function editar(item, fila) {
-  form.fila.value = fila;
-  form.usuario.value = item.usuario;
-  form.clave.value = item.clave;
-  form.acceso.value = item.acceso;
-  form.nombre.value = item.nombre;
-  form.rol.value = item.rol;
+  form.fila.value = fila ?? item.fila ?? "";
+  form.usuario.value = item.usuario ?? "";
+  form.clave.value = item.clave ?? "";
+  form.acceso.value = item.acceso ?? "";
+  form.nombre.value = item.nombre ?? "";
+  form.rol.value = item.rol ?? "";
   datosOriginales = { ...item };
 }
 
