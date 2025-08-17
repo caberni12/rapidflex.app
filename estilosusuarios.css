@@ -7,17 +7,10 @@ body {
   position: relative;
 }
 
-.logo-container {
-  text-align: center;
-  margin-bottom: 5px;
-}
+.logo-container { text-align: center; margin-bottom: 5px; }
+.logo-container img { max-width: 100%; height: auto; }
 
-.logo-container img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* --- FORMULARIO --- */
+/* --- FORMULARIO (Desktop) --- */
 form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -30,13 +23,11 @@ form {
   max-width: 100%;
   box-sizing: border-box;
   margin-top: -14%;
-  position: fixed;
+  position: fixed; /* como tu versión de escritorio */
 }
 
 /* CAMPOS */
-input,
-textarea,
-select {
+input, textarea, select {
   padding: 10px;
   font-size: 16px;
   width: 100%;
@@ -47,20 +38,11 @@ select {
   background-color: #fff;
   margin-bottom: 10px;
 }
+input.nombre { font-size: 14px; padding: 8px; }
+textarea { grid-column: span 2; height: 80px; resize: vertical; }
 
-input.nombre {
-  font-size: 14px;
-  padding: 8px;
-}
-
-textarea {
-  grid-column: span 2;
-  height: 80px;
-  resize: vertical;
-}
-
-input.busqueda,
-input[type="search"] {
+/* Buscador (desktop) */
+input.busqueda, input[type="search"] {
   max-width: 300px;
   width: 100%;
   box-sizing: border-box;
@@ -79,7 +61,6 @@ input[type="search"] {
   gap: 10px;
   justify-content: flex-start;
 }
-
 button {
   padding: 10px 16px;
   font-size: 14px;
@@ -90,66 +71,43 @@ button {
   flex: 1 1 auto;
   max-width: 200px;
 }
+.btn-guardar { background-color: #28a745; color: #fff; }
+.btn-cancelar { background-color: #dc3545; color: #fff; }
+.btn-recargar { margin-bottom: 12px; background-color: #007bff; color: #fff; }
 
-.btn-guardar {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-cancelar {
-  background-color: #dc3545;
-  color: white;
-}
-
-.btn-recargar {
-  margin-bottom: 12px;
-  background-color: #007bff;
-  color: white;
-}
-
-/* --- CONTENEDOR RESPONSIVE DE TABLA CON FONDO NEGRO --- */
+/* --- CONTENEDOR DE TABLA (Desktop) --- */
 .tabla-responsive,
 #tabla-wrapper {
-  background: #0c0c0c !important;
+  background: #0c0c0c;
   border-radius: 8px;
-  width: 100% !important;
-  overflow-x: auto !important;
-  overflow-y: auto !important;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain !important;
-  padding: 0 !important; /* <-- SIN PADDING evita fondo sobresalido arriba */
-  margin: 0 auto 20px auto; /* Solo margen inferior */
+  overscroll-behavior: contain;
+  padding: 0;                 /* evita fondo sobresalido arriba */
+  margin: 0 auto 20px auto;   /* solo margen inferior */
   box-sizing: border-box;
 }
 
-/* TABLA */
+/* TABLA (Desktop) */
 #tabla {
   width: 100%;
   border-collapse: collapse;
-  background: transparent; /* Fondo ahora lo maneja el contenedor */
+  background: transparent; /* el fondo lo maneja el contenedor */
   color: #faf9f9;
   margin: 0;
   border-radius: 8px;
   overflow: hidden;
   font-size: 14px;
 }
-
-th,
-td {
+th, td {
   border: 1px solid #049afdcc;
   padding: 10px;
   text-align: center;
 }
-
-th {
-  background: #049afdcc;
-}
-
-thead tr.filtros th {
-  padding: 4px 5px;
-  background-color: #f9f9f9;
-}
-
+th { background: #049afdcc; }
+thead tr.filtros th { padding: 4px 5px; background-color: #f9f9f9; }
 thead tr.filtros th input,
 thead tr.filtros th select {
   width: 100%;
@@ -158,792 +116,89 @@ thead tr.filtros th select {
   box-sizing: border-box;
 }
 
+/* Botones dentro de celdas */
 td button {
   padding: 6px 10px;
   font-size: 14px;
   border: none;
   border-radius: 4px;
   background-color: #ffffff;
-  color: white;
+  color: white; /* mantengo tu color; cambia a #222 si quieres texto oscuro */
   cursor: pointer;
   margin: 4px;
 }
 
-/* ENLACES */
-.telefono-link {
-  color: blue;
-  text-decoration: underline;
-  cursor: pointer;
-}
+/* ENLACES, USUARIO */
+.telefono-link { color: blue; text-decoration: underline; cursor: pointer; }
+.usuario-nombre { color: #007bff; font-weight: bold; margin-bottom: 10px; text-align: right; }
 
-/* USUARIO */
-.usuario-nombre {
-  color: #007bff;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-align: right;
-}
-
-/* --- LOADER SOBRE TODO EL BODY (MODIFICADO) --- */
+/* --- LOADER (Desktop) --- */
 .loader-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 9999;
-  background-color: rgba(0, 0, 0, 0.7);
+  position: fixed; inset: 0; z-index: 9999;
+  background-color: rgba(0,0,0,.7);
 }
-
 .loader {
   border: 12px solid #141414;
   border-top: 12px solid #f8f4f4;
   border-radius: 50%;
-  width: 200px;
-  height: 200px;
-  aspect-ratio: 1/1;
+  width: 200px; height: 200px; aspect-ratio: 1/1;
   animation: spin 1s linear infinite;
   box-shadow: inset 0 0 10px #080808, 0 0 15px #080808;
-  margin-top: 17%;
-  margin-left: 42%;
+  margin-top: 17%; margin-left: 42%;
   box-sizing: border-box;
 }
-
 .loader-text {
   position: absolute;
   top: calc(35% + 110px);
   left: 49%;
   transform: translateX(-50%);
-  color: #fff;
-  font-size: 20px;
-  text-align: center;
+  color: #fff; font-size: 20px; text-align: center;
 }
+.loader-wrapper.hidden { display: none; }
+@keyframes spin { 0% {transform: rotate(0)} 100% {transform: rotate(360deg)} }
 
-.loader-wrapper.hidden {
-  display: none;
-}
+/* STATUS (Desktop) */
+td.status-celda[data-status="Nuevo"]      { background-color: #28a745 !important; color: #fff; font-weight: bold; }
+td.status-celda[data-status="En proceso"] { background-color: #ffc107 !important; color: #000; font-weight: bold; }
+td.status-celda[data-status="Finalizado"] { background-color: #ff0000 !important; color: #fff; font-weight: bold; }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* --- VERSION MÓVIL FLUIDA --- */
-@media (max-width: 768px) {
-  form {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    padding: 15px;
-    gap: 12px;
-  }
-
-  .botones {
-    justify-content: center;
-  }
-
-  button {
-    font-size: 15px;
-    min-width: 140px;
-    max-width: 100%;
-  }
-
-  .usuario-nombre {
-    text-align: center;
-    font-size: 14px;
-  }
-
-  #tabla {
-    font-size: 13px;
-  }
-
-  td button {
-    font-size: 14px;
-    padding: 8px 10px;
-    width: auto;
-  }
-
-  .loader {
-    width: 70px;
-    height: 70px;
-    aspect-ratio: 1/1;
-    border-width: 6px;
-  }
-
-  .loader-text {
-    font-size: 14px;
-    top: calc(17% + 90px);
-  }
-}
-/* Colores aplicados directamente por el atributo data-status */
-td.status-celda[data-status="Nuevo"] {
-  background-color: #28a745 !important;
-  color: white;
-  font-weight: bold;
-}
-
-td.status-celda[data-status="En proceso"] {
-  background-color: #ffc107 !important;
-  color: black;
-  font-weight: bold;
-}
-
-td.status-celda[data-status="Finalizado"] {
-  background-color: #ff0000 !important;
-  color: white;
-  font-weight: bold;
-}
-
-/* === Contenedor de acciones (3 botones azules) alineado con la tabla === */
+/* CONTROLES SUPERIORES ALINEADOS CON LA TABLA */
 #contenido .acciones{
-  width: 100%;
-  max-width: 100%;
+  width: 100%; max-width: 100%;
   margin: clamp(8px, 1.5vh, 16px) auto clamp(8px, 1.5vh, 12px);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
 }
-
-/* El buscador al mismo ancho de la tabla (línea completa) */
 #contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
+  display: block; width: 100%; max-width: none;
   margin: 8px auto clamp(12px, 2vh, 18px);
-  padding: 10px 12px;
-  box-sizing: border-box;
+  padding: 10px 12px; box-sizing: border-box;
 }
 
-/* === Ajuste de tamaño para Sistema 1 y 2: contenedor más angosto y centrado === */
+/* Contenedor centrado en escritorio */
 #contenido{
   width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: auto; margin-right: auto;
   padding-left: clamp(12px, 2vw, 24px);
   padding-right: clamp(12px, 2vw, 24px);
 }
 #contenido > h2{ margin-left: 0; margin-right: 0; }
-
-/* === Igualar ancho del bloque superior al de la tabla === */
 #contenido > .logo-container,
 #contenido > h2,
 #contenido > #formulario,
-#contenido > #buscador {
+#contenido > #buscador{
   width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: auto; margin-right: auto;
   padding-left: clamp(12px, 2vw, 24px);
   padding-right: clamp(12px, 2vw, 24px);
 }
 
-/* === Aire adicional arriba de la TABLA y separación de controles === */
+/* Aire alrededor de tabla y controles */
 #formulario{ margin-bottom: clamp(16px, 4vh, 48px); }
 #buscador{ display:block; width:100%; max-width:none; margin: 8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
 .btn-recargar{ margin-top: 8px; }
 #tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
 
-
-/* === Empujar más abajo el bloque de ACCIONES (3 botones azules) para que no quede oculto por el panel superior === */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;  /* más aire arriba */
-  margin-bottom: clamp(10px, 2vh, 18px);
-}
-
-/* Aseguramos que el buscador quede inmediatamente debajo, a ancho de tabla */
-#contenido #buscador{
-  display: block;
-  width: 100%;
-  max-width: none;
-  margin-top: clamp(12px, 2.5vh, 24px);
-}
-
-/* === FIX OVERLAP: el formulario superior NO debe ser fixed ni con margen negativo === */
-#formulario,
-#contenido form{
-  position: static !important;
-  top: auto !important;
-  margin-top: clamp(8px, 2vh, 20px) !important;
-}
-
-/* Asegurar que el bloque de ACCIONES quede bajo el panel superior */
-#contenido .acciones{
-  margin-top: clamp(28px, 7vh, 110px) !important;
-}
-
-/* ==========================================================
-   ✅ Mobile & Tablet Overrides (<= 1024px) — limpio
-   Nota: SOLO afecta móviles/tablets. No cambia el desktop.
-   ========================================================== */
-@media (max-width: 1024px) {
-
-  html, body {
-    overflow-x: hidden !important;
-    touch-action: pan-y !important;
-  }
-
-  #contenido {
-    width: 100%;
-    padding-left: clamp(6px, 2.5vw, 12px) !important;
-    padding-right: clamp(14px, 5.5vw, 24px) !important;
-    margin-left: 0 !important;
-    background-color: #fff !important;
-    box-shadow: none !important;
-    filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-
-  #formulario,
-  #contenido form,
-  form {
-    position: static !important;
-    top: auto !important;
-    margin: 12px auto 16px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-
-    display: grid;
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-    padding-left: clamp(8px, 3vw, 14px) !important;
-    padding-right: clamp(12px, 4vw, 18px) !important;
-    box-sizing: border-box;
-  }
-
-  input, textarea, select {
-    font-size: 16px !important;
-    padding: 12px !important;
-    box-sizing: border-box !important;
-    width: calc(100% - 8px) !important;
-    max-width: calc(100% - 8px) !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-  }
-
-  .botones {
-    grid-column: 1 / -1 !important;
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    gap: 8px !important;
-    justify-items: start !important;
-  }
-
-  .botones button {
-    width: auto !important;
-    min-width: 140px !important;
-    max-width: 100% !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-  }
-
-  #tabla td button {
-    display: block !important;
-    width: auto !important;
-    min-width: 120px !important;
-    max-width: 100% !important;
-    min-height: 40px !important;
-    margin: 4px 0 !important;
-  }
-
-  #contenido #buscador {
-    width: 100% !important;
-    margin: 8px 0 12px !important;
-    padding: 10px 12px !important;
-    max-width: none !important;
-  }
-
-  #contenido .acciones {
-    width: 100% !important;
-    margin-top: clamp(18px, 5vh, 28px) !important;
-    margin-bottom: 12px !important;
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(140px, max-content)) !important;
-    justify-content: start !important;
-    gap: 10px !important;
-  }
-  #contenido .acciones .btn,
-  #contenido .acciones button {
-    width: auto !important;
-    min-width: 140px !important;
-    max-width: 100% !important;
-    min-height: 44px !important;
-    font-size: 15px !important;
-  }
-
-  .tabla-responsive,
-  #tabla-wrapper {
-    background: #0c0c0c !important;
-    border-radius: 8px;
-    width: 100% !important;
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain !important;
-    padding: 0 !important;
-    margin: 0 auto 20px auto !important;
-    box-sizing: border-box;
-  }
-
-  #tabla {
-    display: block !important;
-    overflow-x: auto !important;
-    overflow-y: auto !important;
-    white-space: nowrap;
-    margin-top: 16px !important;
-    border-collapse: collapse;
-    min-width: 760px;
-    touch-action: pan-x pan-y !important;
-    background: transparent !important;
-  }
-
-  #tabla thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background-color: #2196F3 !important;
-    color: #fff !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-
-  #tabla th, #tabla td {
-    padding: 10px 8px !important;
-  }
-  #tabla td button {
-    width: 100% !important;
-    max-width: none !important;
-    font-size: 14px !important;
-    margin: 4px 0 !important;
-  }
-
-  .loader {
-    width: 48px !important;
-    height: 48px !important;
-    aspect-ratio: 1/1 !important;
-    border-width: 6px !important;
-  }
-  .loader-text {
-    position: static !important;
-    transform: none !important;
-    margin-top: 8px !important;
-    text-align: center !important;
-    font-size: 14px !important;
-  }
-
-  .logo-container img {
-    max-width: 100% !important;
-    height: auto !important;
-  }
-}
-
-/* ====== Teléfonos (<= 600px) ====== */
-@media (max-width: 600px) {
-  #tabla { font-size: 12.5px !important; }
-  textarea { height: 72px !important; }
-}
-
-/* Fuerza fondo negro en celdas (excepto status) y texto blanco */
+/* Fondo negro en celdas normales (menos status) */
 #tabla tbody td:not(.status-celda){
-  background:#0c0c0c !important;
-  color:#faf9f9 !important;
-}
-
-/* ==========================================================
-   🃏 Layout tipo TARJETA con carrusel horizontal (<=1024px)
-   No requiere cambiar el HTML de la tabla.
-   Cada fila (tr) se vuelve una tarjeta deslizable.
-   ========================================================== */
-@media (max-width: 1024px) {
-
-  /* El wrapper mantiene el scroll horizontal suave */
-  .tabla-responsive,
-  #tabla-wrapper {
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    padding: 12px !important;
-    background: #0c0c0c !important;
-  }
-
-  /* La tabla no forzará ancho fijo en móvil */
-  #tabla {
-    display: block !important;
-    width: 100% !important;
-    background: transparent !important;
-    border-collapse: separate !important;
-    border-spacing: 0 !important;
-    margin: 0 !important;
-  }
-
-  /* Ocultamos cabecera para tarjetas */
-  #tabla thead {
-    display: none !important;
-  }
-
-  /* El cuerpo se convierte en carrusel horizontal de tarjetas */
-  #tabla tbody {
-    display: flex !important;
-    gap: 12px !important;
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    padding: 4px 2px 8px !important;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Cada fila = tarjeta */
-  #tabla tbody tr {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    min-width: min(90vw, 420px) !important; /* ancho de la tarjeta */
-    max-width: 92vw !important;
-    border: 1px solid #049afdcc !important;
-    border-radius: 12px !important;
-    background: #0c0c0c !important;
-    padding: 12px !important;
-    box-shadow: 0 8px 18px rgba(0,0,0,.28) !important;
-    scroll-snap-align: start;
-  }
-
-  /* Quitamos bordes de tabla tradicionales para un look de tarjeta */
-  #tabla tr, #tabla th, #tabla td {
-    border: none !important;
-  }
-
-  /* Cada celda muestra etiqueta + valor en dos columnas */
-  #tabla tbody td {
-    display: grid !important;
-    grid-template-columns: 120px 1fr !important; /* etiqueta | valor */
-    align-items: center !important;
-    gap: 8px !important;
-    text-align: left !important;
-    padding: 10px 6px !important;
-    background: transparent !important;
-    color: #faf9f9 !important;
-    border-bottom: 1px solid rgba(255,255,255,.08) !important;
-  }
-
-  /* Última celda sin borde inferior */
-  #tabla tbody td:last-child {
-    border-bottom: none !important;
-  }
-
-  /* Etiqueta (si no usas data-label, usa fallback de abajo) */
-  #tabla tbody td::before {
-    content: attr(data-label);
-    font-weight: 700 !important;
-    color: #8ecaff !important;
-    white-space: nowrap !important;
-  }
-
-  /* 🔁 Fallback por posición de columna (ajusta textos si tu orden es distinto) */
-  #tabla tbody tr td:nth-child(1)::before { content: "Nombre"; }
-  #tabla tbody tr td:nth-child(2)::before { content: "Email"; }
-  #tabla tbody tr td:nth-child(3)::before { content: "Teléfono"; }
-  #tabla tbody tr td:nth-child(4)::before { content: "Mensaje"; }
-  #tabla tbody tr td:nth-child(5)::before { content: "Status"; }
-  #tabla tbody tr td:nth-child(6)::before { content: "Acciones"; }
-
-  /* Botones dentro de la tarjeta: apilados y cómodos */
-  #tabla td button {
-    display: block !important;
-    width: 100% !important;
-    min-height: 40px !important;
-    margin: 6px 0 !important;
-    font-size: 14px !important;
-  }
-
-  /* Celdas de estado lucen como “chip” dentro de la tarjeta */
-  #tabla td.status-celda {
-    border-radius: 8px !important;
-    text-align: center !important;
-    padding: 10px !important;
-    font-weight: bold !important;
-  }
-
-  /* Scrollbar sutil (opcional) */
-  #tabla-wrapper::-webkit-scrollbar,
-  .tabla-responsive::-webkit-scrollbar,
-  #tabla tbody::-webkit-scrollbar {
-    height: 8px;
-  }
-  #tabla-wrapper::-webkit-scrollbar-thumb,
-  .tabla-responsive::-webkit-scrollbar-thumb,
-  #tabla tbody::-webkit-scrollbar-thumb {
-    background: rgba(4,154,253,.6);
-    border-radius: 8px;
-  }
-}
-
-/* ===== Tarjeta aún más compacta en teléfonos chicos (<=600px) ===== */
-@media (max-width: 600px) {
-  #tabla tbody tr {
-    min-width: 92vw !important;
-    padding: 10px !important;
-  }
-  #tabla tbody td {
-    grid-template-columns: 110px 1fr !important;
-    padding: 8px 6px !important;
-  }
-  textarea { height: 72px !important; }
-}
-
-
-/* ============================================
-   TARJETAS HORIZONTALES SIN SNAP (scroll libre)
-   y sin distorsión de alturas/ancho en móvil
-   ============================================ */
-@media (max-width: 1024px) {
-
-  /* El contenedor es el que scrollea horizontalmente */
-  .tabla-responsive, #tabla-wrapper {
-    overflow-x: auto !important;
-    overflow-y: visible !important;
-    /* sin scroll-snap para scroll libre */
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    padding: 12px !important;
-    background: #0c0c0c !important;
-  }
-
-  /* La tabla no impone layout de “tabla” */
-  #tabla {
-    display: block !important;
-    width: 100% !important;
-    background: transparent !important;
-    border-collapse: separate !important;  /* evita artefactos de bordes */
-    border-spacing: 0 !important;
-    margin: 0 !important;
-  }
-
-  /* Quitamos thead para tarjetas */
-  #tabla thead { display: none !important; }
-
-  /* Carrusel horizontal libre: una sola fila, sin wrap */
-  #tabla tbody {
-    display: flex !important;
-    flex-wrap: nowrap !important;        /* no baja a segunda línea */
-    gap: 12px !important;
-    padding: 4px 2px 8px !important;
-    overflow: visible !important;         /* el wrapper hace el scroll */
-  }
-
-  /* Cada fila es UNA tarjeta fija: no se estira, no cambia de tamaño */
-  #tabla tbody tr {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    flex: 0 0 calc(100vw - 48px) !important; /* ancho fijo ≈ pantalla - padding */
-    max-width: 560px !important;              /* evita tarjetas gigantes */
-    border: 1px solid #049afdcc !important;
-    border-radius: 12px !important;
-    background: #0c0c0c !important;
-    padding: 12px !important;
-    box-shadow: 0 8px 18px rgba(0,0,0,.28) !important;
-    box-sizing: border-box !important;        /* previene “crecimiento” raro */
-  }
-
-  /* Celdas en formato etiqueta | valor, sin bordes de tabla */
-  #tabla tr, #tabla th, #tabla td { border: none !important; }
-  #tabla tbody td {
-    display: grid !important;
-    grid-template-columns: 120px 1fr !important; /* etiqueta | valor */
-    align-items: center !important;
-    gap: 8px !important;
-    text-align: left !important;
-    padding: 10px 6px !important;
-    background: transparent !important;
-    color: #faf9f9 !important;
-    border-bottom: 1px solid rgba(255,255,255,.08) !important;
-    vertical-align: middle !important;
-    box-sizing: border-box !important;
-  }
-  #tabla tbody td:last-child { border-bottom: none !important; }
-
-  /* Etiquetas automáticas (data-label o fallback por posición) */
-  #tabla tbody td::before {
-    content: attr(data-label);
-    font-weight: 700 !important;
-    color: #8ecaff !important;
-    white-space: nowrap !important;
-  }
-  /* Fallback: ajusta los textos si tu orden es distinto */
-  #tabla tbody tr td:nth-child(1)::before { content: "Nombre"; }
-  #tabla tbody tr td:nth-child(2)::before { content: "Email"; }
-  #tabla tbody tr td:nth-child(3)::before { content: "Teléfono"; }
-  #tabla tbody tr td:nth-child(4)::before { content: "Mensaje"; }
-  #tabla tbody tr td:nth-child(5)::before { content: "Status"; }
-  #tabla tbody tr td:nth-child(6)::before { content: "Acciones"; }
-
-  /* ===== Fix específico de la tarjeta “distorsionada” en Acciones ===== */
-  /* La celda Acciones no usa grilla etiqueta|valor para los botones */
-  #tabla tbody tr td:nth-child(6) {
-    grid-template-columns: 1fr !important;
-    background: transparent !important;
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-  }
-  #tabla tbody tr td:nth-child(6)::before {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 13px;
-    color: #8ecaff;
-  }
-  /* Contenido de Acciones centrado y sin estirarse */
-  #tabla tbody tr td:nth-child(6) > * {
-    display: inline-flex !important;
-    gap: 10px !important;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  }
-  #tabla tbody tr td:nth-child(6) button {
-    display: inline-flex !important;
-    width: auto !important;
-    min-width: 44px !important;
-    min-height: 40px !important;
-    margin: 4px 6px !important;
-    font-size: 14px !important;
-  }
-
-  /* Botones normales dentro de otras celdas: sin estirarse a 100% */
-  #tabla td button {
-    width: auto !important;
-    min-height: 40px !important;
-    margin: 6px 0 !important;
-    font-size: 14px !important;
-    line-height: 1 !important;
-  }
-
-  /* Corrige “bloques blancos” en botones con iconos */
-  #tabla td button:not(.btn-guardar):not(.btn-cancelar):not(.btn-recargar) {
-    background-color: #ffffff !important;  /* si quieres chip claro */
-    color: #222 !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-  }
-}
-
-/* Más compacto para teléfonos chicos */
-@media (max-width: 600px) {
-  #tabla tbody tr { flex-basis: calc(100vw - 36px) !important; max-width: none !important; }
-  #tabla tbody td { grid-template-columns: 110px 1fr !important; padding: 8px 6px !important; }
-}
-
-/* ====== FIX scroll vertical + horizontal libre en móviles ====== */
-@media (max-width: 1024px) {
-  html, body { overflow-y: auto !important; height: auto !important; }
-
-  .tabla-responsive, #tabla-wrapper {
-    overflow-x: auto !important;   /* scroll horizontal libre */
-    overflow-y: visible !important;/* NO bloquear el vertical */
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x pan-y !important;   /* permite ambos gestos */
-    overscroll-behavior: contain;
-  }
-
-  #tabla { border-collapse: separate !important; border-spacing: 0 !important; }
-
-  /* Tarjeta con ancho fijo, sin “estirarse” */
-  #tabla tbody { display: flex !important; flex-wrap: nowrap !important; gap: 12px !important; }
-  #tabla tbody tr {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    /* ancho ≈ pantalla, sin crecer */
-    flex: 0 0 calc(100vw - 48px) !important;
-    max-width: 560px !important;
-    box-sizing: border-box !important;
-    border: 1px solid #049afdcc !important;
-    border-radius: 12px !important;
-    background: #0c0c0c !important;
-    padding: 12px !important;
-  }
-
-  /* Fila/celda base en formato etiqueta | valor */
-  #tabla tr, #tabla th, #tabla td { border: none !important; }
-  #tabla tbody td {
-    display: grid !important;
-    grid-template-columns: 120px 1fr !important;
-    align-items: center !important;
-    gap: 8px !important;
-    text-align: left !important;
-    padding: 10px 6px !important;
-    background: transparent !important;
-    color: #faf9f9 !important;
-    border-bottom: 1px solid rgba(255,255,255,.08) !important;
-    box-sizing: border-box !important;
-  }
-  #tabla tbody td:last-child { border-bottom: none !important; }
-
-  /* Etiquetas automáticas */
-  #tabla tbody td::before {
-    content: attr(data-label);
-    font-weight: 700 !important;
-    color: #8ecaff !important;
-    white-space: nowrap !important;
-  }
-
-  /* ====== Fallback correcto por posición de columnas ======
-     Orden real: 1 Fecha, 2 Nombre, 3 Email, 4 Teléfono, 5 Mensaje,
-                 6 Status, 7 Acciones
-  */
-  #tabla tbody tr td:nth-child(1)::before { content: "Fecha"; }
-  #tabla tbody tr td:nth-child(2)::before { content: "Nombre"; }
-  #tabla tbody tr td:nth-child(3)::before { content: "Email"; }
-  #tabla tbody tr td:nth-child(4)::before { content: "Teléfono"; }
-  #tabla tbody tr td:nth-child(5)::before { content: "Mensaje"; }
-  #tabla tbody tr td:nth-child(6)::before { content: "Status"; }
-  #tabla tbody tr td:nth-child(7)::before { content: "Acciones"; }
-
-  /* ====== Celda de ACCIONES (7ª) sin distorsión ====== */
-  #tabla tbody tr td:nth-child(7) {
-    grid-template-columns: 1fr !important;  /* quita etiqueta|valor */
-    text-align: center !important;
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-  }
-  #tabla tbody tr td:nth-child(7)::before {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 13px;
-    color: #8ecaff;
-  }
-
-  /* Centrar y evitar “píldoras” gigantes: adapta a lo que haya dentro (a, div, button) */
-  #tabla tbody tr td:nth-child(7) > * {
-    display: inline-flex !important;
-    gap: 10px !important;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-  }
-  #tabla tbody tr td:nth-child(7) button,
-  #tabla tbody tr td:nth-child(7) a,
-  #tabla tbody tr td:nth-child(7) div {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    width: auto !important;       /* ← NO 100% */
-    min-width: 44px !important;
-    min-height: 40px !important;
-    margin: 4px 6px !important;
-    padding: 8px 12px !important;
-    border-radius: 10px !important;
-  }
-
-  /* Botones fuera de “Acciones” tampoco se estiran */
-  #tabla td button {
-    width: auto !important;
-    min-height: 40px !important;
-    margin: 6px 0 !important;
-    font-size: 14px !important;
-    line-height: 1 !important;
-  }
-
-  /* Teléfonos pequeños */
-  @media (max-width: 600px) {
-    #tabla tbody tr { flex-basis: calc(100vw - 36px) !important; max-width: none !important; }
-    #tabla tbody td { grid-template-columns: 110px 1fr !important; padding: 8px 6px !important; }
-  }
+  background:#0c0c0c; color:#faf9f9;
 }
