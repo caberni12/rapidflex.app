@@ -2,13 +2,13 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwsXshOze1AzVq4Q65VVOQBv1oOngYKBvtTTTjSoqjCzN_ew0ckUrjYrVGr0ikFXxAM/exec";
 
 // ==== Helpers: Banner moderno (#envAlert) ====
-function _ensureEnvAlert(){
+function _ensureEnvAlert() {
   let el = document.getElementById('envAlert');
-  if (!el){
+  if (!el) {
     el = document.createElement('div');
     el.id = 'envAlert';
-    el.setAttribute('role','status');
-    el.setAttribute('aria-live','polite');
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
     el.innerHTML = `
       <span class="icon">✔</span>
       <span class="msg">Conexión exitosa.</span>
@@ -18,23 +18,31 @@ function _ensureEnvAlert(){
   }
   return el;
 }
-function _showEnvAlert(type, text, ttl = 6000){
+
+function _showEnvAlert(type, text, ttl = 6000) {
   const el = _ensureEnvAlert();
-  el.classList.remove('success','error','show');
+  el.classList.remove('success', 'error', 'show');
   el.classList.add(type === 'success' ? 'success' : 'error');
   el.style.setProperty('--ttl', `${ttl}ms`);
+
   const icon = el.querySelector('.icon');
-  const msg  = el.querySelector('.msg');
+  const msg = el.querySelector('.msg');
   if (icon) icon.textContent = (type === 'success' ? '✔' : '⛔');
-  if (msg)  msg.textContent  = text || '';
+  if (msg) msg.textContent = text || '';
+
   el.style.display = 'inline-flex';
-  void el.offsetHeight; // reinicia animación
+  void el.offsetHeight;
   el.classList.add('show');
+
   const closeBtn = el.querySelector('.close');
-  if (closeBtn){
-    closeBtn.onclick = () => { el.classList.remove('show'); setTimeout(()=>{ el.style.display='none'; }, 200); };
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      el.classList.remove('show');
+      setTimeout(() => { el.style.display = 'none'; }, 200);
+    };
   }
-  if (ttl > 0){
+
+  if (ttl > 0) {
     setTimeout(() => {
       el.classList.remove('show');
       setTimeout(() => { el.style.display = 'none'; }, 200);
@@ -45,7 +53,6 @@ function _showEnvAlert(type, text, ttl = 6000){
 // === SESIÓN ===
 async function verificarSesion() {
   try {
-    // MODO DEV: Live Server
     if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
       if (!localStorage.getItem("sessionToken")) {
         localStorage.setItem("sessionToken", "dev-token");
@@ -54,28 +61,28 @@ async function verificarSesion() {
       if (cont) cont.style.display = "block";
       return;
     }
-  } catch (e) {}
+  } catch (_) {}
 
   const token = localStorage.getItem("sessionToken");
   if (!token) {
     window.location.href = "index.html";
     return;
   }
+
   try {
-    const response = await fetch(`${GAS_URL}?checkSession=1&session=${token}`);
+    const response = await fetch(`${GAS_URL}?checkSession=1&session=${encodeURIComponent(token)}`);
     const resultado = await response.json();
     if (resultado.status === "OK") {
       const cont = document.getElementById("contenido");
       if (cont) cont.style.display = "block";
-
-      try{
+      try {
         if (resultado && resultado.nombre) {
           _setUserName(resultado.nombre);
-          try{ localStorage.setItem('nombreUsuario', resultado.nombre); }catch(_){}
+          try { localStorage.setItem('nombreUsuario', resultado.nombre); } catch (_) {}
         } else {
           _setUserNameFromStorage();
         }
-      }catch(e){ _setUserNameFromStorage(); }
+      } catch (_) { _setUserNameFromStorage(); }
     } else {
       localStorage.removeItem("sessionToken");
       window.location.href = "index.html";
@@ -87,25 +94,21 @@ async function verificarSesion() {
 }
 
 function cerrarSesion(ev) {
-  try { if (ev && ev.preventDefault) ev.preventDefault(); } catch(_) {}
-
-  // Limpia sesión y nombre mostrado en el header
+  try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (_) {}
   try {
     localStorage.removeItem("sessionToken");
     localStorage.removeItem("nombreUsuario");
-  } catch(_){}
+  } catch (_) {}
 
-  // Cierra el slider si estaba abierto
   const slider = document.getElementById("slider");
-  if (slider) { slider.classList.remove("open"); slider.style.height = "0px"; }
+  if (slider) {
+    slider.classList.remove("open");
+    slider.style.height = "0px";
+  }
 
-  // Alerta moderna de confirmación
   _showEnvAlert('success', '🔒 Sesión cerrada correctamente', 1500);
-
-  // Redirige después de mostrar la alerta
   setTimeout(() => { window.location.href = "index.html"; }, 1300);
 }
-
 
 // === UI: Slider ===
 function toggleSlider() {
@@ -130,11 +133,15 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Asegura que el botón hamburguesa abra/cierre el slider
-document.querySelector('.menu-btn')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  toggleSlider();
+// Fijar botón hamburguesa
+document.addEventListener("DOMContentLoaded", () => {
+  const menuBtn = document.querySelector(".menu-btn");
+  if (menuBtn) {
+    menuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleSlider();
+    });
+  }
 });
 
 // Recalcular altura si cambia el tamaño
@@ -146,59 +153,61 @@ window.addEventListener("resize", () => {
 });
 
 // === Chips: Usuario e IP en el menú ===
-function _setUserName(name){
-  try{
+function _setUserName(name) {
+  try {
     const el = document.getElementById('usuarioNombre');
     if (!el) return;
     const txt = (name && String(name).trim()) ? String(name).trim() : 'Usuario';
     el.textContent = '👤 ' + txt;
-  }catch(e){}
+  } catch (_) {}
 }
-function _setUserNameFromStorage(){
-  try{
-    const keys = ['nombreUsuario','username','userName','usuario','nombre'];
-    for (let i=0;i<keys.length;i++){
+
+function _setUserNameFromStorage() {
+  try {
+    const keys = ['nombreUsuario', 'username', 'userName', 'usuario', 'nombre'];
+    for (let i = 0; i < keys.length; i++) {
       const v = localStorage.getItem(keys[i]);
-      if (v && String(v).trim()){ _setUserName(v); return; }
+      if (v && String(v).trim()) {
+        _setUserName(v);
+        return;
+      }
     }
     _setUserName('Usuario');
-  }catch(e){ _setUserName('Usuario'); }
+  } catch (_) { _setUserName('Usuario'); }
 }
 
 /* ======= IP pública + IP local (best-effort) ======= */
-// Multi-proveedor de IP pública (con cache busting)
-async function _fetchPublicIP(){
+async function _fetchPublicIP() {
   const endpoints = [
     'https://api.ipify.org?format=json',
     'https://api64.ipify.org?format=json',
     'https://ifconfig.co/json',
     'https://icanhazip.com'
   ];
-  for (const base of endpoints){
-    try{
+  for (const base of endpoints) {
+    try {
       const url = base + (base.includes('?') ? '&' : '?') + 'v=' + Date.now();
       const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) continue;
       const ct = (res.headers.get('content-type') || '').toLowerCase();
       let ip = null;
-      if (ct.includes('application/json')){
+      if (ct.includes('application/json')) {
         const data = await res.json();
         ip = data?.ip || data?.address || data?.query || null;
       } else {
         ip = (await res.text()).trim();
       }
-      if (ip && (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip) || /^[a-f0-9:]+$/i.test(ip))){
+      if (ip && (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip) || /^[a-f0-9:]+$/i.test(ip))) {
         return ip;
       }
-    }catch(_){ /* probar siguiente */ }
+    } catch (_) {}
   }
   return null;
 }
 
-// Intento de IP local privada vía WebRTC (puede estar oculto por privacidad)
-function _getPrivateLocalIPs(timeoutMs = 1500){
+function _getPrivateLocalIPs(timeoutMs = 1500) {
   return new Promise((resolve) => {
-    try{
+    try {
       const ips = new Set();
       const pc = new RTCPeerConnection({ iceServers: [] });
       pc.createDataChannel('x');
@@ -210,42 +219,37 @@ function _getPrivateLocalIPs(timeoutMs = 1500){
       };
       pc.createOffer().then(of => pc.setLocalDescription(of));
       setTimeout(() => {
-        try{ pc.close(); }catch(_){}
-        const priv = [...ips].filter(ip => /^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(ip));
+        try { pc.close(); } catch (_) {}
+        const priv = [...ips].filter(ip =>
+          /^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(ip)
+        );
         resolve(priv);
       }, timeoutMs);
-    }catch(_){
-      resolve([]);
-    }
+    } catch (_) { resolve([]); }
   });
 }
 
-// Mostrar IPs en el chip
-async function _setUserIP(){
+async function _setUserIP() {
   const el = document.getElementById('userIP');
-  if(!el) return;
-
-  // Fallback inicial
+  if (!el) return;
   const host = (location && location.hostname) ? location.hostname : 'desconocido';
   el.textContent = '📶 Host: ' + host;
   el.title = 'Hostname local (fallback)';
 
-  // IP pública
   const publicIP = await _fetchPublicIP();
-  if (publicIP){
+  if (publicIP) {
     el.textContent = '📶 IP pública: ' + publicIP;
     el.title = 'IP pública (saliente)';
   }
 
-  // IP local privada (best-effort)
-  try{
+  try {
     const locals = await _getPrivateLocalIPs();
     const privateIP = locals[0];
-    if (privateIP){
-      el.textContent += `  •  IP local: ${privateIP}`;
+    if (privateIP) {
+      el.textContent += ` • IP local: ${privateIP}`;
       el.title += ' | IP local privada (best-effort, puede no estar disponible)';
     }
-  }catch(_){}
+  } catch (_) {}
 }
 
 // === IFRAME AUTO-RESIZE (single scroll) ===
@@ -253,12 +257,11 @@ function _measureDocHeight(doc) {
   try {
     const b = doc.body, e = doc.documentElement;
     return Math.max(
-      b.scrollHeight, e.scrollHeight,
-      b.offsetHeight, e.offsetHeight,
-      b.clientHeight, e.clientHeight
+      b.scrollHeight, e.scrollHeight, b.offsetHeight, e.offsetHeight, b.clientHeight, e.clientHeight
     );
   } catch { return 0; }
 }
+
 function _autoSizeIframe(frame) {
   if (!frame) return;
   try {
@@ -268,24 +271,22 @@ function _autoSizeIframe(frame) {
     try {
       doc.documentElement.style.overflow = "hidden";
       doc.body.style.overflow = "hidden";
-    } catch {}
+    } catch (_) {}
 
     const resize = () => {
       const h = _measureDocHeight(doc);
-      const cur = parseInt(frame.style.height||"0",10);
-      if (h && Math.abs(cur - h) > 2) {
-        frame.style.height = h + "px";
-      }
+      const cur = parseInt(frame.style.height || "0", 10);
+      if (h && Math.abs(cur - h) > 2) frame.style.height = h + "px";
     };
 
     resize();
 
-    if (frame._observer) { try { frame._observer.disconnect(); } catch {} }
+    if (frame._observer) { try { frame._observer.disconnect(); } catch (_) {} }
     const observer = new MutationObserver(() => {
       if (frame._raf) cancelAnimationFrame(frame._raf);
       frame._raf = requestAnimationFrame(resize);
     });
-    observer.observe(doc.documentElement, {subtree:true, childList:true, attributes:true, characterData:true});
+    observer.observe(doc.documentElement, { subtree: true, childList: true, attributes: true, characterData: true });
     frame._observer = observer;
 
     doc.addEventListener("load", () => {
@@ -300,6 +301,7 @@ function _autoSizeIframe(frame) {
     console.warn("Auto-resize iframe falló:", err);
   }
 }
+
 window.addEventListener("resize", () => {
   const f = document.getElementById("routeFrame");
   if (f && typeof f._forceResize === "function") f._forceResize();
@@ -312,14 +314,16 @@ function hideAllViews() {
   if (dash) dash.style.display = 'none';
   if (routeView) routeView.style.display = 'none';
 }
+
 function showDashboard() {
   hideAllViews();
   const dash = document.getElementById("contenido-principal");
   if (dash) dash.style.display = "block";
   if (typeof cargarDashboard === "function") {
-    try { cargarDashboard(); } catch (e) {}
+    try { cargarDashboard(); } catch (_) {}
   }
 }
+
 function loadFrame(url) {
   if (/main\.html$/i.test(url)) { showDashboard(); return; }
   hideAllViews();
@@ -327,22 +331,24 @@ function loadFrame(url) {
   const frame = document.getElementById("routeFrame");
   if (routeView) routeView.style.display = "block";
   if (frame) {
-    if (frame._observer) { try { frame._observer.disconnect(); } catch {} }
+    if (frame._observer) { try { frame._observer.disconnect(); } catch (_) {} }
     frame.style.height = "1px";
     const finalUrl = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
     frame.onload = () => { _autoSizeIframe(frame); };
     frame.src = finalUrl;
   }
 }
+
+// Rutas, incluye usuarios2.html
 const ROUTES = {
   "dashboard": () => showDashboard(),
-  "sistema":   () => loadFrame("sistema.html"),
-  "sistema2":  () => loadFrame("sistema2.html"),
-  "usuarios":  () => loadFrame("usuarios.html"),
-  "georeferencia":  () => loadFrame("usuarios2.html"),
-  // agregado sin borrar nada
+  "sistema": () => loadFrame("sistema.html"),
+  "sistema2": () => loadFrame("sistema2.html"),
+  "usuarios": () => loadFrame("usuarios.html"),
   "usuarios2": () => loadFrame("usuarios2.html"),
+  "georeferencia": () => loadFrame("usuarios2.html") // alias si lo usas en el menú
 };
+
 function onRouteChange() {
   const hash = (location.hash || "#/dashboard").replace(/^#\/?/, "");
   (ROUTES[hash] || ROUTES["dashboard"])();
@@ -357,76 +363,71 @@ function onRouteChange() {
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
   const key = (e.key || "").toLowerCase();
-  if (e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && ["i", "j", "c", "k"].includes(key)) ||
-      (e.ctrlKey && ["u", "s", "p", "f", "c"].includes(key)) ||
-      (e.metaKey && ["s", "p", "u", "f"].includes(key))) {
+  if (
+    e.key === "F12" ||
+    (e.ctrlKey && e.shiftKey && ["i", "j", "c", "k"].includes(key)) ||
+    (e.ctrlKey && ["u", "s", "p", "f", "c"].includes(key)) ||
+    (e.metaKey && ["s", "p", "u", "f"].includes(key))
+  ) {
     e.preventDefault();
   }
 });
 
-// === Info de entorno (file / private / public) ===
-function _envInfo(){
-  try{
+// === Info de entorno ===
+function _envInfo() {
+  try {
     if (location.protocol === "file:") return { mode: "file" };
     const h = (location.hostname || "").toLowerCase();
     const isPrivate = (
-      h === "localhost" ||
-      h === "127.0.0.1" ||
-      /^10\./.test(h) ||
-      /^192\.168\./.test(h) ||
-      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h) ||
-      !h.includes(".")
+      h === "localhost" || h === "127.0.0.1" ||
+      /^10\./.test(h) || /^192\.168\./.test(h) ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(h) || !h.includes(".")
     );
     return { mode: isPrivate ? "private" : "public" };
-  }catch{ return { mode: "unknown" }; }
+  } catch (_) { return { mode: "unknown" }; }
 }
 
-// === Requisito de servidor: cerrar sesión si se abre localmente (file://) ===
-function _enforceServerRequirement(){
-  try{
+// Requisito de servidor
+function _enforceServerRequirement() {
+  try {
     if (location.protocol === "file:") {
       _showEnvAlert('error', '⛔ Operación bloqueada: usa Live Server o un servidor público.', 0);
-      try { cerrarSesion(); } catch {}
+      try { cerrarSesion(); } catch (_) {}
       return false;
     }
-  }catch(e){ console.warn("Enforce server requirement error:", e); }
+  } catch (e) { console.warn("Enforce server requirement error:", e); }
   return true;
 }
 
-// === FCSH: mostrar alerta moderna (verde/roja) ===
-function _maybeShowFCSHBanner(){
-  try{
+// Banner verde
+function _maybeShowFCSHBanner() {
+  try {
     const info = _envInfo();
-    if (info.mode === "file"){
-      // ya lo maneja _enforceServerRequirement() con alerta roja persistente
-      return;
-    }
-    // private/public => mostrar SIEMPRE por 6s (verde)
+    if (info.mode === "file") return;
     _showEnvAlert('success', '✔ El servidor informa que la conexión a la red fue exitosa', 6000);
-  }catch(e){ console.warn("FCSH banner error:", e); }
+  } catch (e) { console.warn("FCSH banner error:", e); }
 }
 
 // === Arranque ===
 window.addEventListener("DOMContentLoaded", () => {
-  if(!_enforceServerRequirement()) return;
-  _maybeShowFCSHBanner(); // una sola vez
+  if (!_enforceServerRequirement()) return;
+  _maybeShowFCSHBanner();
 
-  // Slider cerrado al inicio
   const _sl = document.getElementById("slider");
   if (_sl) _sl.style.height = "0px";
 
-  // Ocultar vista de iframe hasta enrutado
   const rv = document.getElementById('routeView');
   if (rv) rv.style.display = 'none';
 
   verificarSesion();
+
   if (!location.hash) location.hash = "#/dashboard";
   onRouteChange();
 });
+
 window.addEventListener("hashchange", onRouteChange);
 
-// Atajo Alt+B: mostrar alerta de prueba (verde, 3s)
+// Atajo Alt+B
 document.addEventListener("keydown", (e) => {
   if (e.altKey && (e.key || "").toLowerCase() === "b") {
     _showEnvAlert('success', '🔔 Alerta de prueba', 3000);
