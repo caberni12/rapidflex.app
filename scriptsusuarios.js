@@ -1,21 +1,21 @@
-/* ===== usuarios.js (listado con modal + mapa y lectura de hoja conexion) ===== */
+/* ===== usuarios.js (listado + modal mapa + lectura de hoja conexion) ===== */
 
-// Endpoints base
+/* Endpoints */
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
-// Web App de la hoja "conexion" (solo labels + mapa)
-const CONN_API = 'https://script.google.com/macros/s/AKfycbzDvOr7_f7Li38WgZa4TWXB00KzZ3RECT5FVsBQbBU_F1R5sgh2_yRid0jZGy5mGt8a/exec';
+/* CONN_API: Web App que sirve ?accion=last_all / ?accion=last&usuario=U desde hoja "conexion" */
+const CONN_API = 'https://script.google.com/macros/s/AKfycbzTe86F-F_uqs1ixii8RoW-6frsyZamQEOVBN5cW2ZzfWtOvu59VmjNhrc2ftvcZreA/exec';
 
-// DOM
+/* DOM */
 const form  = document.getElementById("formulario");
 const tabla = document.querySelector("#tabla tbody");
 
-// Estado
+/* Estado */
 let datosOriginales = {};
 let primeraCarga = true;
 let poller = null;
 
-// Toast
+/* Toast */
 function toast(msg, type = "ok", ms = 2000) {
   const el = document.createElement("div");
   el.setAttribute("role", "status");
@@ -32,7 +32,7 @@ function toast(msg, type = "ok", ms = 2000) {
   }, ms);
 }
 
-// Normaliza fila base (usuarios)
+/* Normaliza fila base (usuarios) */
 function normalizar(item) {
   const lat = item.geo_lat ?? item.lat ?? item.Lat ?? "";
   const lng = item.geo_lng ?? item.lng ?? item.Lng ?? "";
@@ -51,7 +51,7 @@ function normalizar(item) {
   };
 }
 
-// Formato condicional
+/* Formato condicional */
 function claseAcceso(v){
   const s = (v ?? "").toString().trim().toLowerCase();
   if (["true","1","sí","si"].includes(s))  return "estado-true";
@@ -59,17 +59,21 @@ function claseAcceso(v){
   return "";
 }
 
-// ====== LECTURA de hoja "conexion" ======
+/* ====== LECTURA de hoja "conexion" vía CONN_API ====== */
 let conexionCache = new Map();
+
 function parseGeo(s){
-  const m = /(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/.exec(String(s||""));
-  return m ? {lat:+m[1], lng:+m[2]} : null;
+  const m = /(-?\d+(?:[.,]\d+)?)[^\d-]+(-?\d+(?:[.,]\d+)?)/.exec(String(s||""));
+  if (!m) return null;
+  return { lat: +String(m[1]).replace(',','.'), lng: +String(m[2]).replace(',','.') };
 }
+
 async function cargarConexionCache(){
   try{
     const r = await fetch(CONN_API + "?accion=last_all");
     if (!r.ok) return;
-    const arr = await r.json(); // [{Usuario, geolocalizacion, hora, fecha, estado, Acceso, nombre, rol}]
+    const arr = await r.json();
+    if (!Array.isArray(arr)) return;
     const map = new Map();
     for (const x of arr){
       const u = String(x.Usuario||'').trim();
@@ -90,6 +94,7 @@ async function cargarConexionCache(){
     conexionCache = map;
   }catch{}
 }
+
 function mergeConexion(u){
   const key = String(u.usuario||'').trim().toLowerCase();
   const c = conexionCache.get(key);
@@ -105,7 +110,7 @@ function mergeConexion(u){
   };
 }
 
-// Submit
+/* Submit */
 form.addEventListener("submit", e => {
   e.preventDefault();
   const datos = {
@@ -136,9 +141,10 @@ form.addEventListener("submit", e => {
     })
     .catch(() => toast("Error de red al guardar", "error"));
 });
+
 function cancelarEdicion() { form.reset(); }
 
-// Listar + fusionar con "conexion"
+/* Listar + fusionar con "conexion" */
 async function obtenerUsuarios() {
   const [usuarios] = await Promise.all([
     fetch(URL_GET).then(r=>r.json()).catch(()=>[]),
@@ -162,14 +168,14 @@ async function obtenerUsuarios() {
       </td>`;
     tr.querySelector(".btn-ed").addEventListener("click", () => editar(item, item.fila));
     tr.querySelector(".btn-el").addEventListener("click", () => eliminar(item.fila));
-    tr.addEventListener("dblclick", () => abrirModalConexion(item)); // modal en doble clic
+    tr.addEventListener("dblclick", () => abrirModalConexion(item)); // doble clic -> modal
     tabla.appendChild(tr);
   });
 
   if (primeraCarga) { toast("Usuarios cargados"); primeraCarga = false; }
 }
 
-// Editar / Eliminar
+/* Editar / Eliminar */
 function editar(item, fila) {
   form.fila.value = fila ?? item.fila ?? "";
   form.usuario.value = item.usuario ?? "";
@@ -179,6 +185,7 @@ function editar(item, fila) {
   form.rol.value = item.rol ?? "";
   datosOriginales = { ...item };
 }
+
 function eliminar(fila) {
   if (!confirm("¿Eliminar este usuario?")) return;
   fetch(URL_POST, { method: "POST", body: JSON.stringify({ accion: "eliminar", id: fila }) })
@@ -187,8 +194,9 @@ function eliminar(fila) {
     .catch(() => toast("Error de red al eliminar", "error"));
 }
 
-// ===== Modal con mapa =====
+/* ===== Modal con mapa (Leaflet) ===== */
 let modalMap = null, modalMarker = null;
+
 function inyectarEstilosModal(){
   if (document.getElementById("connModalCSS")) return;
   const css = `
@@ -212,6 +220,7 @@ function inyectarEstilosModal(){
   .connBtn:hover{background:#0b1220}`;
   const s = document.createElement("style"); s.id = "connModalCSS"; s.textContent = css; document.head.appendChild(s);
 }
+
 function ensureModalConexion(){
   if (document.getElementById("connOverlay")) return;
   inyectarEstilosModal();
@@ -249,6 +258,7 @@ function ensureModalConexion(){
   document.getElementById("connClose").onclick = cerrarModalConexion;
   document.getElementById("connCenter").onclick = () => { if (modalMap && modalMarker) modalMap.setView(modalMarker.getLatLng(), 14); };
 }
+
 function cargarLeaflet(){
   if (window.L) return Promise.resolve();
   return new Promise((resolve) => {
@@ -258,10 +268,10 @@ function cargarLeaflet(){
     s.onload = resolve; document.head.appendChild(s);
   });
 }
+
 async function abrirModalConexion(item){
   ensureModalConexion();
-  const overlay = document.getElementById("connOverlay");
-  overlay.style.display = "block";
+  document.getElementById("connOverlay").style.display = "block";
 
   const accesoTxt = (item.acceso ?? '').toString();
   const esOnline = ["true","1","sí","si"].includes(accesoTxt.trim().toLowerCase()) || (item.estado||"").toLowerCase()==="online";
@@ -306,8 +316,12 @@ async function abrirModalConexion(item){
     }
   }, 0);
 }
-function cerrarModalConexion(){ const overlay = document.getElementById("connOverlay"); if (overlay) overlay.style.display = "none"; }
 
-// Tiempo real
+function cerrarModalConexion(){
+  const overlay = document.getElementById("connOverlay");
+  if (overlay) overlay.style.display = "none";
+}
+
+/* Tiempo real */
 function iniciarTiempoReal(){ if (poller) clearInterval(poller); poller = setInterval(obtenerUsuarios, 10000); }
 obtenerUsuarios(); iniciarTiempoReal();
