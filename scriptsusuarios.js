@@ -1,4 +1,4 @@
-/* ===== usuarios.js (CRUD con URL_GET/URL_POST + geo desde hoja conexion) ===== */
+/* ===== usuarios.js (CRUD + merge desde hoja conexion; rol solo de Usuarios) ===== */
 
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
@@ -21,27 +21,25 @@ function toast(msg, type = "ok", ms = 2000) {
   setTimeout(()=>{el.style.transition="opacity .25s";el.style.opacity="0";setTimeout(()=>el.remove(),250)},ms);
 }
 
-/* Normaliza fila base */
-function normalizar(item) {
-  const toNum = v => v!==""&&v!=null ? parseFloat(String(v).replace(',', '.')) : NaN;
-  const lat = item.geo_lat ?? item.lat ?? item.Lat ?? "";
-  const lng = item.geo_lng ?? item.lng ?? item.Lng ?? "";
+/* Normaliza fila base (Usuarios) */
+function normalizarUsuarios(item) {
+  const num = v => v!==""&&v!=null ? parseFloat(String(v).replace(',', '.')) : NaN;
   return {
     usuario: item.usuario ?? item.Usuario ?? "",
     clave:   item.clave   ?? item.Clave   ?? "",
     acceso:  item.acceso  ?? item.Acceso  ?? "",
     nombre:  item.nombre  ?? item.Nombre  ?? "",
     rol:     item.rol     ?? item.Rol     ?? "",
-    fila:    item.fila,
-    geo_lat: toNum(lat),
-    geo_lng: toNum(lng),
+    fila:    item.fila ?? "",
+    geo_lat: num(item.geo_lat ?? item.lat ?? item.Lat ?? ""),
+    geo_lng: num(item.geo_lng ?? item.lng ?? item.Lng ?? ""),
     hora:    item.hora   ?? "",
     fecha:   item.fecha  ?? "",
     estado:  item.estado ?? ""
   };
 }
 
-/* Fmt condicional */
+/* Formato condicional */
 function claseAcceso(v){
   const s = String(v??"").trim().toLowerCase();
   if (["true","1","sí","si","online"].includes(s)) return "estado-true";
@@ -49,11 +47,11 @@ function claseAcceso(v){
   return "";
 }
 
-/* ===== Geo desde hoja conexion ===== */
-const keyNorm = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+/* ===== Merge desde hoja conexion ===== */
+const kn = s => String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let connByUser = new Map();
 
-function parseGeo(s){
+function parseGeoPair(s){
   const m = /(-?\d+(?:[.,]\d+)?)[,\s;]+(-?\d+(?:[.,]\d+)?)/.exec(String(s||""));
   if (!m) return null;
   const lat = parseFloat(String(m[1]).replace(',', '.'));
@@ -70,29 +68,43 @@ async function cargarConexionCache(){
     for (const x of (Array.isArray(arr)?arr:[])){
       const u = String(x.Usuario||'').trim();
       if (!u) continue;
-      const g = parseGeo(x.geolocalizacion);
-      map.set(keyNorm(u), {
+      const g = parseGeoPair(x.geolocalizacion);
+      map.set(kn(u), {
+        Usuario: u,
+        Clave:   x.Clave   || "",
+        Acceso:  x.Acceso  || "",
+        nombre:  x.nombre  || "",
         geo_lat: g?g.lat:NaN,
         geo_lng: g?g.lng:NaN,
-        hora: x.hora||'',
-        fecha: x.fecha||'',
-        estado: x.estado||''
+        hora:    x.hora    || "",
+        fecha:   x.fecha   || "",
+        estado:  x.estado  || ""
+        // rol NO se toma de conexion
       });
     }
     connByUser = map;
   }catch{}
 }
 
-function mergeGeo(u){
-  const c = connByUser.get(keyNorm(u.usuario));
-  if (!c) return u;
+/* Reglas de fusión:
+   - De conexion: Usuario, Clave, Acceso, nombre, geolocalizacion, hora, fecha, estado
+   - De Usuarios: rol (se respeta SIEMPRE)
+*/
+function mergeDesdeConexion(uRow){
+  const c = connByUser.get(kn(uRow.usuario));
+  if (!c) return uRow;
   return {
-    ...u,
-    geo_lat: isFinite(c.geo_lat) ? c.geo_lat : u.geo_lat,
-    geo_lng: isFinite(c.geo_lng) ? c.geo_lng : u.geo_lng,
-    hora: c.hora || u.hora,
-    fecha: c.fecha || u.fecha,
-    estado: c.estado || u.estado
+    ...uRow,
+    usuario: c.Usuario || uRow.usuario,
+    clave:   c.Clave   || uRow.clave,
+    acceso:  c.Acceso  || uRow.acceso,
+    nombre:  c.nombre  || uRow.nombre,
+    geo_lat: isFinite(c.geo_lat) ? c.geo_lat : uRow.geo_lat,
+    geo_lng: isFinite(c.geo_lng) ? c.geo_lng : uRow.geo_lng,
+    hora:    c.hora    || uRow.hora,
+    fecha:   c.fecha   || uRow.fecha,
+    estado:  c.estado  || uRow.estado
+    // rol queda tal cual de uRow
   };
 }
 
@@ -124,25 +136,35 @@ form.addEventListener("submit", e => {
 });
 function cancelarEdicion(){ form.reset(); }
 
-/* Listar + fusionar geo */
+/* Listar + merge */
 async function obtenerUsuarios(){
   const [usuarios] = await Promise.all([
     fetch(URL_GET).then(r=>r.json()).catch(()=>[]),
     cargarConexionCache()
   ]);
-  tabla.innerHTML = "";
-  const norm = usuarios.map(normalizar).map(mergeGeo);
 
+  const norm = (usuarios||[]).map(normalizarUsuarios).map(mergeDesdeConexion);
+
+  tabla.innerHTML = "";
   norm.forEach(item=>{
     const tr = document.createElement("tr");
-    tr.className = claseAcceso(item.acceso);
+    tr.className = claseAcceso(item.acceso || item.estado);
     tr.innerHTML = `
       <td>${item.usuario}</td>
       <td>${item.clave}</td>
       <td>${item.acceso}</td>
       <td>${item.nombre}</td>
       <td>${item.rol}</td>
-      <td>${isFinite(item.geo_lat)&&isFinite(item.geo_lng)?`${item.geo_lat}, ${item.geo_lng}`:''}</td>`;
+      <td>${isFinite(item.geo_lat)&&isFinite(item.geo_lng)?`${item.geo_lat}, ${item.geo_lng}`:''}</td>
+      <td>${item.hora||''}</td>
+      <td>${item.fecha||''}</td>
+      <td>${item.estado||''}</td>
+      <td>
+        <button type="button" class="btn-ed">✏️</button>
+        <button type="button" class="btn-el">🗑️</button>
+      </td>`;
+    tr.querySelector(".btn-ed").addEventListener("click", () => editar(item, item.fila));
+    tr.querySelector(".btn-el").addEventListener("click", () => eliminar(item.fila));
     tr.addEventListener("dblclick", ()=>abrirModalConexion(item));
     tabla.appendChild(tr);
   });
@@ -157,7 +179,7 @@ function editar(item, fila){
   form.clave.value = item.clave ?? "";
   form.acceso.value = item.acceso ?? "";
   form.nombre.value = item.nombre ?? "";
-  form.rol.value = item.rol ?? "";
+  form.rol.value = item.rol ?? ""; // rol se edita aquí
   datosOriginales = {...item};
 }
 function eliminar(fila){
@@ -182,7 +204,7 @@ function ensureModal(){
   .connGrid div{display:contents}
   .connGrid label{opacity:.7}
   #connMap{height:360px;border:1px solid #162133;border-radius:10px}`;
-  const s = document.createElement("style"); s.textContent = css; document.head.appendChild(s);
+  const s = document.createElement("style"); s.textContent = css; s.id="connModalCSS"; document.head.appendChild(s);
 
   const overlay = document.createElement("div");
   overlay.id="connOverlay";
@@ -227,17 +249,20 @@ async function abrirModalConexion(item){
   const overlay = document.getElementById("connOverlay");
   overlay.style.display = "block";
 
-  // Fallback preciso: si no hay coords en cache, pedir last para ese usuario
+  // Fallback: si faltan coords, consulta la última conexión puntual
   if (!isFinite(item.geo_lat) || !isFinite(item.geo_lng)) {
     try{
       const r = await fetch(CONN_API + "?accion=last&usuario=" + encodeURIComponent(item.usuario||""));
       if (r.ok){
         const j = await r.json();
-        const g = parseGeo(j.geolocalizacion);
+        const g = parseGeoPair(j.geolocalizacion);
         if (g){ item.geo_lat=g.lat; item.geo_lng=g.lng; }
         item.hora = j.hora || item.hora;
         item.fecha= j.fecha|| item.fecha;
         item.estado=j.estado||item.estado;
+        item.clave = j.Clave || item.clave;
+        item.acceso= j.Acceso|| item.acceso;
+        item.nombre= j.nombre|| item.nombre;
       }
     }catch{}
   }
@@ -247,7 +272,7 @@ async function abrirModalConexion(item){
   document.getElementById("cClave").textContent   = item.clave||'';
   document.getElementById("cAcceso").textContent  = item.acceso||'';
   document.getElementById("cNombre").textContent  = item.nombre||'';
-  document.getElementById("cRol").textContent     = item.rol||'';
+  document.getElementById("cRol").textContent     = item.rol||''; // rol desde Usuarios
   const geoStr = (isFinite(item.geo_lat)&&isFinite(item.geo_lng))?`${item.geo_lat}, ${item.geo_lng}`:'(sin coordenadas)';
   document.getElementById("cGeo").textContent     = geoStr;
   document.getElementById("cHora").textContent    = item.hora||'';
