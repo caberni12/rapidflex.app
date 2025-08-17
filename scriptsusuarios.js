@@ -3,7 +3,7 @@
 /* Endpoints */
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
-const CONN_API = 'https://script.google.com/macros/s/AKfycby8sj-J1_fJfgZ8huNVMAoWIiAgPFZ6Guy1T1crtAEdBWEuHabm7AFy6AiMoiqcMQeA/exec';
+const CONN_API = 'https://script.google.com/macros/s/AKfycbyvLO9mn-Xlu4RNF9czAqcSwdzP-gRt3LjusahyF5S9ElaJMNiOYRoL9SoXQ0opaqdx/exec';
 
 /* DOM */
 const form  = document.getElementById("formulario");
