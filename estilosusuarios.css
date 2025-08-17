@@ -370,3 +370,60 @@ td.status-celda[data-status="Finalizado"] {
 /* Color solo en la celda "Acceso" (3ª columna) */
 #tabla tbody tr.estado-true  td:nth-child(3) { color: #22c55e; font-weight: 600; }
 #tabla tbody tr.estado-false td:nth-child(3) { color: #ef4444; font-weight: 600; }
+
+/* ===== Modal de mapa (Leaflet) ===== */
+#gpsOverlay{
+  position: fixed;
+  inset: 0;
+  display: none;              /* se muestra al abrir con doble clic */
+  background: rgba(0,0,0,.6);
+  z-index: 9998;
+}
+
+#gpsPanel{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 70vh;
+  background: #0b0b0b;        /* mantiene estética oscura */
+  border: 1px solid #1f1f1f;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  overflow: hidden;
+}
+
+#gpsPanel .gpsBar{
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: #111;
+  color: #fff;
+  border-bottom: 1px solid #1f1f1f;
+  font-size: 14px;
+}
+
+#gpsPanel .gpsBar button{
+  margin-left: 8px;
+  background: #222;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#gpsMap{
+  width: 100%;
+  height: calc(70vh - 48px);
+}
+
+/* Indicador UX en filas con coordenadas */
+#tabla tbody tr.tiene-geo { cursor: zoom-in; }
+#tabla tbody tr.tiene-geo:hover { outline: 1px dashed #2dd4bf; outline-offset: -2px; }
+
+/* Compat móvil */
+@media (max-width: 768px){
+  #gpsPanel { height: 80vh; }
+  #gpsMap   { height: calc(80vh - 48px); }
+}
