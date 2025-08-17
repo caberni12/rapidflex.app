@@ -687,3 +687,113 @@ td.status-celda[data-status="Finalizado"] {
   }
   textarea { height: 72px !important; }
 }
+
+/* ================== FIX TARJETAS HORIZONTALES ================== */
+@media (max-width: 1024px) {
+
+  /* El contenedor es el que scrollea; aseguramos snap y padding */
+  .tabla-responsive, #tabla-wrapper {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* El tbody es una sola fila horizontal de tarjetas (sin salto) */
+  #tabla tbody {
+    display: flex !important;
+    flex-wrap: nowrap !important;         /* <- evita que se vayan abajo */
+    gap: 12px !important;
+    overflow: visible !important;          /* el scroll lo hace el wrapper */
+  }
+
+  /* Cada fila = tarjeta, con snap fuerte */
+  #tabla tbody tr {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    min-width: min(92vw, 440px) !important;
+    max-width: 92vw !important;
+    border: 1px solid #049afdcc !important;
+    border-radius: 12px !important;
+    background: #0c0c0c !important;
+    padding: 12px !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,.28) !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;              /* <- se “pega” por tarjeta */
+  }
+
+  /* Celdas formato etiqueta | valor */
+  #tabla tbody td {
+    display: grid !important;
+    grid-template-columns: 120px 1fr !important;
+    gap: 8px !important;
+    align-items: center !important;
+    text-align: left !important;
+    padding: 10px 6px !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255,255,255,.08) !important;
+  }
+  #tabla tbody td:last-child { border-bottom: none !important; }
+
+  /* Etiquetas automáticas; usa data-label si existe, si no fallback por orden */
+  #tabla tbody td::before {
+    content: attr(data-label);
+    font-weight: 700 !important;
+    color: #8ecaff !important;
+    white-space: nowrap !important;
+  }
+  /* Fallback por posición (ajusta si tu orden difiere) */
+  #tabla tbody tr td:nth-child(1)::before { content: "Nombre"; }
+  #tabla tbody tr td:nth-child(2)::before { content: "Email"; }
+  #tabla tbody tr td:nth-child(3)::before { content: "Teléfono"; }
+  #tabla tbody tr td:nth-child(4)::before { content: "Mensaje"; }
+  #tabla tbody tr td:nth-child(5)::before { content: "Status"; }
+  #tabla tbody tr td:nth-child(6)::before { content: "Acciones"; }
+
+  /* ================== FIX BOTONES DE ACCIONES ================== */
+  /* La celda de Acciones (6ª) no va en 2 columnas; se convierte en fila flexible */
+  #tabla tbody tr td:nth-child(6) {
+    grid-template-columns: 1fr !important; /* quita etiqueta|valor */
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+  #tabla tbody tr td:nth-child(6)::before {
+    /* mantenemos la etiqueta arriba y pequeña */
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #8ecaff;
+  }
+  /* Los botones dentro de Acciones, en fila centrada y sin estirarse */
+  #tabla tbody tr td:nth-child(6) > * {
+    display: inline-flex !important;
+    gap: 8px !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  #tabla tbody tr td:nth-child(6) button {
+    display: inline-flex !important;
+    width: auto !important;        /* evita botones gigantes */
+    min-width: 44px !important;
+    min-height: 40px !important;
+    margin: 4px 6px !important;
+    font-size: 14px !important;
+  }
+
+  /* Botones generales dentro de tarjetas: apilados cuando no son Acciones */
+  #tabla td button {
+    width: 100% !important;
+    min-height: 40px !important;
+    margin: 6px 0 !important;
+    font-size: 14px !important;
+  }
+
+  /* Compacto en teléfonos pequeños */
+  @media (max-width: 600px) {
+    #tabla tbody tr { min-width: 94vw !important; padding: 10px !important; }
+    #tabla tbody td { grid-template-columns: 110px 1fr !important; padding: 8px 6px !important; }
+  }
+}
