@@ -338,14 +338,36 @@ function cerrarModalConexion(){
 function iniciarTiempoReal(){ if (poller) clearInterval(poller); poller = setInterval(obtenerUsuarios, 10000); }
 obtenerUsuarios(); iniciarTiempoReal();
 
-// --- buscador ---
-function normalizar(t){ return (t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-function filtrarTabla(){
-  const q = normalizar(document.getElementById('buscador')?.value || '');
-  const cont = document.querySelector('#tabla tbody') || document.getElementById('tabla');
-  if (!cont) return;
-  cont.querySelectorAll('tr').forEach(tr=>{
-    if (tr.querySelector('th')) { tr.style.display=''; return; }
-    tr.style.display = normalizar(tr.textContent).includes(q) ? '' : 'none';
-  });
-}
+// === BUSCADOR (usuarios.js) ===
+(function(){
+  const input = document.getElementById('buscador') || document.getElementById('buscar');
+  const cuerpo = (typeof tabla !== 'undefined' && tabla) ? tabla : document.querySelector('#tabla tbody');
+  if (!cuerpo) return;
+
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  let q = '';
+
+  function aplicarFiltro(){
+    const filas = cuerpo.querySelectorAll('tr');
+    filas.forEach(tr => {
+      if (tr.querySelector('th')) { tr.style.display = ''; return; }
+      tr.style.display = norm(tr.textContent).includes(q) ? '' : 'none';
+    });
+  }
+
+  if (input){
+    input.addEventListener('input', () => { q = norm(input.value); aplicarFiltro(); });
+  }
+
+  // Reaplica al actualizar la tabla (obtenerUsuarios cada 10s)
+  const mo = new MutationObserver(aplicarFiltro);
+  mo.observe(cuerpo, { childList: true });
+
+  // Compatibilidad con onkeyup="filtrarTabla()"
+  window.filtrarTabla = function(){
+    if (input){
+      q = norm(input.value);
+      aplicarFiltro();
+    }
+  };
+})();
