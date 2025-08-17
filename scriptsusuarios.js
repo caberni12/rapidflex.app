@@ -1,17 +1,21 @@
-// === Endpoints ===
-const URL_GET = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
-const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
+/* ===== usuarios.js (listado con modal + mapa y lectura de hoja conexion) ===== */
 
-// === DOM ===
+// Endpoints base
+const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
+const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
+// Web App de la hoja "conexion" (mismo que usas para LOG_URL en login)
+const CONN_API = 'https://script.google.com/macros/s/AKfycbxYI3UQNfeM1K6H5DmRdAVVqUkJhIAH3zJQU_vJUWrTZuw3ObwqyKM5JE5D9T8mav3t/exec';
+
+// DOM
 const form  = document.getElementById("formulario");
 const tabla = document.querySelector("#tabla tbody");
 
-// === Estado ===
+// Estado
 let datosOriginales = {};
 let primeraCarga = true;
 let poller = null;
 
-// === UI: alerta flotante autodescartable ===
+// Toast
 function toast(msg, type = "ok", ms = 2000) {
   const el = document.createElement("div");
   el.setAttribute("role", "status");
@@ -28,8 +32,10 @@ function toast(msg, type = "ok", ms = 2000) {
   }, ms);
 }
 
-// === Normaliza fila ===
+// Normaliza fila base (usuarios)
 function normalizar(item) {
+  const lat = item.geo_lat ?? item.lat ?? item.Lat ?? "";
+  const lng = item.geo_lng ?? item.lng ?? item.Lng ?? "";
   return {
     usuario: item.usuario ?? item.Usuario ?? "",
     clave:   item.clave   ?? item.Clave   ?? "",
@@ -37,12 +43,15 @@ function normalizar(item) {
     nombre:  item.nombre  ?? item.Nombre  ?? "",
     rol:     item.rol     ?? item.Rol     ?? "",
     fila:    item.fila,
-    geo_lat: parseFloat(item.geo_lat ?? item.lat ?? item.Lat ?? ""),
-    geo_lng: parseFloat(item.geo_lng ?? item.lng ?? item.Lng ?? "")
+    geo_lat: lat !== "" ? parseFloat(lat) : NaN,
+    geo_lng: lng !== "" ? parseFloat(lng) : NaN,
+    hora:    item.hora   ?? item.Hora   ?? "",
+    fecha:   item.fecha  ?? item.Fecha  ?? "",
+    estado:  item.estado ?? item.Estado ?? ""
   };
 }
 
-// === Acceso -> clase para formato condicional ===
+// Formato condicional
 function claseAcceso(v){
   const s = (v ?? "").toString().trim().toLowerCase();
   if (["true","1","sí","si"].includes(s))  return "estado-true";
@@ -50,7 +59,54 @@ function claseAcceso(v){
   return "";
 }
 
-// === Submit ===
+// ====== LECTURA de hoja "conexion" ======
+let conexionCache = new Map();
+function parseGeo(s){
+  const m = /(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/.exec(String(s||""));
+  return m ? {lat:+m[1], lng:+m[2]} : null;
+}
+async function cargarConexionCache(){
+  try{
+    const r = await fetch(CONN_API + "?accion=last_all");
+    if (!r.ok) return;
+    const arr = await r.json(); // [{Usuario, geolocalizacion, hora, fecha, estado, ...}]
+    const map = new Map();
+    for (const x of arr){
+      const u = String(x.Usuario||'').trim();
+      if (!u) continue;
+      const g = parseGeo(x.geolocalizacion);
+      map.set(u.toLowerCase(), {
+        usuario:u,
+        geo_lat: g ? g.lat : NaN,
+        geo_lng: g ? g.lng : NaN,
+        hora: x.hora||'',
+        fecha: x.fecha||'',
+        estado: (x.estado||''),
+        acceso: x.Acceso ?? x.acceso ?? '',
+        nombre: x.nombre ?? '',
+        rol:    x.rol ?? x.Rol ?? ''
+      });
+    }
+    conexionCache = map;
+  }catch{}
+}
+function mergeConexion(u){
+  const key = String(u.usuario||'').trim().toLowerCase();
+  const c = conexionCache.get(key);
+  if (!c) return u;
+  return {
+    ...u,
+    geo_lat: isFinite(c.geo_lat) ? c.geo_lat : u.geo_lat,
+    geo_lng: isFinite(c.geo_lng) ? c.geo_lng : u.geo_lng,
+    hora: c.hora || u.hora,
+    fecha: c.fecha || u.fecha,
+    estado: c.estado || u.estado,
+    // opcional: sobreescribir acceso si viene de conexion
+    acceso: u.acceso || c.acceso
+  };
+}
+
+// Submit
 form.addEventListener("submit", e => {
   e.preventDefault();
   const datos = {
@@ -62,7 +118,6 @@ form.addEventListener("submit", e => {
     nombre: form.nombre.value,
     rol: form.rol.value
   };
-
   if (datos.accion === "modificar") {
     const iguales =
       datos.usuario === datosOriginales.usuario &&
@@ -72,7 +127,6 @@ form.addEventListener("submit", e => {
       datos.rol     === datosOriginales.rol;
     if (iguales) { toast("No se han realizado cambios"); return; }
   }
-
   fetch(URL_POST, { method: "POST", body: JSON.stringify(datos) })
     .then(r => r.json())
     .then(res => {
@@ -83,170 +137,40 @@ form.addEventListener("submit", e => {
     })
     .catch(() => toast("Error de red al guardar", "error"));
 });
-
-// === Cancelar ===
 function cancelarEdicion() { form.reset(); }
 
-// ====== Leaflet / Mapa ======
-let LLoaded = false, mapa, capaOSM, markers = new Map();
+// Listar + fusionar con "conexion"
+async function obtenerUsuarios() {
+  const [usuarios] = await Promise.all([
+    fetch(URL_GET).then(r=>r.json()).catch(()=>[]),
+    cargarConexionCache()
+  ]);
+  tabla.innerHTML = "";
+  const norm = usuarios.map(normalizar).map(mergeConexion);
 
-function cargarLeaflet() {
-  if (LLoaded) return Promise.resolve();
-  return new Promise((resolve) => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-    document.head.appendChild(link);
-    const s = document.createElement('script');
-    s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-    s.onload = () => { LLoaded = true; resolve(); };
-    document.head.appendChild(s);
-  });
-}
-
-function crearUIgps() {
-  if (document.getElementById('gpsOverlay')) return;
-  const overlay = document.createElement('div');
-  overlay.id = 'gpsOverlay';
-  overlay.innerHTML = `
-    <div id="gpsPanel">
-      <div class="gpsBar">
-        <strong>Mapa de conexiones</strong>
-        <span>
-          <button id="gpsFit">Centrar</button>
-          <button id="gpsClose" aria-label="Cerrar">×</button>
-        </span>
-      </div>
-      <div id="gpsMap"></div>
-    </div>`;
-  document.body.appendChild(overlay);
-
-  overlay.querySelector('#gpsClose').onclick = () => overlay.style.display = 'none';
-  overlay.addEventListener('click', e => { if (e.target.id === 'gpsOverlay') overlay.style.display = 'none'; });
-  overlay.querySelector('#gpsFit').onclick = ajustarABounds;
-}
-
-async function iniciarMapa() {
-  await cargarLeaflet();
-  if (mapa) return mapa;
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
-  });
-  mapa = L.map('gpsMap', { zoomControl: true }).setView([-33.45, -70.66], 11);
-  capaOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '&copy; OpenStreetMap'
-  }).addTo(mapa);
-  return mapa;
-}
-
-function popupDe(it){
-  return `
-    <div style="min-width:160px">
-      <div><strong>${it.usuario || '(sin usuario)'}</strong></div>
-      <div>${it.nombre || ''}</div>
-      <div>Rol: ${it.rol || '-'}</div>
-      <div>Acceso: ${it.acceso || '-'}</div>
-      <div>Lat: ${isFinite(it.geo_lat)?it.geo_lat:'-'} Lng: ${isFinite(it.geo_lng)?it.geo_lng:'-'}</div>
-    </div>`;
-}
-
-function ajustarABounds(){
-  if (!mapa) return;
-  const pts = [];
-  markers.forEach(m => { if (m.getLatLng) pts.push(m.getLatLng()); });
-  if (pts.length) {
-    const b = L.latLngBounds(pts);
-    mapa.fitBounds(b.pad(0.2));
-  }
-}
-
-function keyFor(it){ return (it.fila ?? it.usuario ?? '').toString(); }
-
-function actualizarMapa(items) {
-  items.forEach(it => {
-    const lat = Number(it.geo_lat), lng = Number(it.geo_lng);
-    if (!isFinite(lat) || !isFinite(lng)) return;
-    const key = keyFor(it);
-    if (markers.has(key)) {
-      const m = markers.get(key);
-      if (m.getLatLng) m.setLatLng([lat, lng]).setPopupContent(popupDe(it));
-      else m.__pending__ = [lat, lng], m.__data__ = it;
-    } else {
-      markers.set(key, { __pending__: [lat, lng], __data__: it }); // se crea al abrir
-      if (mapa) {
-        const m = L.marker([lat, lng]).addTo(mapa).bindPopup(popupDe(it));
-        markers.set(key, m);
-      }
-    }
+  norm.forEach(item => {
+    const tr = document.createElement("tr");
+    tr.className = claseAcceso(item.acceso);
+    tr.innerHTML = `
+      <td>${item.usuario}</td>
+      <td>${item.clave}</td>
+      <td>${item.acceso}</td>
+      <td>${item.nombre}</td>
+      <td>${item.rol}</td>
+      <td>
+        <button type="button" class="btn-ed">✏️</button>
+        <button type="button" class="btn-el">🗑️</button>
+      </td>`;
+    tr.querySelector(".btn-ed").addEventListener("click", () => editar(item, item.fila));
+    tr.querySelector(".btn-el").addEventListener("click", () => eliminar(item.fila));
+    tr.addEventListener("dblclick", () => abrirModalConexion(item)); // modal en doble clic
+    tabla.appendChild(tr);
   });
 
-  // crear pendientes si el mapa ya está abierto
-  if (mapa) {
-    for (const [k, v] of markers) {
-      if (v.__pending__) {
-        const m = L.marker(v.__pending__).addTo(mapa).bindPopup(popupDe(v.__data__));
-        markers.set(k, m);
-      }
-    }
-  }
+  if (primeraCarga) { toast("Usuarios cargados"); primeraCarga = false; }
 }
 
-async function verEnMapa(item){
-  const lat = Number(item.geo_lat), lng = Number(item.geo_lng);
-  if (!isFinite(lat) || !isFinite(lng)) { toast("Sin coordenadas", "error"); return; }
-  crearUIgps();
-  const overlay = document.getElementById('gpsOverlay');
-  overlay.style.display = 'block';
-  await iniciarMapa();
-  setTimeout(() => mapa.invalidateSize(), 50);
-
-  const key = keyFor(item);
-  let mark = markers.get(key);
-  if (!mark || !mark.getLatLng) {
-    mark = L.marker([lat, lng]).addTo(mapa).bindPopup(popupDe(item));
-    markers.set(key, mark);
-  } else {
-    mark.setLatLng([lat, lng]).setPopupContent(popupDe(item));
-  }
-  mapa.setView([lat, lng], 14);
-  mark.openPopup();
-}
-
-// ====== Listar + eventos ======
-function obtenerUsuarios() {
-  fetch(URL_GET)
-    .then(r => r.json())
-    .then(data => {
-      tabla.innerHTML = "";
-      const norm = data.map(normalizar);
-
-      norm.forEach(item => {
-        const tr = document.createElement("tr");
-        tr.className = claseAcceso(item.acceso);
-        if (isFinite(item.geo_lat) && isFinite(item.geo_lng)) tr.classList.add('tiene-geo');
-        tr.innerHTML = `
-          <td>${item.usuario}</td>
-          <td>${item.clave}</td>
-          <td>${item.acceso}</td>
-          <td>${item.nombre}</td>
-          <td>${item.rol}</td>
-          <td>
-            <button onclick='editar(${JSON.stringify(item)}, ${item.fila})'>✏️</button>
-            <button onclick='eliminar(${item.fila})'>🗑️</button>
-          </td>`;
-        tr.addEventListener('dblclick', () => verEnMapa(item)); // doble clic abre modal
-        tabla.appendChild(tr);
-      });
-
-      if (primeraCarga) { toast("Usuarios cargados"); primeraCarga = false; }
-      actualizarMapa(norm);
-    })
-    .catch(() => toast("Error al cargar usuarios", "error"));
-}
-
-// === Editar ===
+// Editar / Eliminar
 function editar(item, fila) {
   form.fila.value = fila ?? item.fila ?? "";
   form.usuario.value = item.usuario ?? "";
@@ -256,115 +180,135 @@ function editar(item, fila) {
   form.rol.value = item.rol ?? "";
   datosOriginales = { ...item };
 }
-
-// === Eliminar ===
 function eliminar(fila) {
   if (!confirm("¿Eliminar este usuario?")) return;
-  fetch(URL_POST, {
-    method: "POST",
-    body: JSON.stringify({ accion: "eliminar", id: fila })
-  })
+  fetch(URL_POST, { method: "POST", body: JSON.stringify({ accion: "eliminar", id: fila }) })
     .then(r => r.json())
-    .then(res => {
-      if (res.resultado === "ok") toast("Eliminado correctamente");
-      else toast("Error al eliminar", "error");
-      obtenerUsuarios();
-    })
+    .then(res => { res.resultado === "ok" ? toast("Eliminado correctamente") : toast("Error al eliminar", "error"); obtenerUsuarios(); })
     .catch(() => toast("Error de red al eliminar", "error"));
 }
 
-// === Tiempo real ===
-function iniciarTiempoReal(){
-  if (poller) clearInterval(poller);
-  poller = setInterval(obtenerUsuarios, 10000); // 10s
+// ===== Modal con mapa =====
+let modalMap = null, modalMarker = null;
+function inyectarEstilosModal(){
+  if (document.getElementById("connModalCSS")) return;
+  const css = `
+  #connOverlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:9998}
+  #connModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:min(960px,92vw);background:#0b0f14;color:#e5e7eb;border:1px solid #162133;
+    border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:9999}
+  .connHead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #162133}
+  .connTitle{display:flex;gap:10px;align-items:center}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot.online{background:#16a34a;box-shadow:0 0 0 0 rgba(22,163,74,.5);animation:pulse 1.6s infinite}
+  .dot.offline{background:#dc2626}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.5)}70%{box-shadow:0 0 0 10px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+  .connBody{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px}
+  .connGrid{display:grid;grid-template-columns:140px 1fr;gap:8px;border:1px solid #162133;border-radius:10px;padding:10px}
+  .connGrid div{display:contents}
+  .connGrid label{opacity:.7}
+  #connMap{height:360px;border:1px solid #162133;border-radius:10px}
+  .connFoot{display:flex;justify-content:flex-end;padding:10px 12px;border-top:1px solid #162133}
+  .connBtn{background:#111827;border:1px solid #1f2937;color:#e5e7eb;border-radius:8px;padding:8px 12px;cursor:pointer}
+  .connBtn:hover{background:#0b1220}`;
+  const s = document.createElement("style"); s.id = "connModalCSS"; s.textContent = css; document.head.appendChild(s);
 }
-
-// === Inicio ===
-obtenerUsuarios();
-iniciarTiempoReal();
-
-/* === LOG de conexion: URL del Web App nuevo === */
-const LOG_URL = "https://script.google.com/macros/s/AKfycbzPqO60R3SswkiAOhH9sEnGePFg4pUVHOA_OesEfYyY8NusgaRirmHaOa5ZFEWMxS--/exec";
-
-/* Geo rápida con fallback por IP */
-async function getGeo(){
-  const viaIP = async ()=>{ try{
-    const r = await fetch('https://ipapi.co/json/'); if(!r.ok) return null;
-    const j = await r.json(); return {lat:j.latitude, lng:j.longitude};
-  }catch{return null;} };
-  if ('geolocation' in navigator){
-    try{
-      const p = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:5000,maximumAge:15000}));
-      return {lat:p.coords.latitude, lng:p.coords.longitude};
-    }catch{}
-  }
-  return await viaIP();
+function ensureModalConexion(){
+  if (document.getElementById("connOverlay")) return;
+  inyectarEstilosModal();
+  const overlay = document.createElement("div");
+  overlay.id = "connOverlay";
+  overlay.innerHTML = `
+    <div id="connModal" role="dialog" aria-modal="true">
+      <div class="connHead">
+        <div class="connTitle">
+          <span id="connDot" class="dot offline"></span>
+          <strong id="connTitulo">Conexión</strong>
+        </div>
+        <button class="connBtn" id="connClose" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="connBody">
+        <div class="connGrid">
+          <div><label>Usuario</label><span id="cUsuario"></span></div>
+          <div><label>Clave</label><span id="cClave"></span></div>
+          <div><label>Acceso</label><span id="cAcceso"></span></div>
+          <div><label>Nombre</label><span id="cNombre"></span></div>
+          <div><label>Rol</label><span id="cRol"></span></div>
+          <div><label>Geolocalización</label><span id="cGeo"></span></div>
+          <div><label>Hora</label><span id="cHora"></span></div>
+          <div><label>Fecha</label><span id="cFecha"></span></div>
+          <div><label>Estado</label><span id="cEstado"></span></div>
+        </div>
+        <div id="connMap"></div>
+      </div>
+      <div class="connFoot">
+        <button class="connBtn" id="connCenter">Centrar mapa</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener("click", e => { if (e.target.id === "connOverlay") cerrarModalConexion(); });
+  document.getElementById("connClose").onclick = cerrarModalConexion;
+  document.getElementById("connCenter").onclick = () => { if (modalMap && modalMarker) modalMap.setView(modalMarker.getLatLng(), 14); };
 }
-function fechaHoraCL(){
-  const tz='America/Santiago', now=new Date();
-  return {
-    fecha: new Intl.DateTimeFormat('es-CL',{timeZone:tz}).format(now),
-    hora:  new Intl.DateTimeFormat('es-CL',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(now)
-  };
+function cargarLeaflet(){
+  if (window.L) return Promise.resolve();
+  return new Promise((resolve) => {
+    const link = document.createElement('link'); link.rel='stylesheet';
+    link.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'; document.head.appendChild(link);
+    const s = document.createElement('script'); s.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.onload = resolve; document.head.appendChild(s);
+  });
 }
-function logConexion(payload){
-  try{
-    const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
-    if (!(navigator.sendBeacon && navigator.sendBeacon(LOG_URL, blob))){
-      fetch(LOG_URL,{method:'POST',body:JSON.stringify(payload)});
+async function abrirModalConexion(item){
+  ensureModalConexion();
+  const overlay = document.getElementById("connOverlay");
+  overlay.style.display = "block";
+
+  const accesoTxt = (item.acceso ?? '').toString();
+  const esOnline = ["true","1","sí","si"].includes(accesoTxt.trim().toLowerCase()) || (item.estado||"").toLowerCase()==="online";
+
+  document.getElementById("connDot").className = "dot " + (esOnline ? "online" : "offline");
+  document.getElementById("connTitulo").textContent = `Conexión de ${item.usuario || '(sin usuario)'}`;
+  document.getElementById("cUsuario").textContent = item.usuario || '';
+  document.getElementById("cClave").textContent   = item.clave || '';
+  document.getElementById("cAcceso").textContent  = accesoTxt || '';
+  document.getElementById("cNombre").textContent  = item.nombre || '';
+  document.getElementById("cRol").textContent     = item.rol || '';
+  const geoStr = (isFinite(item.geo_lat) && isFinite(item.geo_lng)) ? `${item.geo_lat}, ${item.geo_lng}` : '';
+  document.getElementById("cGeo").textContent     = geoStr || '(sin coordenadas)';
+  document.getElementById("cHora").textContent    = item.hora || '';
+  document.getElementById("cFecha").textContent   = item.fecha || '';
+  document.getElementById("cEstado").textContent  = (item.estado || (esOnline ? 'online' : 'offline'));
+
+  await cargarLeaflet();
+  setTimeout(() => {
+    if (!modalMap) {
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+      });
+      modalMap = L.map('connMap', { zoomControl:true });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '&copy; OpenStreetMap'
+      }).addTo(modalMap);
     }
-  }catch{}
+    setTimeout(()=> modalMap.invalidateSize(), 60);
+
+    if (isFinite(item.geo_lat) && isFinite(item.geo_lng)) {
+      const pos = [item.geo_lat, item.geo_lng];
+      if (!modalMarker) modalMarker = L.marker(pos).addTo(modalMap);
+      else modalMarker.setLatLng(pos);
+      modalMarker.bindPopup(`<strong>${item.usuario||''}</strong><br>${geoStr || ''}`).openPopup();
+      modalMap.setView(pos, 14);
+    } else {
+      modalMap.setView([-33.45, -70.66], 11);
+      if (modalMarker) { modalMap.removeLayer(modalMarker); modalMarker = null; }
+    }
+  }, 0);
 }
+function cerrarModalConexion(){ const overlay = document.getElementById("connOverlay"); if (overlay) overlay.style.display = "none"; }
 
-/* === tras validar OK en tu flujo actual, envía el registro === */
-async function _enviarConexionLogin(usuario, clave, data){
-  const geo = await getGeo();
-  const {fecha, hora} = fechaHoraCL();
-  logConexion({
-    accion: 'login_event',
-    Usuario: usuario,
-    Clave: clave,
-    Acceso: String(data?.acceso ?? 'true'),
-    nombre: String(data?.nombre ?? usuario),
-    rol: String(data?.rol ?? ''),
-    geolocalizacion: geo ? `${geo.lat},${geo.lng}` : '',
-    hora, fecha,
-    estado: 'online'
-  });
-}
-
-/* === opcional: marcar OFFLINE al salir === */
-async function _enviarConexionLogout(usuario, data){
-  const geo = await getGeo();
-  const {fecha, hora} = fechaHoraCL();
-  logConexion({
-    accion: 'login_event',
-    Usuario: usuario || '',
-    Clave: '',
-    Acceso: String(data?.acceso ?? ''),
-    nombre: String(data?.nombre ?? usuario || ''),
-    rol: String(data?.rol ?? ''),
-    geolocalizacion: geo ? `${geo.lat},${geo.lng}` : '',
-    hora, fecha,
-    estado: 'offline'
-  });
-}
-
-// Botón cerrar sesión si existe
-document.getElementById("btnLogout")?.addEventListener("click", async () => {
-  const u = localStorage.getItem("nombreUsuario") || localStorage.getItem("usuario") || "";
-  await _enviarConexionLogout(u, {});
-  localStorage.removeItem("sessionToken");
-  localStorage.removeItem("usuario");
-  localStorage.removeItem("nombreUsuario");
-  location.href = "index.html";
-});
-
-// Al cerrar pestaña
-window.addEventListener("beforeunload", () => {
-  const u = localStorage.getItem("nombreUsuario") || localStorage.getItem("usuario") || "";
-  const {fecha, hora} = fechaHoraCL();
-  const payload = { accion:'login_event', Usuario:u, Clave:'', Acceso:'', nombre:u, rol:'', geolocalizacion:'', hora, fecha, estado:'offline' };
-  const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
-  navigator.sendBeacon(LOG_URL, blob);
-});
+// Tiempo real
+function iniciarTiempoReal(){ if (poller) clearInterval(poller); poller = setInterval(obtenerUsuarios, 10000); }
+obtenerUsuarios(); iniciarTiempoReal();
