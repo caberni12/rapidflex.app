@@ -1,13 +1,13 @@
-/* ===== usuarios.js (base: CONN_API; rol/fila desde URL_GET; 5 columnas; modal con mapa) ===== */
+/* ===== usuarios.js (tabla 5 cols desde CONN_API; rol/fila desde URL_GET; modal con mapa) ===== */
 
 /* Endpoints */
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
-const CONN_API = 'https://script.google.com/macros/s/AKfycby8sj-J1_fJfgZ8huNVMAoWIiAgPFZ6Guy1T1crtAEdBWEuHabm7AFy6AiMoiqcMQeA/exec';
+const CONN_API = 'https://script.google.com/macros/s/AKfycbxYI3UQNfeM1K6H5DmRdAVVqUkJhIAH3zJQU_vJUWrTZuw3ObwqyKM5JE5D9T8mav3t/exec';
 
 /* DOM */
 const form  = document.getElementById("formulario");
-const tabla = document.querySelector("#tabla tbody");
+let   tabla = document.querySelector("#tabla tbody");
 
 /* Estado */
 let datosOriginales = {};
@@ -34,38 +34,68 @@ function claseAcceso(v){
   if (["false","0","no","offline"].includes(s))     return "estado-false";
   return "";
 }
+async function safeJson(res){
+  const ct = res.headers.get('content-type')||'';
+  const txt = await res.text();
+  try { return /json/i.test(ct) ? JSON.parse(txt) : JSON.parse(txt); }
+  catch { console.error('Respuesta no JSON', txt); throw new Error('JSON inválido'); }
+}
 
-/* ===== Carga de roles y filas desde URL_GET ===== */
+/* ===== Roles/filas desde URL_GET ===== */
 async function cargarRolesYFilas(){
   try{
-    const arr = await fetch(URL_GET).then(r=>r.json());
+    const r = await fetch(URL_GET);
+    if (!r.ok) throw new Error('GET usuarios falló');
+    const arr = await safeJson(r);
     const map = new Map();
     for (const x of arr||[]){
       const usuario = String(x.usuario ?? x.Usuario ?? '').trim();
       if (!usuario) continue;
-      map.set(kn(usuario), {
-        rol:  x.rol ?? x.Rol ?? '',
-        fila: x.fila ?? ''
-      });
+      map.set(kn(usuario), { rol: x.rol ?? x.Rol ?? '', fila: x.fila ?? '' });
     }
     return map;
-  }catch{ return new Map(); }
+  }catch(e){
+    console.error(e);
+    toast('No se pudo leer roles de Usuarios', 'error', 3000);
+    return new Map();
+  }
 }
 
-/* ===== Carga de conexiones desde CONN_API ===== */
+/* ===== Conexiones desde CONN_API ===== */
 async function cargarConexiones(){
   try{
     const r = await fetch(CONN_API + '?accion=last_all');
-    if (!r.ok) return [];
-    const arr = await r.json(); // [{Usuario,Clave,Acceso,nombre,geolocalizacion,hora,fecha,estado,geo_lat,geo_lng,maps_iframe}]
+    if (!r.ok) throw new Error('GET conexion falló');
+    const arr = await safeJson(r); // [{Usuario,Clave,Acceso,nombre,geolocalizacion,geo_lat,geo_lng,maps_iframe,hora,fecha,estado}]
     return Array.isArray(arr) ? arr : [];
-  }catch{ return []; }
+  }catch(e){
+    console.error(e);
+    toast('No se pudo leer conexiones', 'error', 3000);
+    return [];
+  }
 }
 
-/* ===== Listar: base CONN_API + rol/fila de URL_GET ===== */
+/* ===== Listar (base CONN_API + rol/fila de URL_GET) ===== */
 async function obtenerUsuarios(){
+  // asegurar tbody
+  if (!tabla){
+    const t = document.getElementById('tabla');
+    if (t){
+      tabla = t.tBodies[0] || t.appendChild(document.createElement('tbody'));
+    } else {
+      console.error('No existe #tabla');
+      toast('No existe #tabla en el HTML', 'error', 4000);
+      return;
+    }
+  }
+
   const [rolesMap, conexiones] = await Promise.all([cargarRolesYFilas(), cargarConexiones()]);
   tabla.innerHTML = "";
+
+  if (!conexiones.length){
+    toast('Sin registros de conexión', 'error', 2500);
+    return;
+  }
 
   const filas = conexiones.map(c=>{
     const ukey = kn(c.Usuario);
@@ -87,7 +117,7 @@ async function obtenerUsuarios(){
     };
   });
 
-  filas.forEach(item=>{
+  for (const item of filas){
     const tr = document.createElement("tr");
     tr.className = claseAcceso(item.acceso || item.estado);
     tr.innerHTML = `
@@ -104,12 +134,12 @@ async function obtenerUsuarios(){
     tr.querySelector(".btn-el").addEventListener("click", ()=> item.fila && eliminar(item.fila));
     tr.addEventListener("dblclick", ()=> abrirModalConexionDesdeAPI(item.usuario, item.rol));
     tabla.appendChild(tr);
-  });
+  }
 
   if (primeraCarga){ toast("Usuarios cargados"); primeraCarga = false; }
 }
 
-/* ===== CRUD sobre hoja Usuarios ===== */
+/* ===== CRUD hoja Usuarios ===== */
 form.addEventListener("submit", e => {
   e.preventDefault();
   const datos = {
@@ -132,11 +162,13 @@ form.addEventListener("submit", e => {
   }
   fetch(URL_POST, {method:"POST", body: JSON.stringify(datos)})
     .then(r=>r.json())
-    .then(res=>{ res.resultado==="ok"?toast("Guardado exitosamente"):toast("Error al guardar","error"); form.reset(); obtenerUsuarios(); })
+    .then(res=>{
+      res.resultado==="ok" ? toast("Guardado exitosamente") : toast("Error al guardar","error");
+      form.reset(); obtenerUsuarios();
+    })
     .catch(()=> toast("Error de red al guardar","error"));
 });
 function cancelarEdicion(){ form.reset(); }
-
 function editar(item, fila){
   form.fila.value    = fila || "";
   form.usuario.value = item.usuario || "";
@@ -231,7 +263,7 @@ function eliminar(fila){
 
       const r = await fetch(CONN_API + "?accion=last&usuario=" + encodeURIComponent(usuario||""));
       if (!r.ok){ toast("No se pudo leer conexión","error",3000); return; }
-      const d = await r.json(); // {Usuario,Clave,Acceso,nombre,rol,geolocalizacion,geo_lat,geo_lng,maps_iframe,hora,fecha,estado}
+      const d = await safeJson(r); // {Usuario,Clave,Acceso,nombre,rol,geolocalizacion,geo_lat,geo_lng,maps_iframe,hora,fecha,estado}
 
       const u = d.Usuario || usuario || '';
       const acceso = d.Acceso || '';
@@ -254,7 +286,8 @@ function eliminar(fila){
       const src = mapSrc(d.geo_lat, d.geo_lng, d.geolocalizacion, d.maps_iframe);
       document.getElementById('connGMap').innerHTML =
         `<iframe src="${src}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
-    }catch{
+    }catch(e){
+      console.error(e);
       toast("Error cargando modal","error",3000);
     }
   };
