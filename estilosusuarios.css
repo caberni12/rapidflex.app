@@ -1,16 +1,23 @@
 /* --- BASE GENERAL --- */
 body {
   font-family: Arial, sans-serif;
-  background: #ffffff;
+  background: #f3f3f3;
   padding: 5px 20px 20px 20px;
   margin: 0;
   position: relative;
 }
 
-.logo-container { text-align: center; margin-bottom: 5px; }
-.logo-container img { max-width: 100%; height: auto; }
+.logo-container {
+  text-align: center;
+  margin-bottom: 5px;
+}
 
-/* --- FORMULARIO (Desktop) --- */
+.logo-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- FORMULARIO --- */
 form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -23,11 +30,14 @@ form {
   max-width: 100%;
   box-sizing: border-box;
   margin-top: -14%;
-  position: fixed; /* como tu versión de escritorio */
+  position: fixed;
 }
 
+
 /* CAMPOS */
-input, textarea, select {
+input,
+textarea,
+select {
   padding: 10px;
   font-size: 16px;
   width: 100%;
@@ -38,11 +48,20 @@ input, textarea, select {
   background-color: #fff;
   margin-bottom: 10px;
 }
-input.nombre { font-size: 14px; padding: 8px; }
-textarea { grid-column: span 2; height: 80px; resize: vertical; }
 
-/* Buscador (desktop) */
-input.busqueda, input[type="search"] {
+input.nombre {
+  font-size: 14px;
+  padding: 8px;
+}
+
+textarea {
+  grid-column: span 2;
+  height: 80px;
+  resize: vertical;
+}
+
+input.busqueda,
+input[type="search"] {
   max-width: 300px;
   width: 100%;
   box-sizing: border-box;
@@ -61,6 +80,7 @@ input.busqueda, input[type="search"] {
   gap: 10px;
   justify-content: flex-start;
 }
+
 button {
   padding: 10px 16px;
   font-size: 14px;
@@ -71,43 +91,51 @@ button {
   flex: 1 1 auto;
   max-width: 200px;
 }
-.btn-guardar { background-color: #28a745; color: #fff; }
-.btn-cancelar { background-color: #dc3545; color: #fff; }
-.btn-recargar { margin-bottom: 12px; background-color: #007bff; color: #fff; }
 
-/* --- CONTENEDOR DE TABLA (Desktop) --- */
-.tabla-responsive,
-#tabla-wrapper {
-  background: #0c0c0c;
-  border-radius: 8px;
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  padding: 0;                 /* evita fondo sobresalido arriba */
-  margin: 0 auto 20px auto;   /* solo margen inferior */
-  box-sizing: border-box;
+.btn-guardar {
+  background-color: #28a745;
+  color: white;
 }
 
-/* TABLA (Desktop) */
+.btn-cancelar {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-recargar {
+  margin-bottom: 12px;
+  background-color: #007bff;
+  color: white;
+}
+
+/* TABLA */
 #tabla {
   width: 100%;
   border-collapse: collapse;
-  background: transparent; /* el fondo lo maneja el contenedor */
+  background: #0c0c0c;
   color: #faf9f9;
-  margin: 0;
+  margin-bottom: 20px;
   border-radius: 8px;
   overflow: hidden;
   font-size: 14px;
 }
-th, td {
+
+th,
+td {
   border: 1px solid #049afdcc;
   padding: 10px;
   text-align: center;
 }
-th { background: #049afdcc; }
-thead tr.filtros th { padding: 4px 5px; background-color: #f9f9f9; }
+
+th {
+  background: #049afdcc;
+}
+
+thead tr.filtros th {
+  padding: 4px 5px;
+  background-color: #f9f9f9;
+}
+
 thead tr.filtros th input,
 thead tr.filtros th select {
   width: 100%;
@@ -116,89 +144,214 @@ thead tr.filtros th select {
   box-sizing: border-box;
 }
 
-/* Botones dentro de celdas */
 td button {
   padding: 6px 10px;
   font-size: 14px;
   border: none;
   border-radius: 4px;
   background-color: #ffffff;
-  color: white; /* mantengo tu color; cambia a #222 si quieres texto oscuro */
+  color: white;
   cursor: pointer;
   margin: 4px;
 }
 
-/* ENLACES, USUARIO */
-.telefono-link { color: blue; text-decoration: underline; cursor: pointer; }
-.usuario-nombre { color: #007bff; font-weight: bold; margin-bottom: 10px; text-align: right; }
-
-/* --- LOADER (Desktop) --- */
-.loader-wrapper {
-  position: fixed; inset: 0; z-index: 9999;
-  background-color: rgba(0,0,0,.7);
+/* ENLACES */
+.telefono-link {
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
 }
+
+/* USUARIO */
+.usuario-nombre {
+  color: #007bff;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: right;
+}
+
+/* --- LOADER SOBRE TODO EL BODY (MODIFICADO) --- */
+.loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
 .loader {
   border: 12px solid #141414;
   border-top: 12px solid #f8f4f4;
   border-radius: 50%;
-  width: 200px; height: 200px; aspect-ratio: 1/1;
+  width: 200px;
+  height: 200px;
   animation: spin 1s linear infinite;
   box-shadow: inset 0 0 10px #080808, 0 0 15px #080808;
-  margin-top: 17%; margin-left: 42%;
-  box-sizing: border-box;
+  margin-top: 17%;
+  margin-left: 42%;
 }
+
 .loader-text {
   position: absolute;
   top: calc(35% + 110px);
   left: 49%;
   transform: translateX(-50%);
-  color: #fff; font-size: 20px; text-align: center;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
 }
-.loader-wrapper.hidden { display: none; }
-@keyframes spin { 0% {transform: rotate(0)} 100% {transform: rotate(360deg)} }
 
-/* STATUS (Desktop) */
-td.status-celda[data-status="Nuevo"]      { background-color: #28a745 !important; color: #fff; font-weight: bold; }
-td.status-celda[data-status="En proceso"] { background-color: #ffc107 !important; color: #000; font-weight: bold; }
-td.status-celda[data-status="Finalizado"] { background-color: #ff0000 !important; color: #fff; font-weight: bold; }
+.loader-wrapper.hidden {
+  display: none;
+}
 
-/* CONTROLES SUPERIORES ALINEADOS CON LA TABLA */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* --- VERSION MÓVIL FLUIDA --- */
+@media (max-width: 768px) {
+  form {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    padding: 15px;
+    gap: 12px;
+  }
+
+  .botones {
+    justify-content: center;
+  }
+
+  button {
+    font-size: 15px;
+    min-width: 140px;
+    max-width: 100%;
+  }
+
+  .usuario-nombre {
+    text-align: center;
+    font-size: 14px;
+  }
+
+  #tabla {
+    font-size: 13px;
+  }
+
+  td button {
+    font-size: 14px;
+    padding: 8px 10px;
+    width: auto;
+  }
+
+  .loader {
+    width: 70px;
+    height: 70px;
+    border-width: 6px;
+  }
+
+  .loader-text {
+    font-size: 14px;
+    top: calc(17% + 90px);
+  }
+}
+/* Colores aplicados directamente por el atributo data-status */
+td.status-celda[data-status="Nuevo"] {
+  background-color: #28a745 !important;
+  color: white;
+  font-weight: bold;
+}
+
+td.status-celda[data-status="En proceso"] {
+  background-color: #ffc107 !important;
+  color: black;
+  font-weight: bold;
+}
+
+td.status-celda[data-status="Finalizado"] {
+  background-color: #ff0000 !important;
+  color: white;
+  font-weight: bold;
+}
+
+
+/* === Contenedor de acciones (3 botones azules) alineado con la tabla === */
 #contenido .acciones{
-  width: 100%; max-width: 100%;
+  width: 100%;
+  max-width: 100%;
   margin: clamp(8px, 1.5vh, 16px) auto clamp(8px, 1.5vh, 12px);
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-}
-#contenido #buscador{
-  display: block; width: 100%; max-width: none;
-  margin: 8px auto clamp(12px, 2vh, 18px);
-  padding: 10px 12px; box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
 }
 
-/* Contenedor centrado en escritorio */
+/* El buscador al mismo ancho de la tabla (línea completa) */
+#contenido #buscador{
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: 8px auto clamp(12px, 2vh, 18px);
+  padding: 10px 12px;
+  box-sizing: border-box;
+}
+
+/* === Ajuste de tamaño para Sistema 1 y 2: contenedor más angosto y centrado === */
 #contenido{
   width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto; margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
   padding-left: clamp(12px, 2vw, 24px);
   padding-right: clamp(12px, 2vw, 24px);
 }
 #contenido > h2{ margin-left: 0; margin-right: 0; }
+
+/* === Igualar ancho del bloque superior al de la tabla === */
 #contenido > .logo-container,
 #contenido > h2,
 #contenido > #formulario,
-#contenido > #buscador{
+#contenido > #buscador {
   width: min(1200px, 100% - clamp(32px, 8vw, 120px));
-  margin-left: auto; margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
   padding-left: clamp(12px, 2vw, 24px);
   padding-right: clamp(12px, 2vw, 24px);
 }
 
-/* Aire alrededor de tabla y controles */
+/* === Aire adicional arriba de la TABLA y separación de controles === */
 #formulario{ margin-bottom: clamp(16px, 4vh, 48px); }
 #buscador{ display:block; width:100%; max-width:none; margin: 8px auto clamp(12px, 2vh, 18px); padding:10px 12px; box-sizing:border-box; }
 .btn-recargar{ margin-top: 8px; }
 #tabla{ margin-top: clamp(16px, 4vh, 40px); border-radius: 12px; }
 
-/* Fondo negro en celdas normales (menos status) */
-#tabla tbody td:not(.status-celda){
-  background:#0c0c0c; color:#faf9f9;
+
+
+/* === Empujar más abajo el bloque de ACCIONES (3 botones azules) para que no quede oculto por el panel superior === */
+#contenido .acciones{
+  margin-top: clamp(28px, 7vh, 110px) !important;  /* más aire arriba */
+  margin-bottom: clamp(10px, 2vh, 18px);
+}
+
+/* Aseguramos que el buscador quede inmediatamente debajo, a ancho de tabla */
+#contenido #buscador{
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin-top: clamp(12px, 2.5vh, 24px);
+}
+
+
+
+/* === FIX OVERLAP: el formulario superior NO debe ser fixed ni con margen negativo === */
+#formulario,
+#contenido form{
+  position: static !important;
+  top: auto !important;
+  margin-top: clamp(8px, 2vh, 20px) !important;
+}
+
+/* Asegurar que el bloque de ACCIONES quede bajo el panel superior */
+#contenido .acciones{
+  margin-top: clamp(28px, 7vh, 110px) !important;
 }
