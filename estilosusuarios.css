@@ -829,3 +829,121 @@ td.status-celda[data-status="Finalizado"] {
   #tabla tbody tr { flex-basis: calc(100vw - 36px) !important; max-width: none !important; }
   #tabla tbody td { grid-template-columns: 110px 1fr !important; padding: 8px 6px !important; }
 }
+
+/* ====== FIX scroll vertical + horizontal libre en móviles ====== */
+@media (max-width: 1024px) {
+  html, body { overflow-y: auto !important; height: auto !important; }
+
+  .tabla-responsive, #tabla-wrapper {
+    overflow-x: auto !important;   /* scroll horizontal libre */
+    overflow-y: visible !important;/* NO bloquear el vertical */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y !important;   /* permite ambos gestos */
+    overscroll-behavior: contain;
+  }
+
+  #tabla { border-collapse: separate !important; border-spacing: 0 !important; }
+
+  /* Tarjeta con ancho fijo, sin “estirarse” */
+  #tabla tbody { display: flex !important; flex-wrap: nowrap !important; gap: 12px !important; }
+  #tabla tbody tr {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    /* ancho ≈ pantalla, sin crecer */
+    flex: 0 0 calc(100vw - 48px) !important;
+    max-width: 560px !important;
+    box-sizing: border-box !important;
+    border: 1px solid #049afdcc !important;
+    border-radius: 12px !important;
+    background: #0c0c0c !important;
+    padding: 12px !important;
+  }
+
+  /* Fila/celda base en formato etiqueta | valor */
+  #tabla tr, #tabla th, #tabla td { border: none !important; }
+  #tabla tbody td {
+    display: grid !important;
+    grid-template-columns: 120px 1fr !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-align: left !important;
+    padding: 10px 6px !important;
+    background: transparent !important;
+    color: #faf9f9 !important;
+    border-bottom: 1px solid rgba(255,255,255,.08) !important;
+    box-sizing: border-box !important;
+  }
+  #tabla tbody td:last-child { border-bottom: none !important; }
+
+  /* Etiquetas automáticas */
+  #tabla tbody td::before {
+    content: attr(data-label);
+    font-weight: 700 !important;
+    color: #8ecaff !important;
+    white-space: nowrap !important;
+  }
+
+  /* ====== Fallback correcto por posición de columnas ======
+     Orden real: 1 Fecha, 2 Nombre, 3 Email, 4 Teléfono, 5 Mensaje,
+                 6 Status, 7 Acciones
+  */
+  #tabla tbody tr td:nth-child(1)::before { content: "Fecha"; }
+  #tabla tbody tr td:nth-child(2)::before { content: "Nombre"; }
+  #tabla tbody tr td:nth-child(3)::before { content: "Email"; }
+  #tabla tbody tr td:nth-child(4)::before { content: "Teléfono"; }
+  #tabla tbody tr td:nth-child(5)::before { content: "Mensaje"; }
+  #tabla tbody tr td:nth-child(6)::before { content: "Status"; }
+  #tabla tbody tr td:nth-child(7)::before { content: "Acciones"; }
+
+  /* ====== Celda de ACCIONES (7ª) sin distorsión ====== */
+  #tabla tbody tr td:nth-child(7) {
+    grid-template-columns: 1fr !important;  /* quita etiqueta|valor */
+    text-align: center !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+  #tabla tbody tr td:nth-child(7)::before {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #8ecaff;
+  }
+
+  /* Centrar y evitar “píldoras” gigantes: adapta a lo que haya dentro (a, div, button) */
+  #tabla tbody tr td:nth-child(7) > * {
+    display: inline-flex !important;
+    gap: 10px !important;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  #tabla tbody tr td:nth-child(7) button,
+  #tabla tbody tr td:nth-child(7) a,
+  #tabla tbody tr td:nth-child(7) div {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: auto !important;       /* ← NO 100% */
+    min-width: 44px !important;
+    min-height: 40px !important;
+    margin: 4px 6px !important;
+    padding: 8px 12px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Botones fuera de “Acciones” tampoco se estiran */
+  #tabla td button {
+    width: auto !important;
+    min-height: 40px !important;
+    margin: 6px 0 !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+  }
+
+  /* Teléfonos pequeños */
+  @media (max-width: 600px) {
+    #tabla tbody tr { flex-basis: calc(100vw - 36px) !important; max-width: none !important; }
+    #tabla tbody td { grid-template-columns: 110px 1fr !important; padding: 8px 6px !important; }
+  }
+}
