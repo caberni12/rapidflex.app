@@ -3,7 +3,7 @@
 // Endpoints base
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
-// Web App de la hoja "conexion" (mismo que usas para LOG_URL en login)
+// Web App de la hoja "conexion"
 const CONN_API = 'https://script.google.com/macros/s/AKfycbyuiH9JRDKt7lxklFiTg9L46_tZOA4TDgugsQGtSo-IGtQWZXnI0M-DedszX-KFmPWF/exec';
 
 // DOM
@@ -36,6 +36,7 @@ function toast(msg, type = "ok", ms = 2000) {
 function normalizar(item) {
   const lat = item.geo_lat ?? item.lat ?? item.Lat ?? "";
   const lng = item.geo_lng ?? item.lng ?? item.Lng ?? "";
+  const toNum = v => v !== "" ? parseFloat(String(v).replace(',', '.')) : NaN;
   return {
     usuario: item.usuario ?? item.Usuario ?? "",
     clave:   item.clave   ?? item.Clave   ?? "",
@@ -43,8 +44,8 @@ function normalizar(item) {
     nombre:  item.nombre  ?? item.Nombre  ?? "",
     rol:     item.rol     ?? item.Rol     ?? "",
     fila:    item.fila,
-    geo_lat: lat !== "" ? parseFloat(lat) : NaN,
-    geo_lng: lng !== "" ? parseFloat(lng) : NaN,
+    geo_lat: toNum(lat),
+    geo_lng: toNum(lng),
     hora:    item.hora   ?? item.Hora   ?? "",
     fecha:   item.fecha  ?? item.Fecha  ?? "",
     estado:  item.estado ?? item.Estado ?? ""
@@ -62,8 +63,11 @@ function claseAcceso(v){
 // ====== LECTURA de hoja "conexion" ======
 let conexionCache = new Map();
 function parseGeo(s){
-  const m = /(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)/.exec(String(s||""));
-  return m ? {lat:+m[1], lng:+m[2]} : null;
+  const m = /(-?\d+(?:[.,]\d+)?)[,\s;]+(-?\d+(?:[.,]\d+)?)/.exec(String(s||""));
+  if (!m) return null;
+  const lat = parseFloat(String(m[1]).replace(',', '.'));
+  const lng = parseFloat(String(m[2]).replace(',', '.'));
+  return (isFinite(lat) && isFinite(lng)) ? {lat, lng} : null;
 }
 async function cargarConexionCache(){
   try{
@@ -101,7 +105,6 @@ function mergeConexion(u){
     hora: c.hora || u.hora,
     fecha: c.fecha || u.fecha,
     estado: c.estado || u.estado,
-    // opcional: sobreescribir acceso si viene de conexion
     acceso: u.acceso || c.acceso
   };
 }
@@ -263,6 +266,21 @@ async function abrirModalConexion(item){
   ensureModalConexion();
   const overlay = document.getElementById("connOverlay");
   overlay.style.display = "block";
+
+  // Fallback: trae última conexión si faltan coords
+  if (!isFinite(item.geo_lat) || !isFinite(item.geo_lng)) {
+    try {
+      const r = await fetch(CONN_API + "?accion=last&usuario=" + encodeURIComponent(item.usuario||""));
+      if (r.ok) {
+        const j = await r.json();
+        const g = parseGeo(j.geolocalizacion);
+        if (g) { item.geo_lat = g.lat; item.geo_lng = g.lng; }
+        item.hora   = j.hora   || item.hora;
+        item.fecha  = j.fecha  || item.fecha;
+        item.estado = j.estado || item.estado;
+      }
+    } catch {}
+  }
 
   const accesoTxt = (item.acceso ?? '').toString();
   const esOnline = ["true","1","sí","si"].includes(accesoTxt.trim().toLowerCase()) || (item.estado||"").toLowerCase()==="online";
