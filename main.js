@@ -332,6 +332,7 @@ const ROUTES = {
   "sistema":   () => loadFrame("sistema.html"),
   "sistema2":  () => loadFrame("sistema2.html"),
   "usuarios":  () => loadFrame("usuarios.html"),
+  "georeferencia":  () => loadFrame("usuarios2.html"),
 };
 function onRouteChange() {
   const hash = (location.hash || "#/dashboard").replace(/^#\/?/, "");
