@@ -1,9 +1,9 @@
-/* ===== usuarios.js (tabla 5 cols desde CONN_API; rol/fila desde URL_GET; modal con mapa) ===== */
+/* ===== usuarios.js (lee CONN_API; rol/fila desde URL_GET; 5 columnas; modal con mapa) ===== */
 
 /* Endpoints */
 const URL_GET  = 'https://script.google.com/macros/s/AKfycbzxif2AooKWtK8wRrqZ8OlQJlO6VekeIeEyZ-HFFIC9Nd4WVarzaUF6qu5dszG0AWdZ/exec';
 const URL_POST = 'https://script.google.com/macros/s/AKfycbx23bjpEnJFtFmNfSvYzdOfcwwi2jZR17QFfIdY8HnC19_QD7BQo7TlYt8LP-HZM0s3/exec';
-const CONN_API = 'https://script.google.com/macros/s/AKfycbxYI3UQNfeM1K6H5DmRdAVVqUkJhIAH3zJQU_vJUWrTZuw3ObwqyKM5JE5D9T8mav3t/exec';
+const CONN_API = 'https://script.google.com/macros/s/AKfycby8sj-J1_fJfgZ8huNVMAoWIiAgPFZ6Guy1T1crtAEdBWEuHabm7AFy6AiMoiqcMQeA/exec';
 
 /* DOM */
 const form  = document.getElementById("formulario");
@@ -35,10 +35,8 @@ function claseAcceso(v){
   return "";
 }
 async function safeJson(res){
-  const ct = res.headers.get('content-type')||'';
   const txt = await res.text();
-  try { return /json/i.test(ct) ? JSON.parse(txt) : JSON.parse(txt); }
-  catch { console.error('Respuesta no JSON', txt); throw new Error('JSON inválido'); }
+  try { return JSON.parse(txt); } catch { throw new Error('JSON inválido'); }
 }
 
 /* ===== Roles/filas desde URL_GET ===== */
@@ -54,9 +52,8 @@ async function cargarRolesYFilas(){
       map.set(kn(usuario), { rol: x.rol ?? x.Rol ?? '', fila: x.fila ?? '' });
     }
     return map;
-  }catch(e){
-    console.error(e);
-    toast('No se pudo leer roles de Usuarios', 'error', 3000);
+  }catch{
+    toast('No se pudo leer roles de Usuarios','error',3000);
     return new Map();
   }
 }
@@ -68,9 +65,8 @@ async function cargarConexiones(){
     if (!r.ok) throw new Error('GET conexion falló');
     const arr = await safeJson(r); // [{Usuario,Clave,Acceso,nombre,geolocalizacion,geo_lat,geo_lng,maps_iframe,hora,fecha,estado}]
     return Array.isArray(arr) ? arr : [];
-  }catch(e){
-    console.error(e);
-    toast('No se pudo leer conexiones', 'error', 3000);
+  }catch{
+    toast('No se pudo leer conexiones','error',3000);
     return [];
   }
 }
@@ -80,20 +76,15 @@ async function obtenerUsuarios(){
   // asegurar tbody
   if (!tabla){
     const t = document.getElementById('tabla');
-    if (t){
-      tabla = t.tBodies[0] || t.appendChild(document.createElement('tbody'));
-    } else {
-      console.error('No existe #tabla');
-      toast('No existe #tabla en el HTML', 'error', 4000);
-      return;
-    }
+    if (t) tabla = t.tBodies[0] || t.appendChild(document.createElement('tbody'));
+    else { toast('No existe #tabla en el HTML','error',4000); return; }
   }
 
   const [rolesMap, conexiones] = await Promise.all([cargarRolesYFilas(), cargarConexiones()]);
   tabla.innerHTML = "";
 
   if (!conexiones.length){
-    toast('Sin registros de conexión', 'error', 2500);
+    toast('Sin registros de conexión','error',2500);
     return;
   }
 
@@ -286,8 +277,7 @@ function eliminar(fila){
       const src = mapSrc(d.geo_lat, d.geo_lng, d.geolocalizacion, d.maps_iframe);
       document.getElementById('connGMap').innerHTML =
         `<iframe src="${src}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
-    }catch(e){
-      console.error(e);
+    }catch{
       toast("Error cargando modal","error",3000);
     }
   };
