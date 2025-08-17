@@ -236,7 +236,7 @@ function obtenerUsuarios() {
             <button onclick='editar(${JSON.stringify(item)}, ${item.fila})'>✏️</button>
             <button onclick='eliminar(${item.fila})'>🗑️</button>
           </td>`;
-        tr.addEventListener('dblclick', () => verEnMapa(item)); // ← doble clic abre modal
+        tr.addEventListener('dblclick', () => verEnMapa(item)); // doble clic abre modal
         tabla.appendChild(tr);
       });
 
@@ -282,3 +282,89 @@ function iniciarTiempoReal(){
 // === Inicio ===
 obtenerUsuarios();
 iniciarTiempoReal();
+
+/* === LOG de conexion: URL del Web App nuevo === */
+const LOG_URL = "https://script.google.com/macros/s/AKfycbzPqO60R3SswkiAOhH9sEnGePFg4pUVHOA_OesEfYyY8NusgaRirmHaOa5ZFEWMxS--/exec";
+
+/* Geo rápida con fallback por IP */
+async function getGeo(){
+  const viaIP = async ()=>{ try{
+    const r = await fetch('https://ipapi.co/json/'); if(!r.ok) return null;
+    const j = await r.json(); return {lat:j.latitude, lng:j.longitude};
+  }catch{return null;} };
+  if ('geolocation' in navigator){
+    try{
+      const p = await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{enableHighAccuracy:true,timeout:5000,maximumAge:15000}));
+      return {lat:p.coords.latitude, lng:p.coords.longitude};
+    }catch{}
+  }
+  return await viaIP();
+}
+function fechaHoraCL(){
+  const tz='America/Santiago', now=new Date();
+  return {
+    fecha: new Intl.DateTimeFormat('es-CL',{timeZone:tz}).format(now),
+    hora:  new Intl.DateTimeFormat('es-CL',{timeZone:tz,hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(now)
+  };
+}
+function logConexion(payload){
+  try{
+    const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+    if (!(navigator.sendBeacon && navigator.sendBeacon(LOG_URL, blob))){
+      fetch(LOG_URL,{method:'POST',body:JSON.stringify(payload)});
+    }
+  }catch{}
+}
+
+/* === tras validar OK en tu flujo actual, envía el registro === */
+async function _enviarConexionLogin(usuario, clave, data){
+  const geo = await getGeo();
+  const {fecha, hora} = fechaHoraCL();
+  logConexion({
+    accion: 'login_event',
+    Usuario: usuario,
+    Clave: clave,
+    Acceso: String(data?.acceso ?? 'true'),
+    nombre: String(data?.nombre ?? usuario),
+    rol: String(data?.rol ?? ''),
+    geolocalizacion: geo ? `${geo.lat},${geo.lng}` : '',
+    hora, fecha,
+    estado: 'online'
+  });
+}
+
+/* === opcional: marcar OFFLINE al salir === */
+async function _enviarConexionLogout(usuario, data){
+  const geo = await getGeo();
+  const {fecha, hora} = fechaHoraCL();
+  logConexion({
+    accion: 'login_event',
+    Usuario: usuario || '',
+    Clave: '',
+    Acceso: String(data?.acceso ?? ''),
+    nombre: String(data?.nombre ?? usuario || ''),
+    rol: String(data?.rol ?? ''),
+    geolocalizacion: geo ? `${geo.lat},${geo.lng}` : '',
+    hora, fecha,
+    estado: 'offline'
+  });
+}
+
+// Botón cerrar sesión si existe
+document.getElementById("btnLogout")?.addEventListener("click", async () => {
+  const u = localStorage.getItem("nombreUsuario") || localStorage.getItem("usuario") || "";
+  await _enviarConexionLogout(u, {});
+  localStorage.removeItem("sessionToken");
+  localStorage.removeItem("usuario");
+  localStorage.removeItem("nombreUsuario");
+  location.href = "index.html";
+});
+
+// Al cerrar pestaña
+window.addEventListener("beforeunload", () => {
+  const u = localStorage.getItem("nombreUsuario") || localStorage.getItem("usuario") || "";
+  const {fecha, hora} = fechaHoraCL();
+  const payload = { accion:'login_event', Usuario:u, Clave:'', Acceso:'', nombre:u, rol:'', geolocalizacion:'', hora, fecha, estado:'offline' };
+  const blob = new Blob([JSON.stringify(payload)], {type:'application/json'});
+  navigator.sendBeacon(LOG_URL, blob);
+});
