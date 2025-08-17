@@ -2,7 +2,7 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwsXshOze1AzVq4Q65VVOQBv1oOngYKBvtTTTjSoqjCzN_ew0ckUrjYrVGr0ikFXxAM/exec";
 
 /* ===== Endpoint de REGISTRO (conexion) ===== */
-const LOG_URL = "https://script.google.com/macros/s/AKfycbxYI3UQNfeM1K6H5DmRdAVVqUkJhIAH3zJQU_vJUWrTZuw3ObwqyKM5JE5D9T8mav3t/exec";
+const LOG_URL = "https://script.google.com/macros/s/AKfycbzkd4k733DIjUaPwje-FNqAPrqzSfR4wRqdgNaYSa059tvDc4zV-35h4ZSzC0Pd3QOB/exec";
 
 /* ===== Loader ===== */
 function mostrarLoader(){ const l = document.getElementById("loader"); if (l) l.style.display = "flex"; }
@@ -117,13 +117,14 @@ function validar(){
     if (data.status === "OK") {
       try {
         localStorage.setItem("sessionToken", data.token);
-        localStorage.setItem("nombreUsuario", data?.nombre?.trim() || usuario);
+        localStorage.setItem("nombreUsuario", (data?.nombre?.trim?.() || data?.Nombre?.trim?.() || usuario));
       } catch {}
 
-      // Envía a "conexion": 5 datos que tienes + 4 automáticos
-      const Acceso = String(data?.acceso ?? 'true');
-      const nombre = String(data?.nombre ?? usuario);
-      const rol    = String(data?.rol ?? '');
+      // Normaliza claves de backend: acceso/nombre/rol con posibles mayúsculas
+      const Acceso = String(data?.acceso ?? data?.Acceso ?? 'true');
+      const nombre = String(data?.nombre ?? data?.Nombre ?? usuario);
+      const rol    = String(data?.rol ?? data?.Rol ?? data?.role ?? '');
+
       await enviarConexionOnline(usuario, clave, Acceso, nombre, rol);
 
       _showEnvAlert('success', '✔ Acceso concedido…', 1200);
