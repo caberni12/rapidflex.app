@@ -37,11 +37,9 @@ function parseDateFlex(v){
   if (v==null || v==='') return null;
   if (v instanceof Date) return v;
   if (typeof v === 'number') {
-    // Excel serial days
-    if (v > 25569 && v < 60000) return new Date(Math.round((v - 25569) * 86400 * 1000));
-    // epoch
-    if (v > 1e12) return new Date(v);
-    if (v > 1e9)  return new Date(v * 1000);
+    if (v > 25569 && v < 60000) return new Date(Math.round((v - 25569) * 86400 * 1000)); // Excel
+    if (v > 1e12) return new Date(v);           // ms epoch
+    if (v > 1e9)  return new Date(v * 1000);    // s epoch
   }
   const s = String(v).trim();
   const iso = new Date(s);
@@ -155,6 +153,54 @@ function mergeConexion(u){
   };
 }
 
+/* ===== Reverse geocoding a dirección (OSM/Nominatim) ===== */
+const geoCache = new Map();
+let geoQueue = [];
+let geoTimer = null;
+
+function getLatLngFromItem(item){
+  let { geo_lat:lat, geo_lng:lng } = item;
+  if (!isFinite(lat) || !isFinite(lng)) {
+    const p = parseGeo(item.geolocalizacion);
+    if (p){ lat = p.lat; lng = p.lng; }
+  }
+  return (isFinite(lat) && isFinite(lng)) ? { lat:+lat, lng:+lng } : null;
+}
+function formatAddressFromNominatim(json){
+  const a = json?.address || {};
+  const parts = [
+    [a.road, a.house_number].filter(Boolean).join(' '),
+    a.neighbourhood || a.suburb || a.village || a.town || a.city,
+    a.state,
+    a.country
+  ].filter(Boolean);
+  return parts.join(', ') || json?.display_name || '';
+}
+function enqueueReverseGeocode(lat, lng, cb){
+  const key = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+  if (geoCache.has(key)) { cb(geoCache.get(key)); return; }
+  geoQueue.push({ lat, lng, cb, key });
+  if (!geoTimer) geoTimer = setInterval(processGeoQueue, 1100);
+}
+async function processGeoQueue(){
+  if (geoQueue.length === 0) { clearInterval(geoTimer); geoTimer = null; return; }
+  const { lat, lng, cb, key } = geoQueue.shift();
+  try{
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&zoom=16&addressdetails=1`;
+    const res = await fetch(url, { headers: { 'Accept':'application/json' }});
+    let addr = '';
+    if (res.ok) {
+      const j = await res.json();
+      addr = formatAddressFromNominatim(j);
+    }
+    if (!addr) addr = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    geoCache.set(key, addr);
+    cb(addr);
+  }catch{
+    cb(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+  }
+}
+
 /* Listar + fusionar con "conexion" */
 async function obtenerUsuarios() {
   const [usuarios] = await Promise.all([
@@ -173,12 +219,20 @@ async function obtenerUsuarios() {
       <td>${item.acceso}</td>
       <td>${item.nombre}</td>
       <td>${item.rol}</td>
-      <td>${item.geolocalizacion || ''}</td>
+      <td class="celda-geo">${item.geolocalizacion || ''}</td>
       <td>${item.hora || ''}</td>
       <td>${formatFecha(item.fecha) || ''}</td>
       <td>${item.estado || ''}</td>`;
     tr.addEventListener("dblclick", () => abrirModalConexion(item));
     tabla.appendChild(tr);
+
+    // Direccion legible en la tabla
+    const pos = getLatLngFromItem(item);
+    if (pos) {
+      const celdaGeo = tr.querySelector('.celda-geo');
+      celdaGeo.textContent = 'Buscando dirección…';
+      enqueueReverseGeocode(pos.lat, pos.lng, addr => { celdaGeo.textContent = addr; });
+    }
   });
 
   if (primeraCarga) { toast("Usuarios cargados"); primeraCarga = false; }
@@ -215,7 +269,8 @@ function inyectarEstilosModal(){
   .loc-pin{line-height:0; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));}`;
   const s = document.createElement("style"); s.id = "connModalCSS"; s.textContent = css; document.head.appendChild(s);
 }
-// Posicionar modal respecto al buscador
+
+/* Pegado al buscador y reacomodo */
 function posicionarModalRespectoBuscador(){
   const modal = document.getElementById('connModal');
   if (!modal) return;
@@ -232,7 +287,6 @@ function posicionarModalRespectoBuscador(){
 }
 window.addEventListener('resize', posicionarModalRespectoBuscador);
 document.addEventListener('scroll', posicionarModalRespectoBuscador, true);
-
 
 function ensureModalConexion(){
   if (document.getElementById("connOverlay")) return;
@@ -285,6 +339,7 @@ function cargarLeaflet(){
 async function abrirModalConexion(item){
   ensureModalConexion();
   document.getElementById("connOverlay").style.display = "block";
+  posicionarModalRespectoBuscador(); // ajustar al abrir
 
   const accesoTxt = (item.acceso ?? '').toString();
   const esOnline = ["true","1","sí","si"].includes(accesoTxt.trim().toLowerCase()) || (item.estado||"").toLowerCase()==="online";
@@ -301,6 +356,17 @@ async function abrirModalConexion(item){
   document.getElementById("cHora").textContent    = item.hora || '';
   document.getElementById("cFecha").textContent   = formatFecha(item.fecha) || '';
   document.getElementById("cEstado").textContent  = (item.estado || (esOnline ? 'online' : 'offline'));
+
+  // Dirección legible también en el modal si hay coordenadas
+  (function(){
+    const p = getLatLngFromItem(item);
+    if (p){
+      enqueueReverseGeocode(p.lat, p.lng, addr => {
+        const el = document.getElementById("cGeo");
+        if (el) el.textContent = addr;
+      });
+    }
+  })();
 
   await cargarLeaflet();
   setTimeout(() => {
@@ -348,6 +414,7 @@ async function abrirModalConexion(item){
       modalMap.setView([-33.45, -70.66], 11);
       if (modalMarker) { modalMap.removeLayer(modalMarker); modalMarker = null; }
     }
+    setTimeout(posicionarModalRespectoBuscador, 80); // reajuste tras render
   }, 0);
 }
 
@@ -360,7 +427,7 @@ function cerrarModalConexion(){
 function iniciarTiempoReal(){ if (poller) clearInterval(poller); poller = setInterval(obtenerUsuarios, 10000); }
 obtenerUsuarios(); iniciarTiempoReal();
 
-// === BUSCADOR (usuarios.js) ===
+/* === BUSCADOR (opcional: #buscador o #buscar) === */
 (function(){
   const input = document.getElementById('buscador') || document.getElementById('buscar');
   const cuerpo = (typeof tabla !== 'undefined' && tabla) ? tabla : document.querySelector('#tabla tbody');
@@ -381,11 +448,9 @@ obtenerUsuarios(); iniciarTiempoReal();
     input.addEventListener('input', () => { q = norm(input.value); aplicarFiltro(); });
   }
 
-  // Reaplica al actualizar la tabla (obtenerUsuarios cada 10s)
   const mo = new MutationObserver(aplicarFiltro);
   mo.observe(cuerpo, { childList: true });
 
-  // Compatibilidad con onkeyup="filtrarTabla()"
   window.filtrarTabla = function(){
     if (input){
       q = norm(input.value);
