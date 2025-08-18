@@ -1,7 +1,9 @@
-// permisos.js — control por hoja "Permisos"
+// permisos.js — ocultar/mostrar según permisos
 const GAS_PERMISOS = "https://script.google.com/macros/s/AKfycbzCta6x3pBxBcb7M5U4pNKy3ilLv6dzTqXF0DNqs9XXe8Gn5g_Tvk5JUfu_npBVzZPG/exec";
 
-const norm = s => String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9\-_/ ]/g,"");
+const norm = s => String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+  .toUpperCase().replace(/[^A-Z0-9\-_/ ]/g,"");
+
 const CANON = {
   "GEOLOCALIZACION":"GEO-REFERENCIA","GEO REFERENCIA":"GEO-REFERENCIA",
   "GEOREFERENCIA":"GEO-REFERENCIA","GEOREFERENCIAS":"GEO-REFERENCIA",
@@ -13,35 +15,44 @@ document.addEventListener("DOMContentLoaded", () => {
   initPermisos();
   watchNewControls();
 });
+
 window.refrescarPermisos = initPermisos;
 
 /* ===== núcleo ===== */
-function keyOf(el){ const raw = el.getAttribute("data-control") || ""; return norm(CANON[norm(raw)] || raw); }
+function keyOf(el){
+  const raw = el.getAttribute("data-control") || "";
+  return norm(CANON[norm(raw)] || raw);
+}
 
+/* Oculta por defecto todo menos MENU y el botón */
 function prelock(){
   document.querySelectorAll("[data-control]").forEach(el=>{
     const k = keyOf(el);
-    if (k === "MENU" || el.matches(".menu-btn")) { desbloquear(el); return; }
-    bloquear(el);
+    if (k === "MENU" || el.matches(".menu-btn")) { mostrar(el); return; }
+    ocultar(el);
   });
 }
 
+/* Si aparecen nuevos nodos con data-control, ocultar por defecto salvo MENU */
 function watchNewControls(){
   const obs = new MutationObserver(muts=>{
     for (const m of muts){
       m.addedNodes.forEach(n=>{
         if (n.nodeType !== 1) return;
-        if (n.matches && n.matches(".menu-btn")) { desbloquear(n); return; }
+
+        if (n.matches && n.matches(".menu-btn")) { mostrar(n); return; }
+
         if (n.hasAttribute && n.hasAttribute("data-control")){
           const k = keyOf(n);
-          if (k === "MENU") { desbloquear(n); return; }
-          bloquear(n);
+          if (k === "MENU") { mostrar(n); return; }
+          ocultar(n);
         }
+
         if (n.querySelectorAll){
           n.querySelectorAll("[data-control]").forEach(el=>{
             const k = keyOf(el);
-            if (k === "MENU" || el.matches(".menu-btn")) { desbloquear(el); return; }
-            bloquear(el);
+            if (k === "MENU" || el.matches(".menu-btn")) { mostrar(el); return; }
+            ocultar(el);
           });
         }
       });
@@ -50,6 +61,7 @@ function watchNewControls(){
   obs.observe(document.body, { childList:true, subtree:true });
 }
 
+/* Usuario visible */
 function leerUsuario(){
   const el = document.querySelector("#usuarioNombre");
   const fromData = el ? (el.getAttribute("data-usuario")||"").trim() : "";
@@ -60,6 +72,7 @@ function leerUsuario(){
   return txt;
 }
 
+/* Carga y aplica permisos */
 async function initPermisos(){
   const who = leerUsuario();
   if (!who){ desbloquearMinimo(); return; }
@@ -69,16 +82,20 @@ async function initPermisos(){
     let data = null; try{ data = JSON.parse(raw); }catch{}
     if (!data || !data.ok){ desbloquearMinimo(); return; }
     aplicarPermisos(data.permisos);
-  }catch{ desbloquearMinimo(); }
+  }catch{
+    desbloquearMinimo();
+  }
 }
 
+/* Siempre visibles: MENU y DASHBOARD */
 function desbloquearMinimo(){
   const allow = new Set(["MENU","DASHBOARD"]);
   document.querySelectorAll("[data-control]").forEach(el=>{
-    if (allow.has(keyOf(el))) desbloquear(el);
+    if (allow.has(keyOf(el))) mostrar(el); else ocultar(el);
   });
 }
 
+/* Mostrar si true, ocultar si false; por defecto oculto salvo MENU/DASHBOARD */
 function aplicarPermisos(permisos){
   const p = {};
   Object.keys(permisos||{}).forEach(k=>{
@@ -90,30 +107,30 @@ function aplicarPermisos(permisos){
 
   document.querySelectorAll("[data-control]").forEach(el=>{
     const k = keyOf(el);
-    if (k === "MENU" || el.matches(".menu-btn")) { desbloquear(el); return; }
-    if (p[k]) desbloquear(el); else bloquear(el);
+    if (k === "MENU" || el.matches(".menu-btn")) { mostrar(el); return; }
+    if (p[k]) mostrar(el); else ocultar(el);
   });
 }
 
-/* ===== helpers ===== */
-function bloquear(el){
+/* ===== helpers visuales ===== */
+function ocultar(el){
   if (!el) return;
-  el.classList.add("is-locked");
-  el.setAttribute("aria-disabled","true");
-  el.setAttribute("tabindex","-1");
-  if (el.hasAttribute("href")){
+  // guardar href y quitarlo por seguridad
+  if (el.hasAttribute && el.hasAttribute("href")){
     el.dataset.href = el.getAttribute("href");
     el.removeAttribute("href");
   }
-  el.style.pointerEvents = "none";
-  if (!el.title) el.title = "Sin permiso";
+  el.style.display = "none";
+  el.classList.add("is-locked");
+  el.setAttribute("aria-hidden","true");
 }
-function desbloquear(el){
+
+function mostrar(el){
   if (!el) return;
+  el.style.display = "";
   el.classList.remove("is-locked");
-  el.removeAttribute("aria-disabled");
-  el.removeAttribute("tabindex");
-  if (el.dataset && el.dataset.href && !el.hasAttribute("href")) el.setAttribute("href", el.dataset.href);
-  el.style.pointerEvents = "";
-  if (el.title === "Sin permiso") el.removeAttribute("title");
+  el.removeAttribute("aria-hidden");
+  if (el.dataset && el.dataset.href && !el.hasAttribute("href")) {
+    el.setAttribute("href", el.dataset.href);
+  }
 }
