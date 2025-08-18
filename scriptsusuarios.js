@@ -231,7 +231,7 @@ function ensureModalConexion(){
       <div class="connHead">
         <div class="connTitle">
           <span id="connDot" class="dot offline"></span>
-          <strong id="connTitulo">Conexión</strong>
+          <strong id="connTitulo">conexion</strong>
         </div>
         <button class="connBtn" id="connClose" aria-label="Cerrar">Cerrar</button>
       </div>
@@ -242,7 +242,7 @@ function ensureModalConexion(){
           <div><label>Acceso</label><span id="cAcceso"></span></div>
           <div><label>Nombre</label><span id="cNombre"></span></div>
           <div><label>Rol</label><span id="cRol"></span></div>
-          <div><label>Geolocalización</label><span id="cGeo"></span></div>
+          <div><label>gelocalizacion</label><span id="cGeo"></span></div>
           <div><label>Hora</label><span id="cHora"></span></div>
           <div><label>Fecha</label><span id="cFecha"></span></div>
           <div><label>Estado</label><span id="cEstado"></span></div>
@@ -325,37 +325,3 @@ function cerrarModalConexion(){
 /* Tiempo real */
 function iniciarTiempoReal(){ if (poller) clearInterval(poller); poller = setInterval(obtenerUsuarios, 10000); }
 obtenerUsuarios(); iniciarTiempoReal();
-
-// === BUSCADOR (usuarios.js) ===
-(function(){
-  const input = document.getElementById('buscador') || document.getElementById('buscar');
-  const cuerpo = (typeof tabla !== 'undefined' && tabla) ? tabla : document.querySelector('#tabla tbody');
-  if (!cuerpo) return;
-
-  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  let q = '';
-
-  function aplicarFiltro(){
-    const filas = cuerpo.querySelectorAll('tr');
-    filas.forEach(tr => {
-      if (tr.querySelector('th')) { tr.style.display = ''; return; }
-      tr.style.display = norm(tr.textContent).includes(q) ? '' : 'none';
-    });
-  }
-
-  if (input){
-    input.addEventListener('input', () => { q = norm(input.value); aplicarFiltro(); });
-  }
-
-  // Reaplica al actualizar la tabla (obtenerUsuarios cada 10s)
-  const mo = new MutationObserver(aplicarFiltro);
-  mo.observe(cuerpo, { childList: true });
-
-  // Compatibilidad con onkeyup="filtrarTabla()"
-  window.filtrarTabla = function(){
-    if (input){
-      q = norm(input.value);
-      aplicarFiltro();
-    }
-  };
-})();

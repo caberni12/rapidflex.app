@@ -2,7 +2,7 @@
 const GAS_URL = "https://script.google.com/macros/s/AKfycbwsXshOze1AzVq4Q65VVOQBv1oOngYKBvtTTTjSoqjCzN_ew0ckUrjYrVGr0ikFXxAM/exec";
 
 /* ===== Endpoint de REGISTRO (conexion) ===== */
-const LOG_URL = "https://script.google.com/macros/s/AKfycbzkd4k733DIjUaPwje-FNqAPrqzSfR4wRqdgNaYSa059tvDc4zV-35h4ZSzC0Pd3QOB/exec";
+const LOG_URL = "https://script.google.com/macros/s/AKfycbwcBiEt8Mh80lSW0O7YrG3u_rf8ex6ib70hSNGcypZDxqANegOb-L7HtSnNbE9P8tqR/exec";
 
 /* ===== Loader ===== */
 function mostrarLoader(){ const l = document.getElementById("loader"); if (l) l.style.display = "flex"; }
@@ -118,9 +118,15 @@ function validar(){
       try {
         localStorage.setItem("sessionToken", data.token);
         localStorage.setItem("nombreUsuario", (data?.nombre?.trim?.() || data?.Nombre?.trim?.() || usuario));
+
+        // === PERMISOS: señal para que main.html aplique permisos ===
+        // Se usa por permisos.js para consultar la hoja "Permisos"
+        localStorage.setItem("permUser", (data?.nombre ?? data?.Nombre ?? usuario));
+        localStorage.setItem("permKick", String(Date.now())); // trigger por storage event
+        // ==========================================================
       } catch {}
 
-      // Normaliza claves de backend: acceso/nombre/rol con posibles mayúsculas
+      // Normaliza claves de backend
       const Acceso = String(data?.acceso ?? data?.Acceso ?? 'true');
       const nombre = String(data?.nombre ?? data?.Nombre ?? usuario);
       const rol    = String(data?.rol ?? data?.Rol ?? data?.role ?? '');
