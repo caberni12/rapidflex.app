@@ -81,3 +81,35 @@ thead th, tbody td{
   word-break:break-word;
 }
 
+
+/* === Versión móvil: tabla a ancho de pantalla === */
+@media (max-width:600px){
+  .table-wrap{
+    width:100vw !important;
+    margin-left:calc(50% - 50vw) !important;
+    margin-right:calc(50% - 50vw) !important;
+    border-radius:0;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  table{
+    width:100% !important;
+    min-width:0 !important;
+    table-layout:auto;
+  }
+
+  thead th,
+  tbody td{
+    padding:8px 6px;
+    font-size:13px;
+    white-space:normal;
+    word-break:break-word;
+    text-align:center;
+  }
+
+  /* Toolbar compacta */
+  .toolbar{ gap:6px }
+  input[type="search"]{ min-width:0; flex:1 }
+}
+
