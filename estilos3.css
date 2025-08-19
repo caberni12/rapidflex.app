@@ -19,7 +19,7 @@ button:hover{ background:#0b1220 }
 
 /* Table */
 .table-wrap{ background:#000; border:1px solid #0ea5e9; border-radius:12px; overflow:auto }
-table{ width:100%; border-collapse:collapse; min-width:760px; color:#fff }
+table{ width:auto; border-collapse:collapse; min-width:1000px; color:#fff }
 thead th{ position:sticky; top:0; background:#0ea5e9; color:#fff; text-align:center; padding:10px; font-size:14px }
 tbody td{ border-top:1px solid #0ea5e9; padding:10px; text-align:center; font-size:14px; color:#fff }
 
