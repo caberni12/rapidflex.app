@@ -21,7 +21,7 @@ body, .slider, .slider-content, .menu-btn, .logo-container {
   top: 15px;
   left: 15px;
   font-size: 24px;
-  background-color: #0a0a0a;
+  background-color: #0a8bf5;
   color: white;
   border: none;
   border-radius: 6px;
@@ -42,12 +42,12 @@ body, .slider, .slider-content, .menu-btn, .logo-container {
   left: 0;
   width: 100%;
   max-height: 0;
-  background-color: #333;
-  color: white;
+  background-color: #fff;
+  color: black;
   overflow: hidden;
   transition: max-height 0.3s ease;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 5px rgba(17, 17, 17, 0.904);
 }
 
 .slider.open {
@@ -71,7 +71,8 @@ body, .slider, .slider-content, .menu-btn, .logo-container {
   margin: 0;
   font-size: 22px;
   text-align: center;
-  border-bottom: 1px solid #777;
+  background: #fff;
+  border-bottom: 1px solid #0c0c0c;
   padding-bottom: 10px;
   font-weight: 600;
 }
@@ -91,7 +92,7 @@ body, .slider, .slider-content, .menu-btn, .logo-container {
 }
 
 .slider-buttons::-webkit-scrollbar-thumb {
-  background: #555;
+  background: #0370d6;
   border-radius: 3px;
 }
 
@@ -100,7 +101,7 @@ body, .slider, .slider-content, .menu-btn, .logo-container {
   color: white;
   font-size: 16px;
   padding: 10px 20px;
-  background-color: #0c0c0c;
+  background-color: #0a8bf5;
   border-radius: 6px;
   border: none;
   text-align: center;
