@@ -140,6 +140,7 @@ const ROUTES = {
   "sistema2":  () => loadFrame("sistema2.html"),
   "usuarios":  () => loadFrame("usuarios.html"),
   "usuarios2": () => loadFrame("usuarios2.html"),
+  "gestor_permiso": () => loadFrame("gestor_permisos.html"),
 };
 function onRouteChange(){
   const hash=(location.hash||"#/dashboard").replace(/^#\/?/,"");
