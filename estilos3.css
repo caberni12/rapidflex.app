@@ -61,17 +61,5 @@ input[type="text"]{ width:100%; border:1px solid #d1d5db; border-radius:8px; pad
   .modal-content{ width:96vw; }
   .modal-body{ padding-bottom:100px; }
 }
-/* Tabla con margen fijo de 10 cm respecto al viewport */
-.table-wrap{
-  width: calc(100vw - 20cm);                    /* 10 cm por lado */
-  max-width: none;
-  margin-left: calc(50% - 50vw + 10cm);
-  margin-right: calc(50% - 50vw + 10cm);
-}
 
-/* Haz que la tabla llene el contenedor ampliado */
-table{
-  width: 100%;
-  min-width: 1000px; /* mantienes tu mínimo actual */
-}
 
