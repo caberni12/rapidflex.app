@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestor de Permisos</title>
+  <link rel="stylesheet" href="estilos3.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Gestor de Permisos</h2>
+    <div class="toolbar">
+      <button id="btnNuevo" type="button">➕ Nuevo usuario</button>
+      <input id="buscar" type="search" placeholder="Buscar… (usuario o permiso)" autocomplete="off" />
+      <span id="status"></span>
+    </div>
+
+    <div class="table-wrap">
+      <table id="tablaPermisos">
+        <thead id="theadPermisos"></thead>
+        <tbody id="tbodyPermisos"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal Editar -->
+  <div id="modalEditar" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h3 id="modalTitle">Editar permisos</h3>
+        <button class="close" type="button" id="closeEdit" aria-label="Cerrar">&times;</button>
+      </div>
+      <form id="formEditar" class="modal-body">
+        <label for="usuarioEditar">Usuario</label>
+        <input type="text" id="usuarioEditar" required />
+        <div id="checkboxesPermisos" class="checks"></div>
+        <div class="modal-foot">
+          <button type="submit" id="btnGuardar">Guardar</button>
+          <button type="button" class="btn-sec" id="btnCancelEdit">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Eliminar -->
+  <div id="modalEliminar" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h3>Confirmar eliminación</h3>
+        <button class="close" type="button" id="closeDel" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="textoEliminar"></p>
+      </div>
+      <div class="modal-foot">
+        <button id="btnConfirmDel">Eliminar</button>
+        <button class="btn-sec" id="btnCancelDel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="gestor_permisos.js"></script>
+</body>
+</html>

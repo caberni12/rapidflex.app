@@ -1,0 +1,39 @@
+/* Base */
+:root{ --c1:#0b0f14; --c2:#111827; --c3:#1f2937; --blue:#0ea5e9; --red:#ef4444; --green:#22c55e; }
+*{ box-sizing:border-box }
+body{ margin:0; font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:#f7f9fc; color:#0b0f14 }
+.container{ max-width:1100px; margin:24px auto; padding:0 16px }
+h2{ margin:0 0 12px 0; font-weight:700 }
+#status{ color:#555 }
+
+/* Toolbar */
+.toolbar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0 }
+input[type="search"]{ padding:8px 10px; border:1px solid #d1d5db; border-radius:8px; min-width:260px; outline:none }
+input[type="search"]:focus{ border-color:#0ea5e9; box-shadow:0 0 0 3px rgba(14,165,233,.15) }
+
+/* Buttons */
+button{ background:#111827; border:1px solid #1f2937; color:#fff; border-radius:10px; padding:8px 12px; cursor:pointer }
+button:hover{ background:#0b1220 }
+.btn-sec{ background:#e5e7eb; color:#111827; border-color:#d1d5db }
+.btn-sec:hover{ background:#dbe1e8 }
+
+/* Table */
+.table-wrap{ background:#fff; border:1px solid #e5e7eb; border-radius:12px; overflow:auto }
+table{ width:100%; border-collapse:collapse; min-width:760px }
+thead th{ position:sticky; top:0; background:#0ea5e9; color:#fff; text-align:center; padding:10px; font-size:14px }
+tbody td{ border-top:1px solid #e5e7eb; padding:10px; text-align:center; font-size:14px }
+.badge-true{ background:#dcfce7; color:#166534; padding:4px 8px; border-radius:999px; font-weight:600 }
+.badge-false{ background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:999px; font-weight:600 }
+
+/* Modal */
+.modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:50; align-items:center; justify-content:center; padding:16px }
+.modal-content{ width:min(560px,96vw); background:#fff; border-radius:14px; border:1px solid #e5e7eb; box-shadow:0 10px 30px rgba(0,0,0,.2) }
+.modal-head{ display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #e5e7eb }
+.modal-body{ padding:14px }
+.modal-foot{ display:flex; gap:10px; justify-content:flex-end; padding:12px 14px; border-top:1px solid #e5e7eb }
+.close{ background:transparent; border:0; font-size:22px; color:#374151; cursor:pointer }
+label{ display:block; font-weight:600; margin:8px 0 6px }
+input[type="text"]{ width:100%; border:1px solid #d1d5db; border-radius:8px; padding:8px 10px; font-size:15px }
+.checks{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:8px; margin:10px 0 }
+.checks label{ font-weight:500 }
+.checks input{ margin-right:6px }
