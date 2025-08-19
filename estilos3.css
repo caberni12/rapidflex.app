@@ -35,3 +35,29 @@ input[type="text"]{ width:100%; border:1px solid #d1d5db; border-radius:8px; pad
 .checks{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:8px; margin:10px 0 }
 .checks label{ font-weight:500 }
 .checks input{ margin-right:6px }
+/* ==== FIX solo del modal ==== */
+.modal-content{
+  display:flex;
+  flex-direction:column;
+  max-height:90vh;     /* limita altura del modal */
+}
+
+.modal-body{
+  flex:1;              /* el cuerpo ocupa el espacio y hace scroll */
+  overflow:auto;
+  padding:14px;
+  padding-bottom:88px; /* espacio para que no tape el footer */
+}
+
+.modal-foot{
+  margin-top:auto;     /* queda al fondo del modal */
+  background:#fff;
+  border-top:1px solid #e5e7eb;
+  padding:12px 14px;
+}
+
+/* Ajuste en móvil */
+@media (max-width:600px){
+  .modal-content{ width:96vw; }
+  .modal-body{ padding-bottom:100px; }
+}
