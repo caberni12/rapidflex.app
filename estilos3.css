@@ -62,4 +62,22 @@ input[type="text"]{ width:100%; border:1px solid #d1d5db; border-radius:8px; pad
   .modal-body{ padding-bottom:100px; }
 }
 
+/* === Tabla a ancho de pantalla (full-bleed) === */
+.table-wrap{
+  width:100vw !important;
+  margin-left:calc(50% - 50vw) !important;
+  margin-right:calc(50% - 50vw) !important;
+  overflow-x:auto; /* por si hay muchas columnas */
+}
+
+table{
+  width:100% !important;
+  min-width:0 !important;   /* quita el mínimo de 1000px */
+  table-layout:auto;        /* deja que se ajuste */
+}
+
+thead th, tbody td{
+  white-space:normal;        /* permite salto de línea */
+  word-break:break-word;
+}
 
