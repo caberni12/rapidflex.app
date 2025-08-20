@@ -183,5 +183,5 @@ body, .slider, .slider-content, .menu-btn, .logo-container {
 }
 /* 1401+ → 100% */
 @media (min-width:1401px){
-  html{ zoom:100%; }
+  html{ zoom:90%; }
 }
