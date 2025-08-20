@@ -175,3 +175,13 @@ body, .slider, .slider-content, .menu-btn, .logo-container {
 
 /* MENU BTN POINTER FIX */
 .menu-btn{ pointer-events: auto; z-index: 1002; }
+
+
+/* 1024–1400 px → 90% */
+@media (min-width:1024px) and (max-width:1400px){
+  html{ zoom:90%; }
+}
+/* 1401+ → 100% */
+@media (min-width:1401px){
+  html{ zoom:100%; }
+}
